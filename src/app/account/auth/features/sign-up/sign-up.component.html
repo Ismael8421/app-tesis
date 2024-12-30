@@ -1,1 +1,60 @@
-<p>sign-up works!</p>
+<section>
+    <div>
+        <div>
+            <div>
+                <div>
+                    <h1>
+                        Crea una cuenta
+                    </h1>
+                    <app-google-button (onClick)="submitWithGoogle()" />
+                </div>
+                <form [formGroup]="form" (ngSubmit)="submit()">
+                    <div>
+                        <label for="email">Correo</label>
+                        <input 
+                        type="email"
+                        name="email" 
+                        id="email"  
+                        placeholder="name@company.com" 
+                        formControlName="email"
+                        >
+
+                        <small *ngIf="isRequired('email')">Este campo es requerido</small>
+                        <small *ngIf="hasEmailError()">Correo invalido</small>
+                    </div>
+
+                    <div>
+                        <label for="password">Contraseña</label>
+                        <input 
+                        type="password" 
+                        name="password" 
+                        id="password" 
+                        placeholder="••••••••" 
+                        formControlName="password"
+                        >
+                        
+                        <small *ngIf="isRequired('password')">Este campo es requerido</small>
+                    </div>
+
+                    <div>
+                        <div>
+                            <div>
+                              <input id="remember" aria-describedby="remember" type="checkbox" required="">
+                            </div>
+                            <div class="ml-3 text-sm">
+                              <label for="remember">Recordarme</label>
+                            </div>
+                        </div>
+                        <a href="#">Olvidaste tu contraseña?</a>
+                    </div>
+
+                    <button type="submit">Crear</button>
+                    <p>
+                        Ya tienes una cuenta? <a routerLink="/auth/sign-in">Iniciar sesión</a>
+                    </p>
+
+                </form>
+            </div>
+        </div>
+    </div>
+  </section>

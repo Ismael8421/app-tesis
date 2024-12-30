@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { AuthStateService } from './account/shared/data-access/auth-state.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,11 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'app-tesis';
+  private _authState = inject(AuthStateService);
+  private _router = inject(Router);
+
+  async logOut() {
+    await this._authState.logOut();
+    this._router.navigateByUrl('/auth/sign-in');
+  }
 }

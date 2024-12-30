@@ -16,7 +16,7 @@ export interface FormSignIn{
   standalone: true,
   imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent],
   templateUrl: './sign-in.component.html',
-  styles: ``
+  styleUrl: './sign-in.component.css'
 })
 export default class SignInComponent {
   private _formBuilder = inject(FormBuilder);
@@ -41,20 +41,19 @@ export default class SignInComponent {
 
     try {
       const {email, password} = this.form.value;
-
       if(!email || !password) return;
-
       await this._authServices.signIn({ email, password });
-
-      this._router.navigateByUrl('/tasks');
+      this._router.navigateByUrl('/menu');
+      
     } catch (error) {
+
     }
   }
 
   async submitWithGoogle() {
     try {
       await this._authServices.signInWithGoogle();
-      this._router.navigateByUrl('/tasks');
+      this._router.navigateByUrl('/menu');
     } catch (error) {
     }
   }

@@ -5,6 +5,7 @@ import { Component, output } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './google-button.component.html',
+  styleUrl: './google-button.component.css'
 })
 export class GoogleButtonComponent {
   onClick = output<void>();

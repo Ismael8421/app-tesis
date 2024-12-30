@@ -16,6 +16,7 @@ interface FormSignUp{
   standalone: true,
   imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent],
   templateUrl: './sign-up.component.html',
+  styleUrl: './sign-up.component.css'
 })
 export default class SignUpComponent {
   private _formBuilder = inject(FormBuilder);
@@ -35,6 +36,19 @@ export default class SignUpComponent {
     password: this._formBuilder.control('', Validators.required),
   });
 
+  // Variable para controlar la visibilidad de la contraseña
+  passwordVisible = false;
+
+  // Función para alternar la visibilidad de la contraseña
+  togglePasswordVisibility() {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  // Obtener el tipo de input para la contraseña
+  get passwordInputType(): string {
+    return this.passwordVisible ? 'text' : 'password';
+  }
+
   async submit() {
     if(this.form.invalid) return;
 
@@ -45,7 +59,7 @@ export default class SignUpComponent {
 
       await this._authServices.signUp({ email, password });
 
-      this._router.navigateByUrl('/tasks');
+      this._router.navigateByUrl('/menu');
     } catch (error) {
     }
   }
@@ -53,7 +67,7 @@ export default class SignUpComponent {
   async submitWithGoogle() {
     try {
       await this._authServices.signInWithGoogle();
-      this._router.navigateByUrl('/tasks');
+      this._router.navigateByUrl('/menu');
     } catch (error) {
     }
   }

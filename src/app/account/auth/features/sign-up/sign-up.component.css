@@ -1,0 +1,162 @@
+/* Fondo de la sección */
+section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #8A90A8, #F5F0B0);
+    font-family: 'Arial', sans-serif;
+}
+
+/* Contenedor principal */
+section > div {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Títulos */
+h1 {
+    font-size: 24px;
+    color: #8A90A8;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Formularios */
+form div {
+    margin-bottom: 15px;
+}
+
+/* Labels */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #8A90A8;
+}
+
+/* Inputs */
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #9F72A8;
+    border-radius: 8px;
+    background-color: #F5F0B0;
+    color: #555555;
+    transition: border-color 0.3s;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #DE6EF5;
+    outline: none;
+    background-color: #FFF9D9;
+}
+
+/* Contenedor de la contraseña y el botón */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px; /* Separación para que no se junte con el label */
+}
+
+.password-container input {
+    padding-right: 40px; /* Espacio para el botón */
+}
+
+/* Aseguramos que el label esté en su propia línea */
+.password-container label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Estilos del botón (ojo) */
+.password-container button {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #007BFF;
+    transition: color 0.3s;
+    padding: 0;
+}
+
+.password-container button:hover {
+    color: #0056b3;
+}
+
+/* Checkbox */
+#remember {
+    margin-right: 10px;
+}
+
+label[for="remember"] {
+    font-size: 14px;
+    color: #8A90A8;
+}
+
+/* Botón */
+button[type="submit"] {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #859CF5;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #9F72A8;
+}
+
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* Enlaces */
+a {
+    color: #DE6EF5;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #9F72A8;
+}
+
+/* Párrafos */
+p {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+    color: #8A90A8;
+}
+
+/* Efecto de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

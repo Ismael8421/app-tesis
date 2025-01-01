@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { hasEmailError, isRequired } from '../utils/validators';
 import { NgIf } from '@angular/common';
 import { GoogleButtonComponent } from '../../ui/google-button/google-button.component';
+import { EyeButtonComponent } from '../../ui/eye-button/eye-button.component';
 
 export interface FormSignIn{
   email: FormControl<string | null>;
@@ -14,7 +15,7 @@ export interface FormSignIn{
 @Component({
   selector: 'app-sign-in',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent],
+  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.css'
 })
@@ -35,6 +36,19 @@ export default class SignInComponent {
     email: this._formBuilder.control('', [Validators.required, Validators.email]),
     password: this._formBuilder.control('', Validators.required),
   });
+
+  // Variable para controlar la visibilidad de la contraseña
+  passwordVisible = false;
+
+  // Función para alternar la visibilidad de la contraseña
+  togglePasswordVisibility() {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  // Obtener el tipo de input para la contraseña
+  get passwordInputType(): string {
+    return this.passwordVisible ? 'text' : 'password';
+  }
 
   async submit() {
     if(this.form.invalid) return;

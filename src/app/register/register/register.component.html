@@ -1,0 +1,19 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <div>
+      <label for="user-name">Nombre:</label>
+      <input
+        type="text"
+        name="user-name"
+        id="user-name"
+        formControlName="nameUser"
+      />
+      <div *ngIf="usrName.invalid && usrName.touched">
+        <small>El nombre es obligatorio.</small>
+      </div>
+    </div>
+  
+    <div>
+      <button type="submit" [disabled]="form.invalid">Registrarse</button>
+    </div>
+  </form>
+  

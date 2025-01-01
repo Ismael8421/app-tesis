@@ -5,6 +5,7 @@ import { NgIf } from '@angular/common';
 import { AuthService } from '../../data-access/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { GoogleButtonComponent } from '../../ui/google-button/google-button.component';
+import { EyeButtonComponent } from '../../ui/eye-button/eye-button.component';
 
 interface FormSignUp{
   email: FormControl<string | null>;
@@ -14,7 +15,7 @@ interface FormSignUp{
 @Component({
   selector: 'app-sign-up',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent],
+  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.css'
 })
@@ -59,7 +60,7 @@ export default class SignUpComponent {
 
       await this._authServices.signUp({ email, password });
 
-      this._router.navigateByUrl('/menu');
+      this._router.navigateByUrl('/register');
     } catch (error) {
     }
   }
@@ -67,7 +68,7 @@ export default class SignUpComponent {
   async submitWithGoogle() {
     try {
       await this._authServices.signInWithGoogle();
-      this._router.navigateByUrl('/menu');
+      this._router.navigateByUrl('/register');
     } catch (error) {
     }
   }

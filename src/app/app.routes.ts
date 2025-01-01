@@ -14,6 +14,11 @@ export const routes: Routes = [
         loadChildren: () => import('./menu/features/menu.routes'),
     },
     {
+        canActivateChild: [privateGuard()],
+        path: 'register',
+        loadChildren: () => import('./register/register.routes'),
+    },
+    {
         path: '**',
         redirectTo: '/auth/sign-in',
     },

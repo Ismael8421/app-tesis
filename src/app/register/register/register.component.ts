@@ -1,25 +1,25 @@
-import { NgIf } from '@angular/common';
+import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegisterService, userCreate } from '../data-access/register.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf],
+  imports: [ReactiveFormsModule, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, FormsModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
   private _userCreate = inject(RegisterService);
-  form: FormGroup;
-  usrName: FormControl;
+  form: FormGroup;//nombre del formulario y los valores se crean directo en el constructor
 
   constructor() {
-    this.usrName = new FormControl('', Validators.required);
-
     this.form = new FormGroup({
-      nameUser: this.usrName,
+      nameUser: new FormControl('', Validators.required),
+      secNameUser: new FormControl('', Validators.required),
+      courseUser: new FormControl('', Validators.required),
+      professionUser: new FormControl('', Validators.required)
     });
   }
 
@@ -27,15 +27,19 @@ export class RegisterComponent {
     if (this.form.invalid) return;
 
     try {
-      const { nameUser } = this.form.value;
+      const { nameUser, secNameUser, courseUser, professionUser } = this.form.value;
+      
       const user: userCreate = {
         nombre: nameUser || '',
+        apellido: secNameUser || '',
+        curso: courseUser || '',
+        carrera: professionUser || ''
       };
 
       await this._userCreate.create(user);
       console.log('Usuario registrado con éxito');
     } catch (error) {
-      console.error('Error al crear el usuario:', error);
+      console.error('Error al crear el usuario:');
     }
   }
 }

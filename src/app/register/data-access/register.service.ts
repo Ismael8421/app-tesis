@@ -1,9 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, addDoc } from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth'; // Importar el servicio de autenticación
+
 
 export interface user {
   id: string;
   nombre: string;
+  apellido: string;
+  curso: string;
+  carrera: string;
 }
 
 export type userCreate = Omit<user, 'id'>;
@@ -18,7 +23,7 @@ export class RegisterService {
 
   private _collection = collection(this._firestore, PATH);
 
-  create(user: userCreate) {
-    return addDoc(this._collection, user);
+  create(User: userCreate) {
+    return addDoc(this._collection, User);
   }
 }

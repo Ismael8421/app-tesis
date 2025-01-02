@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Auth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from '@angular/fire/auth';
+import { Auth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, User as FirebaseUser } from '@angular/fire/auth';
 
 export interface User {
   email: string;
@@ -11,7 +11,12 @@ export interface User {
 })
 export class AuthService {
 
-  private _auth = inject(Auth)
+  private _auth = inject(Auth);
+
+  // Método público para obtener el usuario autenticado
+  get currentUser(): FirebaseUser | null {
+    return this._auth.currentUser;
+  }
 
   signUp(user: User) {
     return createUserWithEmailAndPassword(
@@ -31,9 +36,6 @@ export class AuthService {
 
   signInWithGoogle() {
     const provider = new GoogleAuthProvider();
-
-    //provider.setCustomParameters({ prompt: 'select_account' });
-
     return signInWithPopup(this._auth, provider);
   }
 }

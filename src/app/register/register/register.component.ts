@@ -1,5 +1,5 @@
 import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegisterService, userCreate } from '../data-access/register.service';
 import { AuthService } from '../../account/auth/data-access/auth.service';
@@ -15,6 +15,8 @@ export class RegisterComponent {
   private _userCreate = inject(RegisterService);
   private _authService = inject(AuthService);
   
+  loading = signal(false);
+
   form: FormGroup;
 
   constructor() {
@@ -31,6 +33,8 @@ export class RegisterComponent {
     if (this.form.invalid) return;
 
     try {
+      this.loading.set(true);
+
       const user = this._authService.currentUser; // Obtiene el usuario autenticado
 
       if (!user || !user.uid) {
@@ -55,6 +59,8 @@ export class RegisterComponent {
       console.log('Usuario registrado con éxito en Firestore.');
     } catch (error) {
       console.error('Error al crear el documento:', error);
+    } finally{
+      this.loading.set(false);
     }
   }
 }

@@ -83,8 +83,96 @@
     </div>
   </div>
 
+  <label>Para mejorar la experiencia al momento de recomendarte a otros usuarios, completa esta encuesta con tus preferencias de como eres y que tipo de personas buscas</label><br>
+  <small>Del 1 al 5, califica cómo te consideras y qué nivel buscas en las siguientes características</small>
+  <table>
+    <tr>
+      <th>Tu nivel</th>
+      <th>Nivel Buscado</th>
+    </tr>
+    <th>Compromiso</th>
+    <tr>
+      <td><!--Auto-->
+        <input
+        type="number"
+        name="compromiso_nivel"
+        min="1"
+        max="5"
+        >
+      </td>
+      <td><!--Buscado-->
+        <input
+        type="number"
+        name="compromiso_buscado"
+        min="1"
+        max="5"
+        >
+      </td>
+    </tr>
+    <th>Comunicaci&oacute;n</th>
+    <tr>
+      <td><!--Auto-->
+        <input
+        type="number"
+        name="comunicacion_nivel"
+        min="1"
+        max="5"
+        >
+      </td>
+      <td><!--Buscado-->
+        <input type="number" name="comunicacion_buscado" min="1" max="5" />
+      </td>
+    </tr>
+    <th>Conocimientos t&eacute;cnicos</th>
+    <tr>
+      <td><!--Auto-->
+        <input
+        type="number"
+        name="conocimientos_tecnicos_nivel"
+        min="1" max="5"
+        >
+      </td>
+      <td><!--Buscado-->
+        <input
+        type="number"
+        name="conocimientos_tecnicos_buscado"
+        min="1"
+        max="5"
+        >
+      </td>
+    </tr>
+    <th>Creatividad</th>
+    <tr>
+      <td><!--Auto-->
+        <input type="number" name="creatividad_nivel" min="1" max="5" />
+      </td>
+      <td><!--Buscado-->
+        <input type="number" name="creatividad_buscado" min="1" max="5" />
+      </td>
+    </tr>
+    <th>Liderazgo</th>
+    <tr>
+      <td><!--Auto-->
+        <input type="number" name="liderazgo_nivel" min="1" max="5" />
+      </td>
+      <td><!--Buscado-->
+        <input type="number" name="liderazgo_buscado" min="1" max="5" />
+      </td>
+    </tr>
+    <th>Tiempo</th>
+    <tr>
+      <td><!--Auto-->
+        <input type="number" name="tiempo_nivel" min="1" max="5" />
+      </td>
+      <td><!--Buscado-->
+        <input type="number" name="tiempo_buscado" min="1" max="5" />
+      </td>
+    </tr>
+  </table>
+  
+
   <div>
-    <button type="submit" [disabled]="form.invalid">Registrarse</button>
+    <button type="submit" [disabled]="loading()">{{loading() ? 'Cargando...' : 'Registrar'}}</button>
   </div>
 </form>
   

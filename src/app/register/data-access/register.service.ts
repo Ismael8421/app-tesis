@@ -3,8 +3,8 @@ import { Firestore, collection, addDoc, setDoc, doc } from '@angular/fire/firest
 import { Auth } from '@angular/fire/auth';
 
 export interface preference {
-  auto: string;
-  buscado: string;
+  auto: number;
+  buscado: number;
 }
 
 export interface userCreate {

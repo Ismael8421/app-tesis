@@ -1,5 +1,8 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
-  <div>
+  <!-- Página 1: Nombre de usuario, Nombre, Apellido, Año lectivo -->
+
+  <div *ngIf="currentPage === 1">
+    <div>
     <label for="userName">Nombre de usuario:</label>
     <input
       type="text"
@@ -50,8 +53,12 @@
       <option value="tercero">Tercero</option>
     </select>
   </div>
-  
-  <div>
+
+  </div>
+
+  <!-- Página 2: Carrera -->
+  <div *ngIf="currentPage === 2">
+    <div>
     <label for="user-profession">Carrera:</label>
     <select
       id="user-profession"
@@ -82,39 +89,37 @@
       <p *ngSwitchDefault>Por favor, selecciona una opción válida.</p>
     </div>
   </div>
+  </div>
 
-  <label>Para mejorar la experiencia al momento de recomendarte a otros usuarios, completa esta encuesta con tus preferencias de como eres y que tipo de personas buscas</label><br>
-  <small>Del 1 al 5, califica cómo te consideras y qué nivel buscas en las siguientes características</small><br>
-  
-  <!--Compromiso-->
-
+  <!-- Página 3: Compromiso y Comunicación -->
   <div formGroupName="preference">
     <!-- Compromiso -->
-    <div formGroupName="commitment">Compromiso<br>
-      <label for="sliderAutoCommitment">Autoevaluación:</label>
-      <input
-        type="range"
-        id="sliderAutoCommitment"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="auto"
-      >
-      <span>{{ form.get('preference.commitment.auto')?.value }}</span><br>
-  
-      <label for="sliderBuscadoCommitment">Valor buscado:</label>
-      <input
-        type="range"
-        id="sliderBuscadoCommitment"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="buscado"
-      >
-      <span>{{ form.get('preference.commitment.buscado')?.value }}</span>
-    </div>
-  
-    <!-- Comunicación -->
+    <div *ngIf="currentPage === 3">
+      <div formGroupName="commitment">Compromiso<br>
+        <label for="sliderAutoCommitment">Autoevaluación:</label>
+        <input
+          type="range"
+          id="sliderAutoCommitment"
+          min="1"
+          max="5"
+          step="1"
+          formControlName="auto"
+        >
+        <span>{{ form.get('preference.commitment.auto')?.value }}</span><br>
+    
+        <label for="sliderBuscadoCommitment">Valor buscado:</label>
+        <input
+          type="range"
+          id="sliderBuscadoCommitment"
+          min="1"
+          max="5"
+          step="1"
+          formControlName="buscado"
+        >
+        <span>{{ form.get('preference.commitment.buscado')?.value }}</span>
+      </div>
+
+      <!-- Comunicación -->
     <div formGroupName="communication">Comunicación<br>
       <label for="sliderAutoCommunication">Autoevaluación:</label>
       <input
@@ -138,8 +143,11 @@
       >
       <span>{{ form.get('preference.communication.buscado')?.value }}</span>
     </div>
+    </div>
   
-    <!-- Conocimientos Técnicos -->
+    <!-- Página 4: Conocimientos Técnicos y Creatividad -->
+    <div *ngIf="currentPage === 4">
+      <!-- Conocimientos Técnicos -->
     <div formGroupName="knowledge">Conocimientos Técnicos<br>
       <label for="sliderAutoKnowledge">Autoevaluación:</label>
       <input
@@ -163,7 +171,7 @@
       >
       <span>{{ form.get('preference.knowledge.buscado')?.value }}</span>
     </div>
-  
+
     <!-- Creatividad -->
     <div formGroupName="creativity">Creatividad<br>
       <label for="sliderAutoCreativity">Autoevaluación:</label>
@@ -188,8 +196,11 @@
       >
       <span>{{ form.get('preference.creativity.buscado')?.value }}</span>
     </div>
+    </div>
   
-    <!-- Liderazgo -->
+    <!-- Página 5: Liderazgo y Tiempo -->
+    <div *ngIf="currentPage === 5">
+      <!-- Liderazgo -->
     <div formGroupName="leadership">Liderazgo<br>
       <label for="sliderAutoLeadership">Autoevaluación:</label>
       <input
@@ -213,7 +224,7 @@
       >
       <span>{{ form.get('preference.leadership.buscado')?.value }}</span>
     </div>
-  
+
     <!-- Gestión del Tiempo -->
     <div formGroupName="time">Gestión del Tiempo<br>
       <label for="sliderAutoTime">Autoevaluación:</label>
@@ -238,14 +249,12 @@
       >
       <span>{{ form.get('preference.time.buscado')?.value }}</span>
     </div>
+    </div>
   </div>
-  
-  
-  
-  
 
-  <div>
-    <button type="submit" [disabled]="loading()">{{loading() ? 'Cargando...' : 'Registrar'}}</button>
-  </div>
+  <!-- Botones de navegación -->
+  <button type="button" (click)="prevPage()" [disabled]="currentPage === 1">Atrás</button>
+  <button type="button" (click)="nextPage()" [disabled]="currentPage === 5">Siguiente</button>
+
+  <button type="submit" [disabled]="loading() || form.invalid">{{loading() ? 'Cargando...' : 'Registrar'}}</button>
 </form>
-  

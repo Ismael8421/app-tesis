@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegisterService, userCreate } from '../data-access/register.service';
 import { AuthService } from '../../account/auth/data-access/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -14,10 +15,12 @@ import { AuthService } from '../../account/auth/data-access/auth.service';
 export class RegisterComponent {
   private _userCreate = inject(RegisterService);
   private _authService = inject(AuthService);
+  private _router = inject(Router);
   
   loading = signal(false);
 
   form: FormGroup;
+  currentPage: number = 1; // Página actual del formulario
 
   constructor() {
     this.form = new FormGroup({
@@ -35,48 +38,60 @@ export class RegisterComponent {
           auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
           buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
         }),
-      
+
         knowledge: new FormGroup({
           auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
           buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
         }),
-      
+
         creativity: new FormGroup({
           auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
           buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
         }),
-      
+
         leadership: new FormGroup({
           auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
           buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
         }),
-      
+
         time: new FormGroup({
           auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
           buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
         })
       })
-      
+
     });
   }
 
+  nextPage() {
+    if (this.currentPage < 5) {
+      this.currentPage++;
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
   async submit() {
-    if (this.form.invalid) return;
-  
+    if (this.form.invalid) return
+
     try {
       this.loading.set(true);
-  
+
       const user = this._authService.currentUser;
-  
+
       if (!user || !user.uid) {
         console.error('No se encontró un usuario autenticado.');
         return;
       }
-  
+
       const uid = user.uid;
-  
+
       const { username, name, lastName, course, profession } = this.form.value;
-  
+
       const userData: userCreate = {
         nombreUsuario: username || '',
         nombre: name || '',
@@ -85,12 +100,12 @@ export class RegisterComponent {
         carrera: profession || '',
         preferencias: {
           compromiso: {
-            auto: this.form.get('preference.commiitment.auto')?.value || 0,
-            buscado: this.form.get('preference.commiitment.buscado')?.value || 0
+            auto: this.form.get('preference.commitment.auto')?.value || 0,
+            buscado: this.form.get('preference.commitment.buscado')?.value || 0
           },
           comunicacion: {
-            auto: this.form.get('preference.comumunication.auto')?.value || 0,
-            buscado: this.form.get('preference.comumunication.buscado')?.value || 0
+            auto: this.form.get('preference.communication.auto')?.value || 0,
+            buscado: this.form.get('preference.communication.buscado')?.value || 0
           },
           conocimientos_tecnicos: {
             auto: this.form.get('preference.knowledge.auto')?.value || 0,
@@ -110,15 +125,16 @@ export class RegisterComponent {
           }
         }
       };
-  
+
       await this._userCreate.create(uid, userData);
       console.log('Usuario registrado con éxito en Firestore.');
-      console.log(this.form.value);
+      this._router.navigateByUrl('/menu');
+
     } catch (error) {
       console.error('Error al crear el documento:', error);
     } finally {
       this.loading.set(false);
     }
   }
-  
+
 }

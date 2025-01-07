@@ -5,9 +5,9 @@
       type="text"
       name="userName"
       id="userName"
-      formControlName="nameUserU"
+      formControlName="username"
       >
-      <div *ngIf="form.controls['nameUserU'].invalid && form.controls['nameUserU'].touched">
+      <div *ngIf="form.controls['username'].invalid && form.controls['username'].touched">
         <small>Este campo es obligatorio</small>
       </div>
   </div>
@@ -18,9 +18,9 @@
       type="text"
       name="user-name"
       id="user-name"
-      formControlName="nameUser"
+      formControlName="name"
     >
-    <div *ngIf="form.controls['nameUser'].invalid && form.controls['nameUser'].touched">
+    <div *ngIf="form.controls['name'].invalid && form.controls['name'].touched">
       <small>Este campo es obligatorio</small>
     </div>
   </div>
@@ -31,9 +31,9 @@
       type="text"
       name="user-secName"
       id="user-secName"
-      formControlName="secNameUser"
+      formControlName="lastName"
     >
-    <div *ngIf="form.controls['secNameUser'].invalid && form.controls['secNameUser'].touched">
+    <div *ngIf="form.controls['lastName'].invalid && form.controls['lastName'].touched">
       <small>Este campo es obligatorio</small>
     </div>
   </div>
@@ -42,7 +42,7 @@
     <label for="user-course">Año lectivo:</label>
     <select
       id="user-course"
-      formControlName="courseUser"
+      formControlName="course"
     >
       <option value="" disabled selected>Elige una opción</option>
       <option value="primero">Primero</option>
@@ -55,7 +55,7 @@
     <label for="user-profession">Carrera:</label>
     <select
       id="user-profession"
-      formControlName="professionUser"
+      formControlName="profession"
     >
       <option value="" disabled selected>Elige una opción</option>
       <option value="IEME">IEME</option>
@@ -66,7 +66,7 @@
       <option value="Ciencias">Ciencias</option>
     </select>
   
-    <div [ngSwitch]="form.controls['professionUser'].value">
+    <div [ngSwitch]="form.controls['profession'].value">
       <p *ngSwitchCase="'IEME'">Estás en la carrera de Instalaciones Eléctricas y Mantenimiento Electrónico (IEME).</p>
 
       <p *ngSwitchCase="'MCM'">Estás en la carrera de Mecanizado y Construcción de Piezas Metálicas (MCM).</p>
@@ -84,120 +84,164 @@
   </div>
 
   <label>Para mejorar la experiencia al momento de recomendarte a otros usuarios, completa esta encuesta con tus preferencias de como eres y que tipo de personas buscas</label><br>
-  <small>Del 1 al 5, califica cómo te consideras y qué nivel buscas en las siguientes características</small>
-  <table>
-    <tr>
-      <th>Tu nivel</th>
-      <th>Nivel Buscado</th>
-    </tr>
-    <th>Compromiso</th>
-    <tr>
-      <td><!--Auto-->
-        <input
-        type="number"
-        name="compromiso_nivel"
+  <small>Del 1 al 5, califica cómo te consideras y qué nivel buscas en las siguientes características</small><br>
+  
+  <!--Compromiso-->
+
+  <div formGroupName="preference">
+    <!-- Compromiso -->
+    <div formGroupName="commitment">Compromiso<br>
+      <label for="sliderAutoCommitment">Autoevaluación:</label>
+      <input
+        type="range"
+        id="sliderAutoCommitment"
         min="1"
         max="5"
-        >
-      </td>
-      <td><!--Buscado-->
-        <input
-        type="number"
-        name="compromiso_buscado"
+        step="1"
+        formControlName="auto"
+      >
+      <span>{{ form.get('preference.commitment.auto')?.value }}</span><br>
+  
+      <label for="sliderBuscadoCommitment">Valor buscado:</label>
+      <input
+        type="range"
+        id="sliderBuscadoCommitment"
         min="1"
         max="5"
-        >
-      </td>
-    </tr>
-    <th>Comunicaci&oacute;n</th>
-    <tr>
-      <td><!--Auto-->
-        <input
-        type="number"
-        name="comunicacion_nivel"
+        step="1"
+        formControlName="buscado"
+      >
+      <span>{{ form.get('preference.commitment.buscado')?.value }}</span>
+    </div>
+  
+    <!-- Comunicación -->
+    <div formGroupName="communication">Comunicación<br>
+      <label for="sliderAutoCommunication">Autoevaluación:</label>
+      <input
+        type="range"
+        id="sliderAutoCommunication"
         min="1"
         max="5"
-        >
-      </td>
-      <td><!--Buscado-->
-        <input type="number" name="comunicacion_buscado" min="1" max="5" />
-      </td>
-    </tr>
-    <th>Conocimientos t&eacute;cnicos</th>
-    <tr>
-      <td><!--Auto-->
-        <input
-        type="number"
-        name="conocimientos_tecnicos_nivel"
-        min="1" max="5"
-        >
-      </td>
-      <td><!--Buscado-->
-        <input
-        type="number"
-        name="conocimientos_tecnicos_buscado"
+        step="1"
+        formControlName="auto"
+      >
+      <span>{{ form.get('preference.communication.auto')?.value }}</span><br>
+  
+      <label for="sliderBuscadoCommunication">Valor buscado:</label>
+      <input
+        type="range"
+        id="sliderBuscadoCommunication"
         min="1"
         max="5"
-        >
-      </td>
-    </tr>
-    <th>Creatividad</th>
-    <tr>
-      <td><!--Auto-->
-        <input type="number"
-        name="creatividad_nivel"
+        step="1"
+        formControlName="buscado"
+      >
+      <span>{{ form.get('preference.communication.buscado')?.value }}</span>
+    </div>
+  
+    <!-- Conocimientos Técnicos -->
+    <div formGroupName="knowledge">Conocimientos Técnicos<br>
+      <label for="sliderAutoKnowledge">Autoevaluación:</label>
+      <input
+        type="range"
+        id="sliderAutoKnowledge"
         min="1"
         max="5"
-        >
-      </td>
-      <td><!--Buscado-->
-        <input
-        type="number"
-        name="creatividad_buscado"
+        step="1"
+        formControlName="auto"
+      >
+      <span>{{ form.get('preference.knowledge.auto')?.value }}</span><br>
+  
+      <label for="sliderBuscadoKnowledge">Valor buscado:</label>
+      <input
+        type="range"
+        id="sliderBuscadoKnowledge"
         min="1"
         max="5"
-        >
-      </td>
-    </tr>
-    <th>Liderazgo</th>
-    <tr>
-      <td><!--Auto-->
-        <input
-        type="number"
-        name="liderazgo_nivel"
+        step="1"
+        formControlName="buscado"
+      >
+      <span>{{ form.get('preference.knowledge.buscado')?.value }}</span>
+    </div>
+  
+    <!-- Creatividad -->
+    <div formGroupName="creativity">Creatividad<br>
+      <label for="sliderAutoCreativity">Autoevaluación:</label>
+      <input
+        type="range"
+        id="sliderAutoCreativity"
         min="1"
         max="5"
-        >
-      </td>
-      <td><!--Buscado-->
-        <input
-        type="number"
-        name="liderazgo_buscado"
+        step="1"
+        formControlName="auto"
+      >
+      <span>{{ form.get('preference.creativity.auto')?.value }}</span><br>
+  
+      <label for="sliderBuscadoCreativity">Valor buscado:</label>
+      <input
+        type="range"
+        id="sliderBuscadoCreativity"
         min="1"
         max="5"
-        >
-      </td>
-    </tr>
-    <th>Tiempo</th>
-    <tr>
-      <td><!--Auto-->
-        <input
-        type="number"
-        name="tiempo_nivel"
-        min="1"
-        max="5" 
-        >
-      </td>
-      <td><!--Buscado-->
-        <input
-        type="number"
-        name="tiempo_buscado"
+        step="1"
+        formControlName="buscado"
+      >
+      <span>{{ form.get('preference.creativity.buscado')?.value }}</span>
+    </div>
+  
+    <!-- Liderazgo -->
+    <div formGroupName="leadership">Liderazgo<br>
+      <label for="sliderAutoLeadership">Autoevaluación:</label>
+      <input
+        type="range"
+        id="sliderAutoLeadership"
         min="1"
         max="5"
-        >
-      </td>
-    </tr>
-  </table>
+        step="1"
+        formControlName="auto"
+      >
+      <span>{{ form.get('preference.leadership.auto')?.value }}</span><br>
+  
+      <label for="sliderBuscadoLeadership">Valor buscado:</label>
+      <input
+        type="range"
+        id="sliderBuscadoLeadership"
+        min="1"
+        max="5"
+        step="1"
+        formControlName="buscado"
+      >
+      <span>{{ form.get('preference.leadership.buscado')?.value }}</span>
+    </div>
+  
+    <!-- Gestión del Tiempo -->
+    <div formGroupName="time">Gestión del Tiempo<br>
+      <label for="sliderAutoTime">Autoevaluación:</label>
+      <input
+        type="range"
+        id="sliderAutoTime"
+        min="1"
+        max="5"
+        step="1"
+        formControlName="auto"
+      >
+      <span>{{ form.get('preference.time.auto')?.value }}</span><br>
+  
+      <label for="sliderBuscadoTime">Valor buscado:</label>
+      <input
+        type="range"
+        id="sliderBuscadoTime"
+        min="1"
+        max="5"
+        step="1"
+        formControlName="buscado"
+      >
+      <span>{{ form.get('preference.time.buscado')?.value }}</span>
+    </div>
+  </div>
+  
+  
+  
   
 
   <div>

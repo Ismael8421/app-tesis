@@ -21,46 +21,104 @@ export class RegisterComponent {
 
   constructor() {
     this.form = new FormGroup({
-      nameUserU: new FormControl('', Validators.required),
-      nameUser: new FormControl('', Validators.required),
-      secNameUser: new FormControl('', Validators.required),
-      courseUser: new FormControl('', Validators.required),
-      professionUser: new FormControl('', Validators.required)
+      username: new FormControl('', Validators.required),
+      name: new FormControl('', Validators.required),
+      lastName: new FormControl('', Validators.required),
+      course: new FormControl('', Validators.required),
+      profession: new FormControl('', Validators.required),
+      preference: new FormGroup({
+        commitment: new FormGroup({
+          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
+          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+        }), 
+        communication: new FormGroup({
+          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
+          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+        }),
+      
+        knowledge: new FormGroup({
+          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
+          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+        }),
+      
+        creativity: new FormGroup({
+          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
+          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+        }),
+      
+        leadership: new FormGroup({
+          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
+          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+        }),
+      
+        time: new FormGroup({
+          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
+          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+        })
+      })
+      
     });
   }
 
   async submit() {
     if (this.form.invalid) return;
-
+  
     try {
       this.loading.set(true);
-
-      const user = this._authService.currentUser; // Obtiene el usuario autenticado
-
+  
+      const user = this._authService.currentUser;
+  
       if (!user || !user.uid) {
         console.error('No se encontró un usuario autenticado.');
         return;
       }
-
-      const uid = user.uid; // Obtiene el UID del usuario autenticado
-
-      const { nameUserU, nameUser, secNameUser, courseUser, professionUser } = this.form.value;
-
+  
+      const uid = user.uid;
+  
+      const { username, name, lastName, course, profession } = this.form.value;
+  
       const userData: userCreate = {
-        nombreUsuario: nameUserU || '',
-        nombre: nameUser || '',
-        apellido: secNameUser || '',
-        curso: courseUser || '',
-        carrera: professionUser || ''
+        nombreUsuario: username || '',
+        nombre: name || '',
+        apellido: lastName || '',
+        curso: course || '',
+        carrera: profession || '',
+        preferencias: {
+          compromiso: {
+            auto: this.form.get('preference.commiitment.auto')?.value || 0,
+            buscado: this.form.get('preference.commiitment.buscado')?.value || 0
+          },
+          comunicacion: {
+            auto: this.form.get('preference.comumunication.auto')?.value || 0,
+            buscado: this.form.get('preference.comumunication.buscado')?.value || 0
+          },
+          conocimientos_tecnicos: {
+            auto: this.form.get('preference.knowledge.auto')?.value || 0,
+            buscado: this.form.get('preference.knowledge.buscado')?.value || 0
+          },
+          creatividad: {
+            auto: this.form.get('preference.creativity.auto')?.value || 0,
+            buscado: this.form.get('preference.creativity.buscado')?.value || 0
+          },
+          liderazgo: {
+            auto: this.form.get('preference.leadership.auto')?.value || 0,
+            buscado: this.form.get('preference.leadership.buscado')?.value || 0
+          },
+          tiempo: {
+            auto: this.form.get('preference.time.auto')?.value || 0,
+            buscado: this.form.get('preference.time.buscado')?.value || 0
+          }
+        }
       };
-
-      // Crear el documento en Firestore
+  
       await this._userCreate.create(uid, userData);
       console.log('Usuario registrado con éxito en Firestore.');
+      console.log(this.form.value);
     } catch (error) {
       console.error('Error al crear el documento:', error);
-    } finally{
+    } finally {
       this.loading.set(false);
     }
   }
+  
 }

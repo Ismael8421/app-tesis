@@ -29,37 +29,39 @@ export class RegisterComponent {
       lastName: new FormControl('', Validators.required),
       course: new FormControl('', Validators.required),
       profession: new FormControl('', Validators.required),
-      preference: new FormGroup({
-        commitment: new FormGroup({
-          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
-          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
-        }), 
-        communication: new FormGroup({
-          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
-          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
-        }),
-
-        knowledge: new FormGroup({
-          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
-          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
-        }),
-
-        creativity: new FormGroup({
-          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
-          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
-        }),
-
-        leadership: new FormGroup({
-          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
-          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
-        }),
-
-        time: new FormGroup({
-          auto: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]), 
-          buscado: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
-        })
-      })
-
+      autoEvaluation: new FormGroup({
+        programming: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        graphicDesign: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        knowledgeME: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        leadership: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        communication: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        resolution: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+      }),
+      wantedSkills: new FormGroup({
+        programmingW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        graphicDesignW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        knowledgeMEW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        leadershipW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        communicationW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
+        resolutionW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+      }),
+      preferences: new FormGroup({
+        professionWanted: new FormControl('', Validators.required),
+        styleWorkP: new FormControl('', Validators.required),
+        levelCommitment: new FormControl('', Validators.required)
+      }),
+      availability: new FormGroup({
+        hours: new FormControl('', Validators.required),
+        workModality: new FormControl('', Validators.required)
+      }),
+      interests: new FormGroup({
+        softwareDevelop: new FormControl('', Validators.required),
+        graphicDesignI: new FormControl('', Validators.required),
+        construction: new FormControl('', Validators.required),
+        analysis: new FormControl('', Validators.required),
+        investigation: new FormControl('', Validators.required)
+      }),
+      styleWork: new FormControl('', Validators.required)
     });
   }
 
@@ -96,34 +98,45 @@ export class RegisterComponent {
         nombreUsuario: username || '',
         nombre: name || '',
         apellido: lastName || '',
-        curso: course || '',
+        anioLectivo: course || '',
         carrera: profession || '',
-        preferencias: {
-          compromiso: {
-            auto: this.form.get('preference.commitment.auto')?.value || 0,
-            buscado: this.form.get('preference.commitment.buscado')?.value || 0
-          },
-          comunicacion: {
-            auto: this.form.get('preference.communication.auto')?.value || 0,
-            buscado: this.form.get('preference.communication.buscado')?.value || 0
-          },
-          conocimientos_tecnicos: {
-            auto: this.form.get('preference.knowledge.auto')?.value || 0,
-            buscado: this.form.get('preference.knowledge.buscado')?.value || 0
-          },
-          creatividad: {
-            auto: this.form.get('preference.creativity.auto')?.value || 0,
-            buscado: this.form.get('preference.creativity.buscado')?.value || 0
-          },
-          liderazgo: {
-            auto: this.form.get('preference.leadership.auto')?.value || 0,
-            buscado: this.form.get('preference.leadership.buscado')?.value || 0
-          },
-          tiempo: {
-            auto: this.form.get('preference.time.auto')?.value || 0,
-            buscado: this.form.get('preference.time.buscado')?.value || 0
-          }
-        }
+        autoevaluacion:{
+          comuniacion: this.form.get('autoEvaluation.communication')?.value || 0,
+          disenoGrafico: this.form.get('autoEvaluation.graphicDesign')?.value || 0,
+          liderazgo: this.form.get('autoEvaluation.leadership')?.value || 0,
+          mecanicaElectronica: this.form.get('autoEvaluation.knowledgeME')?.value || 0,
+          programacion: this.form.get('autoEvaluation.programming')?.value || 0,
+          resolucionProblemas: this.form.get('autoEvaluation.resolution')?.value || 0,
+        },
+      
+        habilidadesBuscadas: {
+          comunicacion: this.form.get('wantedSkills.communicationW')?.value ,
+          disenoGrafico: this.form.get('wantedSkills.graphicDesignW')?.value ,
+          liderazgo: this.form.get('wantedSkills.leadershipW')?.value ,
+          mecanicaElectronica: this.form.get('wantedSkills.knowledgeMEW')?.value ,
+          programacion: this.form.get('wantedSkills.programmingW')?.value ,
+          resolucionProblemas: this.form.get('wantedSkills.resolutionW')?.value 
+        },
+      
+        preferencias:{
+          carrera: this.form.get('preferences.professionWanted')?.value ,
+          estiloTrabajoP: this.form.get('preferences.styleWorkP')?.value ,
+          nivelCompromiso: this.form.get('preferences.levelCommitment')?.value 
+        },
+        
+        disponibilidad:{
+          horasSemanales: this.form.get('availability.hours')?.value ,
+          modalidadTrabajo: this.form.get('availability.workModality')?.value
+        },
+      
+        intereses:{
+          analisisDatos: this.form.get('interests.analysis')?.value ,
+          construccionDispositivos: this.form.get('interests.construction')?.value ,
+          desarrolloSoftware: this.form.get('interests.softwareDevelop')?.value ,
+          disenoGrafico: this.form.get('interests.graphicDesignI')?.value ,
+          investigacionCientifica: this.form.get('interests.investigation')?.value 
+        },
+        estiloTrabajo: this.form.get('styleWork')?.value
       };
 
       await this._userCreate.create(uid, userData);

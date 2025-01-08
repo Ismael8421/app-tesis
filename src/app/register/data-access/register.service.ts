@@ -2,26 +2,50 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, addDoc, setDoc, doc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 
-export interface preference {
-  auto: number;
-  buscado: number;
-}
-
 export interface userCreate {
   nombreUsuario: string;
   nombre: string;
   apellido: string;
-  curso: string;
+  anioLectivo: string;
   carrera: string;
   uid?: string;
-  preferencias:{
-    compromiso: preference;
-    comunicacion: preference;
-    conocimientos_tecnicos: preference;
-    creatividad: preference;
-    liderazgo: preference;
-    tiempo: preference;
+  autoevaluacion:{
+    comuniacion: number;
+    disenoGrafico: number;
+    liderazgo: number;
+    mecanicaElectronica: number;
+    programacion: number;
+    resolucionProblemas: number;
   }
+
+  habilidadesBuscadas: {
+    comunicacion: boolean;
+    disenoGrafico: boolean;
+    liderazgo: boolean;
+    mecanicaElectronica: boolean;
+    programacion: boolean;
+    resolucionProblemas: boolean
+  }
+
+  preferencias:{
+    carrera: string;
+    estiloTrabajoP: string;
+    nivelCompromiso: string;
+  }
+
+  disponibilidad:{
+    horasSemanales: number;
+    modalidadTrabajo: string;
+  }
+
+  intereses:{
+    analisisDatos: boolean;
+    construccionDispositivos: boolean;
+    desarrolloSoftware: boolean;
+    disenoGrafico: boolean;
+    investigacionCientifica: boolean;
+  }
+  estiloTrabajo: string;
 }
 
 

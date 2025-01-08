@@ -1,10 +1,10 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
-  <!-- Página 1: Nombre de usuario, Nombre, Apellido, Año lectivo -->
 
+  <!-- Página 1: Datos personales -->
   <div *ngIf="currentPage === 1">
     <div>
-    <label for="userName">Nombre de usuario:</label>
-    <input
+      <label for="userName">Nombre de usuario:</label>
+      <input
       type="text"
       name="userName"
       id="userName"
@@ -13,57 +13,53 @@
       <div *ngIf="form.controls['username'].invalid && form.controls['username'].touched">
         <small>Este campo es obligatorio</small>
       </div>
-  </div>
+    </div>
 
-  <div>
-    <label for="user-name">Nombre:</label>
-    <input
+    <div>
+      <label for="user-name">Nombre:</label>
+      <input
       type="text"
       name="user-name"
       id="user-name"
       formControlName="name"
-    >
-    <div *ngIf="form.controls['name'].invalid && form.controls['name'].touched">
-      <small>Este campo es obligatorio</small>
+      >
+      <div *ngIf="form.controls['name'].invalid && form.controls['name'].touched">
+        <small>Este campo es obligatorio</small>
+      </div>
     </div>
-  </div>
 
-  <div>
-    <label for="user-secName">Apellido:</label>
-    <input
+    <div>
+      <label for="user-secName">Apellido:</label>
+      <input
       type="text"
       name="user-secName"
       id="user-secName"
       formControlName="lastName"
-    >
-    <div *ngIf="form.controls['lastName'].invalid && form.controls['lastName'].touched">
-      <small>Este campo es obligatorio</small>
+      >
+      <div *ngIf="form.controls['lastName'].invalid && form.controls['lastName'].touched">
+        <small>Este campo es obligatorio</small>
+      </div>
     </div>
-  </div>
 
-  <div>
-    <label for="user-course">Año lectivo:</label>
-    <select
+    <div>
+      <label for="user-course">Año lectivo:</label>
+      <select
       id="user-course"
       formControlName="course"
-    >
+      >
       <option value="" disabled selected>Elige una opción</option>
       <option value="primero">Primero</option>
       <option value="segundo">Segundo</option>
       <option value="tercero">Tercero</option>
-    </select>
-  </div>
+      </select>
+    </div>
 
-  </div>
-
-  <!-- Página 2: Carrera -->
-  <div *ngIf="currentPage === 2">
     <div>
-    <label for="user-profession">Carrera:</label>
-    <select
+      <label for="user-profession">Carrera:</label>
+      <select
       id="user-profession"
       formControlName="profession"
-    >
+      >
       <option value="" disabled selected>Elige una opción</option>
       <option value="IEME">IEME</option>
       <option value="MCM">MCM</option>
@@ -71,24 +67,32 @@
       <option value="Mecatrónica">Mecatrónica</option>
       <option value="Informática">Informática</option>
       <option value="Ciencias">Ciencias</option>
-    </select>
-  
-    <div [ngSwitch]="form.controls['profession'].value">
-      <p *ngSwitchCase="'IEME'">IEME</p>
-
-      <p *ngSwitchCase="'MCM'">MCM</p>
-
-      <p *ngSwitchCase="'EMA'">EMA</p>
-
-      <p *ngSwitchCase="'Mecatrónica'">Mecatrónica</p>
-
-      <p *ngSwitchCase="'Informática'">Informática</p>
-
-      <p *ngSwitchCase="'Ciencias'">Ciencias Básicas</p>
-      
-      <p *ngSwitchDefault>Por favor, selecciona una opción válida.</p>
+      </select>
     </div>
   </div>
+
+  <!-- Autoevaluación de habilidades -->
+  
+  <div *ngIf="currentPage === 2">
+    <p>Evalúa tus habilidades en las siguientes áreas usando una escala del 1 al 5 (1 = Bajo, 5 = Excelente).</p>
+    <div>Programación o Desarrollo de Software:<br>
+
+    </div>
+    <div>Diseño Gráfico o Creativo:<br>
+
+    </div>
+    <div>Conocimientos en Mecánica y Electrónica:<br>
+
+    </div>
+    <div>Habilidades de Liderazgo o Gestión:<br>
+
+    </div>
+    <div>Comunicación y Trabajo en Equipo:<br>
+
+    </div>
+    <div>Resolución de Problemas y Pensamiento Crítico:<br>
+
+    </div>
   </div>
 
   <!-- Página 3: Compromiso y Comunicación -->

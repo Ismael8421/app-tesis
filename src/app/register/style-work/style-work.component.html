@@ -1,0 +1,42 @@
+<div [formGroup]="form">
+    <h1>Estilo de trabajo</h1>
+    <div>
+        <label for="estiloTrabajoTxtTxt">¿Cómo describirías tu estilo de trabajo?</label>
+        <div>
+            <input
+            type="radio"
+            id="proactive"
+            value="Proactivo "
+            formControlName="styleWork"
+            >
+            <label for="estiloTrabajoTxt">Proactivo (me gusta tomar la iniciativa)</label>
+        </div>
+        <div>
+            <input
+            type="radio"
+            id="organized"
+            value="Organizado "
+            formControlName="styleWork"
+            >
+            <label for="estiloTrabajoTxt">Organizado (prefiero seguir un plan detallado)</label>
+        </div>
+        <div>
+            <input
+            type="radio"
+            id="flexibleID"
+            value="Flexible"
+            formControlName="styleWork"
+            >
+            <label for="estiloTrabajoTxt">Flexible (me adapto a cualquier situación)</label>
+        </div>
+        <div>
+            <input
+            type="radio"
+            id="dependent"
+            value="Dependiente"
+            formControlName="styleWork"
+            >
+            <label for="estiloTrabajoTxt">Dependiente (prefiero trabajar con guía constante)</label>
+        </div>
+    </div>
+</div>

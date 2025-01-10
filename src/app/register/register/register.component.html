@@ -1,264 +1,43 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
 
   <!-- Página 1: Datos personales -->
-  <div *ngIf="currentPage === 1">
-    <div>
-      <label for="userName">Nombre de usuario:</label>
-      <input
-      type="text"
-      name="userName"
-      id="userName"
-      formControlName="username"
-      >
-      <div *ngIf="form.controls['username'].invalid && form.controls['username'].touched">
-        <small>Este campo es obligatorio</small>
-      </div>
-    </div>
-
-    <div>
-      <label for="user-name">Nombre:</label>
-      <input
-      type="text"
-      name="user-name"
-      id="user-name"
-      formControlName="name"
-      >
-      <div *ngIf="form.controls['name'].invalid && form.controls['name'].touched">
-        <small>Este campo es obligatorio</small>
-      </div>
-    </div>
-
-    <div>
-      <label for="user-secName">Apellido:</label>
-      <input
-      type="text"
-      name="user-secName"
-      id="user-secName"
-      formControlName="lastName"
-      >
-      <div *ngIf="form.controls['lastName'].invalid && form.controls['lastName'].touched">
-        <small>Este campo es obligatorio</small>
-      </div>
-    </div>
-
-    <div>
-      <label for="user-course">Año lectivo:</label>
-      <select
-      id="user-course"
-      formControlName="course"
-      >
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="primero">Primero</option>
-      <option value="segundo">Segundo</option>
-      <option value="tercero">Tercero</option>
-      </select>
-    </div>
-
-    <div>
-      <label for="user-profession">Carrera:</label>
-      <select
-      id="user-profession"
-      formControlName="profession"
-      >
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="IEME">IEME</option>
-      <option value="MCM">MCM</option>
-      <option value="EMA">EMA</option>
-      <option value="Mecatrónica">Mecatrónica</option>
-      <option value="Informática">Informática</option>
-      <option value="Ciencias">Ciencias</option>
-      </select>
-    </div>
+  <div *ngIf="page === 1">
+    <app-personal-data></app-personal-data>
   </div>
 
-  <!-- Autoevaluación de habilidades -->
-  
-  <div *ngIf="currentPage === 2">
-    <p>Evalúa tus habilidades en las siguientes áreas usando una escala del 1 al 5 (1 = Bajo, 5 = Excelente).</p>
-    <div>Programación o Desarrollo de Software:<br>
-
-    </div>
-    <div>Diseño Gráfico o Creativo:<br>
-
-    </div>
-    <div>Conocimientos en Mecánica y Electrónica:<br>
-
-    </div>
-    <div>Habilidades de Liderazgo o Gestión:<br>
-
-    </div>
-    <div>Comunicación y Trabajo en Equipo:<br>
-
-    </div>
-    <div>Resolución de Problemas y Pensamiento Crítico:<br>
-
-    </div>
+  <!-- Página 2: Autoevaluación de Habilidades -->
+  <div *ngIf="page === 2">
+    <app-auto-evaluation></app-auto-evaluation>
   </div>
 
-  <!-- Página 3: Compromiso y Comunicación -->
-  <div formGroupName="preference">
-    <!-- Compromiso -->
-    <div *ngIf="currentPage === 3">
-      <div formGroupName="commitment">Compromiso<br>
-        <label for="sliderAutoCommitment">Autoevaluación:</label>
-        <input
-          type="range"
-          id="sliderAutoCommitment"
-          min="1"
-          max="5"
-          step="1"
-          formControlName="auto"
-        >
-        <span>{{ form.get('preference.commitment.auto')?.value }}</span><br>
-    
-        <label for="sliderBuscadoCommitment">Valor buscado:</label>
-        <input
-          type="range"
-          id="sliderBuscadoCommitment"
-          min="1"
-          max="5"
-          step="1"
-          formControlName="buscado"
-        >
-        <span>{{ form.get('preference.commitment.buscado')?.value }}</span>
-      </div>
+  <!--Pagina 3: Habilidades buscadas -->
+  <div *ngIf="page === 3">
+    <app-wanted-skills></app-wanted-skills>
+  </div>
 
-      <!-- Comunicación -->
-    <div formGroupName="communication">Comunicación<br>
-      <label for="sliderAutoCommunication">Autoevaluación:</label>
-      <input
-        type="range"
-        id="sliderAutoCommunication"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="auto"
-      >
-      <span>{{ form.get('preference.communication.auto')?.value }}</span><br>
-  
-      <label for="sliderBuscadoCommunication">Valor buscado:</label>
-      <input
-        type="range"
-        id="sliderBuscadoCommunication"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="buscado"
-      >
-      <span>{{ form.get('preference.communication.buscado')?.value }}</span>
-    </div>
-    </div>
-  
-    <!-- Página 4: Conocimientos Técnicos y Creatividad -->
-    <div *ngIf="currentPage === 4">
-      <!-- Conocimientos Técnicos -->
-    <div formGroupName="knowledge">Conocimientos Técnicos<br>
-      <label for="sliderAutoKnowledge">Autoevaluación:</label>
-      <input
-        type="range"
-        id="sliderAutoKnowledge"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="auto"
-      >
-      <span>{{ form.get('preference.knowledge.auto')?.value }}</span><br>
-  
-      <label for="sliderBuscadoKnowledge">Valor buscado:</label>
-      <input
-        type="range"
-        id="sliderBuscadoKnowledge"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="buscado"
-      >
-      <span>{{ form.get('preference.knowledge.buscado')?.value }}</span>
-    </div>
+  <!-- Pagina 4: Preferencias de compañeros -->
+  <div *ngIf="page === 4">
+    <app-preferences></app-preferences>
+  </div>
 
-    <!-- Creatividad -->
-    <div formGroupName="creativity">Creatividad<br>
-      <label for="sliderAutoCreativity">Autoevaluación:</label>
-      <input
-        type="range"
-        id="sliderAutoCreativity"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="auto"
-      >
-      <span>{{ form.get('preference.creativity.auto')?.value }}</span><br>
-  
-      <label for="sliderBuscadoCreativity">Valor buscado:</label>
-      <input
-        type="range"
-        id="sliderBuscadoCreativity"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="buscado"
-      >
-      <span>{{ form.get('preference.creativity.buscado')?.value }}</span>
-    </div>
-    </div>
-  
-    <!-- Página 5: Liderazgo y Tiempo -->
-    <div *ngIf="currentPage === 5">
-      <!-- Liderazgo -->
-    <div formGroupName="leadership">Liderazgo<br>
-      <label for="sliderAutoLeadership">Autoevaluación:</label>
-      <input
-        type="range"
-        id="sliderAutoLeadership"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="auto"
-      >
-      <span>{{ form.get('preference.leadership.auto')?.value }}</span><br>
-  
-      <label for="sliderBuscadoLeadership">Valor buscado:</label>
-      <input
-        type="range"
-        id="sliderBuscadoLeadership"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="buscado"
-      >
-      <span>{{ form.get('preference.leadership.buscado')?.value }}</span>
-    </div>
+  <!-- Pagina 5: Disponibilidad -->
+  <div *ngIf="page === 5">
+    <app-availability></app-availability>
+  </div>
 
-    <!-- Gestión del Tiempo -->
-    <div formGroupName="time">Gestión del Tiempo<br>
-      <label for="sliderAutoTime">Autoevaluación:</label>
-      <input
-        type="range"
-        id="sliderAutoTime"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="auto"
-      >
-      <span>{{ form.get('preference.time.auto')?.value }}</span><br>
+  <!-- Pagina 6: Intereses en proyectos -->
+  <div *ngIf="page === 6">
+    <app-interests></app-interests>
+  </div>
   
-      <label for="sliderBuscadoTime">Valor buscado:</label>
-      <input
-        type="range"
-        id="sliderBuscadoTime"
-        min="1"
-        max="5"
-        step="1"
-        formControlName="buscado"
-      >
-      <span>{{ form.get('preference.time.buscado')?.value }}</span>
-    </div>
-    </div>
+  <!-- Página 7: Estilo de trabajo -->
+  <div *ngIf="page === 7">
+    <app-style-work></app-style-work>
   </div>
 
   <!-- Botones de navegación -->
-  <button type="button" (click)="prevPage()" [disabled]="currentPage === 1">Atrás</button>
-  <button type="button" (click)="nextPage()" [disabled]="currentPage === 5">Siguiente</button>
+  <button type="button" (click)="prevPage()" [disabled]="page === 1">Atrás</button>
+  <button type="button" (click)="nextPage()" [disabled]="page === 7">Siguiente</button>
 
   <button type="submit" [disabled]="loading() || form.invalid">{{loading() ? 'Cargando...' : 'Registrar'}}</button>
 </form>

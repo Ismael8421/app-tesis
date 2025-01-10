@@ -1,0 +1,98 @@
+<div [formGroup]="form">
+    <div formGroupName="preferences">
+        <h1>Preferencias de compañeros</h1>
+        <!-- Carrera preferida -->
+        <div>
+            <label for="professionWanted">¿Prefieres trabajar con compañeros de tu misma carrera, de otras carreras o te es indiferente?</label>
+            <div>
+                <input
+                  type="radio"
+                  id="sameCareer"
+                  value="Misma carrera"
+                  formControlName="professionWanted"
+                >
+                <label for="sameCareer">Solo compañeros de mi misma carrera</label>
+            </div>
+            <div>
+                <input
+                type="radio"
+                id="otherCareers"
+                value="Otras carreras"
+                formControlName="professionWanted"
+                >
+                <label for="otherCareers">Solo compañeros de otras carreras</label>
+            </div>
+            <div>
+                <input
+                type="radio"
+                id="indifferent"
+                value="Indiferente"
+                formControlName="professionWanted"
+                >
+                <label for="indifferent">No me importa la carrera de mis compañeros</label>
+            </div>
+        </div>
+        <!-- Tipo de traajo -->
+        <div>
+            <label for="styleWorkP">¿Cómo prefieres trabajar en equipo?</label>
+            <div>
+                <input
+                type="radio"
+                id="styleWorkP"
+                value="Colaborativo"
+                formControlName="styleWorkP"
+                >
+                <label for="styleWorkP">Trabajo colaborativo (todos aportan por igual).</label>
+            </div>
+            <div>
+                <input
+                type="radio"
+                id="styleWorkP"
+                value="Con líder definido"
+                formControlName="styleWorkP"
+                >
+                <label for="styleWorkP">Trabajo con un líder definido (puedo liderar o seguir instrucciones).</label>
+            </div>
+            <div>
+                <input
+                type="radio"
+                id="styleWorkP"
+                value="Independiente"
+                formControlName="styleWorkP"
+                >
+                <label for="styleWorkP">Trabajo independiente (cada miembro tiene una tarea asignada).</label>
+            </div>
+        </div>
+        <!-- Nivel de compromiso-->
+        <div>
+            <label for="levelCommitment">¿Qué nivel de compromiso esperas de tus compañeros?</label>
+            <div>
+                <input
+                  type="radio"
+                  id="sameCareer"
+                  value="Alto"
+                  formControlName="levelCommitment"
+                >
+                <label for="levelCommitment">Alto</label>
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  id="levelCommitment"
+                  value="Moderado"
+                  formControlName="levelCommitment"
+                >
+                <label for="levelCommitment">Moderado</label>
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  id="levelCommitment"
+                  value="Bajo"
+                  formControlName="levelCommitment"
+                >
+                <label for="levelCommitment">Bajo</label>
+              </div>
+        </div>
+    </div>
+</div>

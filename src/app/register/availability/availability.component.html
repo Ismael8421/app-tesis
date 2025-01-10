@@ -1,0 +1,55 @@
+<div [formGroup]="form">
+    <div formGroupName="availability">
+        <h1>Disponibilidad</h1>
+        <!-- Horas semales -->
+        <div>
+            <label for="">¿Cuántas horas puedes dedicar semanalmente al proyecto?</label>
+            <input
+            type="number"
+            id="hours"
+            formControlName="hours"
+            min="1"
+            max="168"
+            >
+            <div *ngIf="form.get('availability.hours')?.invalid && form.get('availability.hours')?.touched">
+                <small *ngIf="form.get('availability.hours')?.errors?.['required']">Debes ingresar las horas disponibles.</small>
+                <small *ngIf="form.get('availability.hours')?.errors?.['min']">Debe ser al menos 1 hora.</small>
+                <small *ngIf="form.get('availability.hours')?.errors?.['max']">No puede superar las 168 horas.</small>
+            </div>
+        </div>
+        <!-- Modalidad de trabajo -->
+        <div>
+            <label for="workModalityTitle">¿Prefieres trabajar presencialmente, virtualmente o de forma híbrida?</label>
+            <div>
+                <input
+                type="radio"
+                name="workModality"
+                id="workModalityPresencial"
+                value="Presencialmente"
+                formControlName="workModality"
+                >
+                <label for="workModalityPresencial">Presencialmente</label>
+            </div>
+            <div>
+                <input
+                type="radio"
+                name="workModality"
+                id="workModalityVirtual"
+                value="Virtualmente"
+                formControlName="workModality"
+                >
+                <label for="workModalityVirtual">Virtualmente</label>
+            </div>
+            <div>
+                <input
+                type="radio"
+                name="workModality"
+                id="workModalityHibrido"
+                value="Híbrido"
+                formControlName="workModality"
+                >
+                <label for="workModalityHibrido">Híbrido (mezcla de ambas)</label>
+            </div>
+        </div>
+    </div>
+</div>

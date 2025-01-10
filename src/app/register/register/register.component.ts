@@ -4,13 +4,20 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { RegisterService, userCreate } from '../data-access/register.service';
 import { AuthService } from '../../account/auth/data-access/auth.service';
 import { Router } from '@angular/router';
+import { PersonalDataComponent } from '../personal-data/personal-data.component';
+import { AutoEvaluationComponent } from '../auto-evaluation/auto-evaluation.component';
+import { WantedSkillsComponent } from '../wanted-skills/wanted-skills.component';
+import { PreferencesComponent } from '../preferences/preferences.component';
+import { AvailabilityComponent } from '../availability/availability.component';
+import { InterestsComponent } from '../interests/interests.component';
+import { StyleWorkComponent } from '../style-work/style-work.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, FormsModule],
+  imports: [ReactiveFormsModule, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, FormsModule, PersonalDataComponent, AutoEvaluationComponent, WantedSkillsComponent, PreferencesComponent, AvailabilityComponent, InterestsComponent, StyleWorkComponent],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  styleUrl: './register.component.css'
 })
 export class RegisterComponent {
   private _userCreate = inject(RegisterService);
@@ -20,7 +27,7 @@ export class RegisterComponent {
   loading = signal(false);
 
   form: FormGroup;
-  currentPage: number = 1; // Página actual del formulario
+  page: number = 1; // Página actual del formulario
 
   constructor() {
     this.form = new FormGroup({
@@ -38,42 +45,42 @@ export class RegisterComponent {
         resolution: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
       }),
       wantedSkills: new FormGroup({
-        programmingW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        graphicDesignW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        knowledgeMEW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        leadershipW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        communicationW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        resolutionW: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
+        programmingW: new FormControl(),
+        graphicDesignW: new FormControl(),
+        knowledgeMEW: new FormControl(),
+        leadershipW: new FormControl(),
+        communicationW: new FormControl(),
+        resolutionW: new FormControl()
       }),
       preferences: new FormGroup({
-        professionWanted: new FormControl('', Validators.required),
+        professionWanted: new FormControl('',Validators.required),
         styleWorkP: new FormControl('', Validators.required),
         levelCommitment: new FormControl('', Validators.required)
       }),
       availability: new FormGroup({
-        hours: new FormControl('', Validators.required),
+        hours: new FormControl('', [Validators.min(1), Validators.max(168), Validators.required]),
         workModality: new FormControl('', Validators.required)
       }),
       interests: new FormGroup({
-        softwareDevelop: new FormControl('', Validators.required),
-        graphicDesignI: new FormControl('', Validators.required),
-        construction: new FormControl('', Validators.required),
-        analysis: new FormControl('', Validators.required),
-        investigation: new FormControl('', Validators.required)
+        softwareDevelop: new FormControl(),
+        graphicDesignI: new FormControl(),
+        construction: new FormControl(),
+        analysis: new FormControl(),
+        investigation: new FormControl()
       }),
       styleWork: new FormControl('', Validators.required)
     });
   }
 
   nextPage() {
-    if (this.currentPage < 5) {
-      this.currentPage++;
+    if (this.page < 7) {
+      this.page++;
     }
   }
 
   prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
+    if (this.page > 1) {
+      this.page--;
     }
   }
 
@@ -110,12 +117,12 @@ export class RegisterComponent {
         },
       
         habilidadesBuscadas: {
-          comunicacion: this.form.get('wantedSkills.communicationW')?.value ,
-          disenoGrafico: this.form.get('wantedSkills.graphicDesignW')?.value ,
-          liderazgo: this.form.get('wantedSkills.leadershipW')?.value ,
-          mecanicaElectronica: this.form.get('wantedSkills.knowledgeMEW')?.value ,
-          programacion: this.form.get('wantedSkills.programmingW')?.value ,
-          resolucionProblemas: this.form.get('wantedSkills.resolutionW')?.value 
+          comunicacion: this.form.get('wantedSkills.communicationW')?.value || false,
+          disenoGrafico: this.form.get('wantedSkills.graphicDesignW')?.value || false,
+          liderazgo: this.form.get('wantedSkills.leadershipW')?.value || false,
+          mecanicaElectronica: this.form.get('wantedSkills.knowledgeMEW')?.value || false,
+          programacion: this.form.get('wantedSkills.programmingW')?.value || false,
+          resolucionProblemas: this.form.get('wantedSkills.resolutionW')?.value || false 
         },
       
         preferencias:{
@@ -130,17 +137,18 @@ export class RegisterComponent {
         },
       
         intereses:{
-          analisisDatos: this.form.get('interests.analysis')?.value ,
-          construccionDispositivos: this.form.get('interests.construction')?.value ,
-          desarrolloSoftware: this.form.get('interests.softwareDevelop')?.value ,
-          disenoGrafico: this.form.get('interests.graphicDesignI')?.value ,
-          investigacionCientifica: this.form.get('interests.investigation')?.value 
+          analisisDatos: this.form.get('interests.analysis')?.value || false,
+          construccionDispositivos: this.form.get('interests.construction')?.value || false,
+          desarrolloSoftware: this.form.get('interests.softwareDevelop')?.value || false,
+          disenoGrafico: this.form.get('interests.graphicDesignI')?.value || false,
+          investigacionCientifica: this.form.get('interests.investigation')?.value || false 
         },
         estiloTrabajo: this.form.get('styleWork')?.value
       };
 
       await this._userCreate.create(uid, userData);
       console.log('Usuario registrado con éxito en Firestore.');
+      console.log(this.form.value);
       this._router.navigateByUrl('/menu');
 
     } catch (error) {

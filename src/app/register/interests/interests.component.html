@@ -1,0 +1,47 @@
+<div [formGroup]="form">
+    <div formGroupName="interests">
+        <h1>Intereses en proyectos</h1>
+        <p>Selecciona las áreas de proyecto que más te interesan. Puedes elegir más de una.</p>
+
+        <div>
+            <input
+            type="checkbox" 
+            id="softwareDevelop"
+            formControlName="softwareDevelop"
+            >
+            <label for="softwareDevelop">Desarrollo de software</label>
+        </div>
+        <div>
+            <input
+            type="checkbox" 
+            id="graphicDesignI"
+            formControlName="graphicDesignI"
+            >
+            <label for="graphicDesignI">Diseño gráfico y creativo</label>
+        </div>
+        <div>
+            <input
+            type="checkbox" 
+            id="construction"
+            formControlName="construction"
+            >
+            <label for="construction">Construcción de máquinas o dispositivos electrónicos</label>
+        </div>
+        <div>
+            <input
+            type="checkbox" 
+            id="analysis"
+            formControlName="analysis"
+            >
+            <label for="analysis">Análisis de datos</label>
+        </div>
+        <div>
+            <input
+            type="checkbox" 
+            id="investigation"
+            formControlName="investigation"
+            >
+            <label for="investigation">Investigación científica</label>
+        </div>
+    </div>
+</div>

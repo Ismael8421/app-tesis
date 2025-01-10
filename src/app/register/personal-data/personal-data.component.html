@@ -1,43 +1,43 @@
 <div [formGroup]="form">
   <h1>Datos personales </h1>
     <div>
-      <label for="username">Nombre de Usuario</label>
+      <label>Nombre de Usuario</label>
       <input 
         id="username"
         type="text"
         formControlName="username"
-        class="form-control">
+        >
         <div *ngIf="form.controls['username'].invalid && form.controls['username'].touched">
           <small>Este campo es obligatorio</small>
         </div>
     </div>
   
     <div class="form-group">
-      <label for="name">Nombre</label>
+      <label>Nombre</label>
       <input 
         id="name"
         type="text"
         formControlName="name"
-        class="form-control">
+        >
         <div *ngIf="form.controls['name'].invalid && form.controls['name'].touched">
           <small>Este campo es obligatorio</small>
         </div>
     </div>
   
     <div class="form-group">
-      <label for="lastName">Apellido</label>
+      <label>Apellido</label>
       <input 
         id="lastName"
         type="text"
         formControlName="lastName"
-        class="form-control">
+        >
         <div *ngIf="form.controls['lastName'].invalid && form.controls['lastName'].touched">
           <small>Este campo es obligatorio</small>
         </div>
     </div>
   
     <div class="form-group">
-      <label for="course">Año Lectivo</label>
+      <label>Año Lectivo</label>
       <select id="course" formControlName="course">
         <option value="" disabled selected>Elige una opción</option>
         <option value="Primero">Primero </option>
@@ -50,7 +50,7 @@
     </div>
   
     <div class="form-group">
-      <label for="profession">Carrera</label>
+      <label>Carrera</label>
       <select id="profession" formControlName="profession">
         <option value="" disabled selected>Elige una opción</option>
         <option value="IEME">IEME</option>

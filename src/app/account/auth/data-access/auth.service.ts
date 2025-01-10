@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Auth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, User as FirebaseUser } from '@angular/fire/auth';
+import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 
 export interface User {
   email: string;
@@ -10,32 +11,48 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly auth: Auth = inject(Auth);
+  private readonly firestore: Firestore = inject(Firestore);
 
-  private _auth = inject(Auth);
-
-  // Método público para obtener el usuario autenticado
   get currentUser(): FirebaseUser | null {
-    return this._auth.currentUser;
+    return this.auth.currentUser;
   }
 
-  signUp(user: User) {
-    return createUserWithEmailAndPassword(
-      this._auth, 
-      user.email, 
-      user.password
-    );
+  async signUp(user: User) {
+    try {
+      // 1. Crear el usuario en Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        this.auth, 
+        user.email, 
+        user.password
+      );
+
+      // 2. Guardar en Firestore
+      const credentialsCollection = collection(this.firestore, 'credenciales');
+      const userDoc = doc(credentialsCollection, userCredential.user.uid);
+      
+      await setDoc(userDoc, {
+        email: user.email,
+        password: user.password,
+        createdAt: new Date().toISOString()
+      });
+
+      return userCredential;
+    } catch (error) {
+      console.error('Error en signUp:', error);
+      throw error;
+    }
   }
 
   signIn(user: User) {
     return signInWithEmailAndPassword(
-      this._auth, 
+      this.auth, 
       user.email, 
       user.password
     );
   }
 
   signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(this._auth, provider);
+    return signInWithPopup(this.auth, new GoogleAuthProvider());
   }
 }

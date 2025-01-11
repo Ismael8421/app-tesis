@@ -7,9 +7,10 @@ import { Router, RouterLink } from '@angular/router';
 import { GoogleButtonComponent } from '../../ui/google-button/google-button.component';
 import { EyeButtonComponent } from '../../ui/eye-button/eye-button.component';
 
-interface FormSignUp{
+interface FormSignUp {
   email: FormControl<string | null>;
   password: FormControl<string | null>;
+  confirmPassword: FormControl<string | null>;
 }
 
 @Component({
@@ -24,42 +25,64 @@ export default class SignUpComponent {
   private _authServices = inject(AuthService);
   private _router = inject(Router);
 
+  // Para campos email y password usamos la función importada
   isRequired(field: 'email' | 'password') {
     return isRequired(field, this.form)
+  }
+
+  // Nueva función específica para confirmPassword
+  isConfirmPasswordRequired(): boolean {
+    return this.form.get('confirmPassword')?.hasError('required') && 
+           this.form.get('confirmPassword')?.touched || false;
   }
 
   hasEmailError() {
     return hasEmailError(this.form);
   }
 
+  passwordsMatch(): boolean {
+    const password = this.form.get('password')?.value;
+    const confirmPassword = this.form.get('confirmPassword')?.value;
+    return password === confirmPassword;
+  }
+
   form = this._formBuilder.group<FormSignUp>({
     email: this._formBuilder.control('', [Validators.required, Validators.email]),
     password: this._formBuilder.control('', Validators.required),
+    confirmPassword: this._formBuilder.control('', Validators.required)
   });
 
-  // Variable para controlar la visibilidad de la contraseña
+  // Propiedades para controlar la visibilidad de las contraseñas
   passwordVisible = false;
+  confirmPasswordVisible = false;
 
-  // Función para alternar la visibilidad de la contraseña
+  // Métodos para alternar la visibilidad
   togglePasswordVisibility() {
     this.passwordVisible = !this.passwordVisible;
   }
 
-  // Obtener el tipo de input para la contraseña
-  get passwordInputType(): string {
-    return this.passwordVisible ? 'text' : 'password';
+  toggleConfirmPasswordVisibility() {
+    this.confirmPasswordVisible = !this.confirmPasswordVisible;
+  }
+
+  // Método para obtener el tipo de input
+  getPasswordInputType(field: 'password' | 'confirm'): string {
+    return field === 'password' 
+      ? (this.passwordVisible ? 'text' : 'password')
+      : (this.confirmPasswordVisible ? 'text' : 'password');
   }
 
   async submit() {
-    if(this.form.invalid) return;
+    if (this.form.invalid) return;
+    if (!this.passwordsMatch()) {
+      // Aquí podrías manejar el error, por ejemplo mostrando un mensaje
+      return;
+    }
 
     try {
-      const {email, password} = this.form.value;
-
-      if(!email || !password) return;
-
+      const { email, password } = this.form.value;
+      if (!email || !password) return;
       await this._authServices.signUp({ email, password });
-
       this._router.navigateByUrl('/register');
     } catch (error) {
     }

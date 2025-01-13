@@ -1,0 +1,164 @@
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    padding: 0 15px;
+}
+
+section {
+    width: 100%;
+    max-width: 400px;
+    background-color: #8A90A8;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px #D99AB7;
+    text-align: center;
+}
+
+h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.google-button-container {
+    margin-bottom: 20px;
+}
+
+form {
+    width: 100%;
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
+label {
+    font-size: 14px;
+    color: #555;
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+/* Cambiar color de fondo de los inputs */
+input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #D99AB7; /* Fondo con el color solicitado */
+    border: 1px solid #D99AB7;  /* Mantener el borde con el mismo color */
+    border-radius: 5px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #4CAF50; /* Mantener el borde en verde al hacer foco */
+    background-color: #D99AB7; /* Fondo sigue siendo el mismo al hacer foco */
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #DE6EF5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+    background-color: #9F72A8;
+}
+
+a {
+    color: #F5F0B0;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+p {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 20px;
+    }
+
+    form div {
+        margin-bottom: 10px;
+    }
+
+    input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    button[type="submit"] {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .toggle-password {
+        right: 8px;
+    }
+
+    p {
+        font-size: 12px;
+    }
+}
+
+/* Estilos para tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+    h1 {
+        font-size: 22px;
+    }
+
+    input {
+        font-size: 15px;
+        padding: 9px;
+    }
+
+    button[type="submit"] {
+        font-size: 15px;
+        padding: 11px;
+    }
+
+    p {
+        font-size: 13px;
+    }
+}

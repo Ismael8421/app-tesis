@@ -11,7 +11,7 @@ export const routes: Routes = [
         canActivateChild: [privateGuard()],
         path: 'menu',
         loadComponent:() => import('./account/shared/ui/layout.component'),
-        loadChildren: () => import('./menu/features/menu.routes'),
+        loadChildren: () => import('./menu/menu.routes'),
     },
     {
         canActivateChild: [privateGuard()],

@@ -1,0 +1,131 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.config-container {
+    width: min(100%, 400px);
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: clamp(15px, 5vw, 20px);
+    margin: auto;
+}
+
+.perfil {
+    display: flex;
+    align-items: center;
+    margin-bottom: clamp(15px, 4vw, 20px);
+    padding: clamp(8px, 3vw, 10px);
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.img {
+    height: clamp(50px, 15vw, 60px);
+    width: clamp(50px, 15vw, 60px);
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    object-fit: cover;
+}
+
+.perfilTxt {
+    font-size: clamp(16px, 4vw, 18px);
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.perfilTxt:hover {
+    color: #007bff;
+}
+
+.settings {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 3vw, 15px);
+}
+
+.option {
+    padding: clamp(10px, 3vw, 12px);
+    text-align: center;
+    font-size: clamp(14px, 4vw, 16px);
+    color: #333;
+    text-decoration: none;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.option:hover, .option:active {
+    background-color: #007bff;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.logout {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.logout:hover, .logout:active {
+    background-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Media Queries */
+@media screen and (max-width: 320px) {
+    .config-container {
+        padding: 12px;
+    }
+    
+    .perfil {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .img {
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+}
+
+@media (hover: none) {
+    .option:hover {
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .option {
+        transition: none;
+    }
+}

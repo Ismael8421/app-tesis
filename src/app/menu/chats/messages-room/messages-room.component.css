@@ -1,0 +1,121 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    background-color: #ffd8d8;
+    overflow-x: hidden;
+    min-height: 100vh;
+    /* Eliminamos align-items: center para que no centre verticalmente */
+    display: flex;
+    justify-content: center;
+    padding-top: 20px; /* Añadimos padding superior para separarlo del borde */
+}
+
+/* Contenedor del chat */
+.chat-container {
+    width: min(400px, 95%); /* Usa el menor entre 400px y 95% del viewport */
+    margin: 0 auto;
+    background-color: #ff7c7c;
+    padding: clamp(15px, 5vw, 20px);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    height: fit-content; /* Ajusta la altura al contenido */
+}
+
+.chat-title {
+    font-size: clamp(20px, 5vw, 24px);
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Estilo del formulario */
+form {
+    width: 100%;
+    background-color: #ff5757;
+    border-radius: 8px;
+    padding: clamp(8px, 3vw, 10px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.fx {
+    display: flex;
+    align-items: center;
+}
+
+.fx-gap {
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    position: relative;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 15px);
+    font-size: clamp(12px, 3vw, 16px);
+    border: 2px solid #ff9999;
+    border-radius: 8px;
+    outline: none;
+    color: #333;
+}
+
+input[type="text"]::placeholder {
+    color: #ffb3b3;
+}
+
+/* Botón de búsqueda */
+button {
+    width: clamp(30px, 8vw, 40px);
+    height: clamp(30px, 8vw, 40px);
+    border: none;
+    border-radius: 50%;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.1);
+}
+
+button span {
+    position: absolute;
+    width: clamp(10px, 3vw, 14px);
+    height: 3px;
+    background-color: #ff5757;
+    transform: rotate(45deg);
+    transition: 0.3s ease all;
+}
+
+button span:before,
+button span:after {
+    content: "";
+    position: absolute;
+    width: clamp(10px, 3vw, 14px);
+    height: 3px;
+    background-color: #ff5757;
+    transition: 0.3s ease all;
+}
+
+button span:before {
+    transform: rotate(90deg);
+}

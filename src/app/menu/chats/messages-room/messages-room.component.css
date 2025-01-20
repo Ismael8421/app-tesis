@@ -122,3 +122,40 @@ button span:after {
 button span:before {
     transform: rotate(90deg);
 }
+
+.chat-card {
+    width: 100%;
+    background-color: #ff5757;
+    border-radius: 8px;
+    padding: clamp(8px, 3vw, 10px);
+    display: flex;
+    align-items: center; /* Alinear verticalmente */
+    gap: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
+}
+
+.img {
+    height: clamp(40px, 12vw, 50px);
+    width: clamp(40px, 12vw, 50px);
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    object-fit: cover;
+}
+
+.text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.name {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.last-message {
+    margin: 0;
+    font-size: 0.9em;
+    color: #444;
+}

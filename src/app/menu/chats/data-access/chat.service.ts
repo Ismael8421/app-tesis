@@ -1,6 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 
+export interface chat {
+  image: string;
+  name: string;
+  lastMessage: string;
+}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+
 @Injectable({
   providedIn: 'root'
 })

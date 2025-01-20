@@ -3,7 +3,7 @@ import { Auth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEma
 import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 
 export interface User {
-  email: string;
+  email: string;                                                             
   password: string;
 }
 

@@ -1,164 +1,127 @@
-/* Estilos generales */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+:root {
+    --primary-gradient: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+    --card-bg: rgba(255, 255, 255, 0.1);
+    --input-bg: rgba(255, 255, 255, 0.9);
+    --text-color: #ffffff;
+    --error-color: #ff4444;
+    --link-color: #e0e0e0;
+  }
+  
+  section {
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    flex-direction: column;
-    padding: 0 15px;
-}
-
-section {
+    background: var(--primary-gradient);
+    padding: 1rem;
+  }
+  
+  form {
     width: 100%;
-    max-width: 400px;
-    background-color: #8A90A8;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px #D99AB7;
+    max-width: 380px;
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+  
+  h1 {
+    color: var(--text-color);
     text-align: center;
-}
-
-h1 {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.google-button-container {
-    margin-bottom: 20px;
-}
-
-form {
-    width: 100%;
-}
-
-form div {
-    margin-bottom: 15px;
-}
-
-label {
-    font-size: 14px;
-    color: #555;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+  }
+  
+  .google-button-container {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  label {
+    color: var(--text-color);
     display: block;
-    text-align: left;
-    margin-bottom: 5px;
-}
-
-/* Cambiar color de fondo de los inputs */
-input {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  input {
     width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #D99AB7; /* Fondo con el color solicitado */
-    border: 1px solid #D99AB7;  /* Mantener el borde con el mismo color */
-    border-radius: 5px;
-    outline: none;
-}
-
-input:focus {
-    border-color: #4CAF50; /* Mantener el borde en verde al hacer foco */
-    background-color: #D99AB7; /* Fondo sigue siendo el mismo al hacer foco */
-}
-
-.input-with-icon {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 25px;
+    background: var(--input-bg);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  input::placeholder {
+    color: #666;
+  }
+  
+  .input-with-icon {
     position: relative;
-}
-
-.toggle-password {
+  }
+  
+  .toggle-password {
     position: absolute;
+    right: 1rem;
     top: 50%;
-    right: 10px;
     transform: translateY(-50%);
     background: none;
     border: none;
+    color: #666;
     cursor: pointer;
-}
-
-button[type="submit"] {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    background-color: #DE6EF5;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-button[type="submit"]:hover {
-    background-color: #9F72A8;
-}
-
-a {
-    color: #F5F0B0;
+  }
+  
+  small {
+    color: var(--error-color);
+    font-size: 0.8rem;
+    margin-top: -0.5rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  
+  a {
+    color: var(--link-color);
     text-decoration: none;
-}
-
-a:hover {
+    font-size: 0.9rem;
+  }
+  
+  a:hover {
     text-decoration: underline;
-}
-
-p {
-    margin-top: 15px;
-    font-size: 14px;
-    color: #555;
-}
-
-/* Estilos para dispositivos móviles */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 20px;
+  }
+  
+  button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 25px;
+    background: var(--primary-gradient);
+    color: var(--text-color);
+    font-weight: bold;
+    cursor: pointer;
+    margin: 1.5rem 0;
+    transition: opacity 0.2s;
+  }
+  
+  button[type="submit"]:hover {
+    opacity: 0.9;
+  }
+  
+  p {
+    color: var(--text-color);
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 480px) {
+    form {
+      padding: 1.5rem;
     }
-
-    form div {
-        margin-bottom: 10px;
+    
+    input, button[type="submit"] {
+      padding: 0.6rem 1rem;
     }
-
-    input {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    button[type="submit"] {
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    .toggle-password {
-        right: 8px;
-    }
-
-    p {
-        font-size: 12px;
-    }
-}
-
-/* Estilos para tablets */
-@media (min-width: 481px) and (max-width: 768px) {
-    h1 {
-        font-size: 22px;
-    }
-
-    input {
-        font-size: 15px;
-        padding: 9px;
-    }
-
-    button[type="submit"] {
-        font-size: 15px;
-        padding: 11px;
-    }
-
-    p {
-        font-size: 13px;
-    }
-}
+  }

@@ -14,21 +14,20 @@ body {
     background-color: #ffd8d8;
     overflow-x: hidden;
     min-height: 100vh;
-    /* Eliminamos align-items: center para que no centre verticalmente */
     display: flex;
     justify-content: center;
-    padding-top: 20px; /* Añadimos padding superior para separarlo del borde */
+    padding-top: 20px;
 }
 
 /* Contenedor del chat */
 .chat-container {
-    width: min(400px, 95%); /* Usa el menor entre 400px y 95% del viewport */
+    width: min(400px, 95%);
     margin: 0 auto;
     background-color: #ff7c7c;
     padding: clamp(15px, 5vw, 20px);
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: fit-content; /* Ajusta la altura al contenido */
+    height: fit-content; 
 }
 
 .chat-title {
@@ -80,6 +79,10 @@ input[type="text"]::placeholder {
 }
 
 /* Botón de búsqueda */
+.icon {
+    color: #ff5757;
+}
+
 button {
     width: clamp(30px, 8vw, 40px);
     height: clamp(30px, 8vw, 40px);

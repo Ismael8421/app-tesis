@@ -2,6 +2,10 @@ import { Routes } from "@angular/router";
 
 export default [
     {
+        path: 'mensajes',
+        loadComponent: () => import('./chats/message/message.component').then(m => m.MessageComponent),
+    },
+    {
         path: '',
         loadComponent: () => import('./menu/menu.component').then(m => m.MenuComponent),
         children: [
@@ -11,7 +15,7 @@ export default [
                 pathMatch: 'full'
             },
             {
-                path: 'mensajes',
+                path: 'chats',
                 loadChildren: () => import('./chats/chats.routes')
             },
             {

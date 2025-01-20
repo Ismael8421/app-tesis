@@ -1,9 +1,12 @@
-import { Component } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
+import { register } from 'swiper/element/bundle';
+register();
 
 @Component({
   selector: 'app-search',
   standalone: true,
   imports: [],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',
   styleUrl: './search.component.css'
 })

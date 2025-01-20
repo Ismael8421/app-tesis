@@ -1,1 +1,25 @@
-<p>message works!</p>
+<div class="chat">
+  <div class="chat-title">
+    <h1>Fabio Ottaviani</h1>
+    <h2>Supah</h2>
+    <figure class="avatar">
+    <img />
+    </figure>
+  </div>
+
+  <div class="messages">
+    <div class="messages-content"></div>
+  </div>
+
+  <div class="message-box">
+    <input 
+    type="text" 
+    name="mensaje"
+    [(ngModel)]="mensaje"
+    placeholder="Enviar mensaje"
+    class="message-input"
+    >
+    
+    <button class="message-submit">Send</button>
+  </div>
+  </div>

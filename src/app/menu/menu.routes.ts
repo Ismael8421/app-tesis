@@ -6,6 +6,11 @@ export default [
         loadComponent: () => import('./chats/message/message.component').then(m => m.MessageComponent),
     },
     {
+        path: 'perfil',
+        loadComponent: () => import('./configs/profile/profile.component').then(m => m.ProfileComponent)
+    },
+    
+    {
         path: '',
         loadComponent: () => import('./menu/menu.component').then(m => m.MenuComponent),
         children: [

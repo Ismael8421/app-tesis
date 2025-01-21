@@ -1,12 +1,12 @@
 <div class="config-container">
     <div class="perfil">
         <img src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg" alt="Perfil" class="img">
-        <a class="perfilTxt">Ver perfil</a>
+        <a class="perfilTxt" [routerLink]="['perfil']">Ver perfil</a>
     </div>
 
     <div class="settings">
-        <a class="option">Cambiar correo o contraseña</a>
         <a class="option">Tema</a>
+        <a class="option">Cambiar correo o contraseña</a>
         <a class="option">Reportar un error</a>
         <a class="option logout" (click)="logOut()">Cerrar sesión</a>
     </div>

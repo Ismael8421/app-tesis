@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthStateService } from '../../account/shared/data-access/auth-state.service';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { AuthStateService } from '../../../account/shared/data-access/auth-state.service';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [],
+  imports: [RouterLink, RouterOutlet],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })

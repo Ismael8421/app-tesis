@@ -5,7 +5,7 @@ export interface chat {
   image: string;
   name: string;
   lastMessage: string;
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+}
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class ChatService {
   private _collection = collection(this._firestore, 'chats');
   public chats: any[] = [];
 
-  constructor() {}
+  constructor() { }
 
   cargarMensajes() {
     // this._collection = this._firestore.collection('chats');

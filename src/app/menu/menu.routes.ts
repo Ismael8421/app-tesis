@@ -24,7 +24,7 @@ export default [
             },
             {
                 path: 'configuraciones',
-                loadComponent: () => import('./settings/settings.component').then(m => m.SettingsComponent)
+                loadComponent: () => import('./configs/settings/settings.component').then(m => m.SettingsComponent)
             }
         ]
     }

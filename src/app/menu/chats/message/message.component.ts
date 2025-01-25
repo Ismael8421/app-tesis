@@ -1,26 +1,35 @@
+import { Component } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BackIconComponent } from '../../UI/back-icon/back-icon.component';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-message',
   standalone: true,
-  imports: [CommonModule, FormsModule, BackIconComponent],
+  imports: [BackIconComponent, IonicModule, CommonModule, FormsModule],
   templateUrl: './message.component.html',
-  styleUrl: './message.component.css'
+  styleUrl: './message.component.scss'
 })
 export class MessageComponent {
-  private _router = inject(Router);
+  mensaje: string = '';
+  avatarUrl: string = '';
 
-  goBack() {
-    this._router.navigateByUrl('/menu/chats')
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    // Optional: get ID from route
+    const id = this.route.snapshot.paramMap.get('id');
   }
 
-  mensaje: string = '';
+  goBack() {
+    this.router.navigateByUrl('/menu/chats');
+  }
 
   enviar_mensaje() {
     console.log(this.mensaje);
+    // Implement message sending logic
   }
 }

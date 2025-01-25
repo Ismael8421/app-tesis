@@ -1,22 +1,46 @@
-<div class="chat">
-  <div class="chat-title">
-    <a (click)="goBack()" style="cursor: pointer;"><app-back-icon class="back-icon"></app-back-icon></a>
-    <div class="title-container">
-      <h1>Nombre</h1>
-      <h2>En linea/Desconectado</h2>
+<ion-content>
+  <div class="chat">
+    <ion-header>
+      <ion-toolbar class="chat-title">
+        <ion-buttons slot="start">
+          <ion-back-button 
+            defaultHref="/menu/chats" 
+            (click)="goBack()"
+          >
+            <app-back-icon class="back-icon"></app-back-icon>
+          </ion-back-button>
+        </ion-buttons>
+        
+        <ion-title class="title-container">
+          <h1>Nombre</h1>
+          <h2>En linea/Desconectado</h2>
+        </ion-title>
+        
+        <ion-avatar slot="end" class="avatar">
+          <img [src]="avatarUrl || ''">
+        </ion-avatar>
+      </ion-toolbar>
+    </ion-header>
+
+    <div class="messages">
+      <div class="messages-content">
+        <!-- Mensaje content -->
+      </div>
     </div>
-    <figure class="avatar">
-      <img />
-    </figure>
-  </div>
 
-  <div class="messages">
-    <div class="messages-content"></div>
-  </div>
+    <div class="message-box">
+      <ion-input 
+        [(ngModel)]="mensaje" 
+        placeholder="Enviar mensaje" 
+        class="message-input"
+      ></ion-input>
 
-  <div class="message-box">
-    <input type="text" name="mensaje" [(ngModel)]="mensaje" placeholder="Enviar mensaje" class="message-input">
-
-    <button class="message-submit" (click)="enviar_mensaje()">Send</button>
+      <ion-button 
+        (click)="enviar_mensaje()" 
+        class="message-submit"
+      >
+        Enviar
+      </ion-button>
+    </div>
   </div>
-</div>
+</ion-content>

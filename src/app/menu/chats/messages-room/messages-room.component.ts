@@ -1,13 +1,15 @@
 import { Component, inject } from '@angular/core';
-import { RecomendatioIconComponent } from '../../UI/recomendatio-icon/recomendatio-icon.component';
+import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RecomendatioIconComponent } from '../../UI/recomendatio-icon/recomendatio-icon.component';
 
 @Component({
   selector: 'app-messages-room',
   standalone: true,
-  imports: [RecomendatioIconComponent],
+  imports: [RecomendatioIconComponent, IonicModule, CommonModule],
   templateUrl: './messages-room.component.html',
-  styleUrl: './messages-room.component.css'
+  styleUrl: './messages-room.component.scss'
 })
 export class MessagesRoomComponent {
   private _router = inject(Router);
@@ -15,4 +17,4 @@ export class MessagesRoomComponent {
   navigateTo() {
     this._router.navigateByUrl('/menu/mensajes');
   }
-}
+} 

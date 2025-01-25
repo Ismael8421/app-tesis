@@ -6,6 +6,7 @@ import { hasEmailError, isRequired } from '../utils/validators';
 import { NgIf } from '@angular/common';
 import { GoogleButtonComponent } from '../../ui/google-button/google-button.component';
 import { EyeButtonComponent } from '../../ui/eye-button/eye-button.component';
+import { IonicModule } from '@ionic/angular';
 
 export interface FormSignIn{
   email: FormControl<string | null>;
@@ -15,9 +16,9 @@ export interface FormSignIn{
 @Component({
   selector: 'app-sign-in',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent],
+  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonicModule],
   templateUrl: './sign-in.component.html',
-  styleUrl: './sign-in.component.css'
+  styleUrl: './sign-in.component.scss'
 })
 export default class SignInComponent {
   private _formBuilder = inject(FormBuilder);

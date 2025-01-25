@@ -1,13 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthStateService } from '../../../account/shared/data-access/auth-state.service';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [RouterLink, RouterOutlet],
+  imports: [RouterLink, RouterOutlet, IonicModule],
   templateUrl: './settings.component.html',
-  styleUrl: './settings.component.css'
+  styleUrl: './settings.component.scss'
 })
 export class SettingsComponent {
   private _authState = inject(AuthStateService);

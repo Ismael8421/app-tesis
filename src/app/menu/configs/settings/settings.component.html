@@ -1,16 +1,50 @@
-<div class="config-container">
-    <div class="perfil" (click)="navigateTo()">
-        <img src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg" alt="Perfil" class="img">
-        <a class="perfilTxt">Ver perfil</a>
+<ion-content>
+    <div class="config-container">
+      <div class="perfil" (click)="navigateTo()">
+        <ion-avatar class="ion-avatar">
+          <img 
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==" 
+            alt="Perfil"
+          >
+        </ion-avatar>
+        <ion-text class="perfilTxt">Ver perfil</ion-text>
+      </div>
+  
+      <div class="settings">
+        <ion-button 
+          expand="block" 
+          fill="clear" 
+          class="option theme-option"
+        >
+          Tema
+        </ion-button>
+  
+        <ion-button 
+          expand="block" 
+          fill="clear" 
+          class="option change-credentials"
+        >
+          Cambiar correo o contraseña
+        </ion-button>
+  
+        <ion-button 
+          expand="block" 
+          fill="clear" 
+          class="option report-error"
+        >
+          Reportar un error
+        </ion-button>
+  
+        <ion-button 
+          expand="block" 
+          fill="clear" 
+          class="option logout" 
+          (click)="logOut()"
+        >
+          Cerrar sesión
+        </ion-button>
+      </div>
     </div>
-
-    <div class="settings">
-        <a class="option">Tema</a>
-        <a class="option">Cambiar correo o contraseña</a>
-        <a class="option">Reportar un error</a>
-        <a class="option logout" (click)="logOut()">Cerrar sesión</a>
-    </div>
-</div>
-
-
-<router-outlet></router-outlet>
+  
+    <ion-router-outlet></ion-router-outlet>
+  </ion-content>

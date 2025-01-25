@@ -1,51 +1,77 @@
-<section class="login-section">
-  <div class="login-container">
-    <div>
-      <div>
-       
-        <h1>Inicia sesión</h1>
-        <div class="google-button-container">
-          <app-google-button (onClick)="submitWithGoogle()"></app-google-button>
-        </div>
-        <form [formGroup]="form" (ngSubmit)="submit()">
-          <div class="input-container">
-            <input 
-              type="email"
-              name="email" 
-              id="email"  
-              placeholder="usuario@gmail.com" 
-              formControlName="email"
-            >
-            <small *ngIf="isRequired('email')">Este campo es requerido</small>
-            <small *ngIf="hasEmailError()">Correo invalido</small>
-          </div>
+<ion-content class="login-section">
+  <div class="login-container ion-padding">
+    <div class="ion-text-center">
+      <h1>Inicia sesión</h1>
+      
+      <div class="google-button-container ion-margin-vertical">
+        <app-google-button (onClick)="submitWithGoogle()"></app-google-button>
+      </div>
 
-          <div class="input-container">
-            <input 
-              [type]="passwordInputType"
-              name="password" 
-              id="password" 
-              placeholder="••••••••" 
-              formControlName="password"
-            >
-            <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
-              <app-eye-button />
-            </button>
-          </div>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <ion-item class="ion-margin-bottom">
+          <ion-input 
+            type="email"
+            name="email" 
+            placeholder="usuario@gmail.com" 
+            formControlName="email"
+            [clearInput]="true"
+          ></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="isRequired('email')">
+          <small>Este campo es requerido</small>
+        </ion-text>
+        <ion-text color="danger" *ngIf="hasEmailError()">
+          <small>Correo invalido</small>
+        </ion-text>
 
-          <div class="options">
-            <a routerLink="/auth/forgot-password">Olvidaste tu contraseña?</a>
-          </div>
+        <ion-item class="ion-margin-bottom">
+          <ion-input 
+            [type]="passwordInputType"
+            name="password" 
+            placeholder="••••••••" 
+            formControlName="password"
+            [clearInput]="true"
+          ></ion-input>
+          <ion-button 
+            fill="clear" 
+            class="toggle-password" 
+            (click)="togglePasswordVisibility()"
+          >
+            <app-eye-button />
+          </ion-button>
+        </ion-item>
 
-          <button type="submit">Iniciar</button>
+        <ion-text class="ion-margin-bottom ion-text-right">
+          <ion-button 
+            fill="clear" 
+            color="medium" 
+            routerLink="/auth/forgot-password"
+          >
+            Olvidaste tu contraseña?
+          </ion-button>
+        </ion-text>
+
+        <ion-button 
+          type="submit" 
+          expand="block" 
+          class="ion-margin-top"
+        >
+          Iniciar
+        </ion-button>
+
+        <ion-text class="ion-text-center ion-margin-top">
           <p>
             No tienes una cuenta? 
-            <a routerLink="/auth/sign-up">Registrarse</a>
+            <ion-button 
+              fill="clear" 
+              color="primary" 
+              routerLink="/auth/sign-up"
+            >
+              Registrarse
+            </ion-button>
           </p>
-        </form>
-      </div>
+        </ion-text>
+      </form>
     </div>
   </div>
-</section>
-
-  
+</ion-content>

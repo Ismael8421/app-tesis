@@ -11,10 +11,14 @@ import { AuthStateService } from '../../../account/shared/data-access/auth-state
 })
 export class SettingsComponent {
   private _authState = inject(AuthStateService);
-    private _router = inject(Router);
+  private _router = inject(Router);
 
-    async logOut() {
-        await this._authState.logOut();
-        this._router.navigateByUrl('/auth/sign-in');
-    }
+  navigateTo() {
+    this._router.navigateByUrl('/menu/perfil');
+  }
+
+  async logOut() {
+    await this._authState.logOut();
+    this._router.navigateByUrl('/auth/sign-in');
+  }
 }

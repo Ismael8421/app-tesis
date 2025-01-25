@@ -1,28 +1,24 @@
 <body>
     <div class="chat-container">
         <div class="chat-title">Chats</div>
-        <div>
+        <div class="search-container">
             <form>
-                <div class="fx fx-gap">
-                    <div class="search-input">
-                        <input type="text" placeholder="Buscar" required />
-                    </div>
-                    <div>
-                        <button type="submit">
-                            <app-recomendatio-icon class="icon" />
-                        </button>
-                    </div>
+                <div class="search-input">
+                    <input type="text" placeholder="Buscar" required />
+                    <button type="submit">
+                        <app-recomendatio-icon class="icon" />
+                    </button>
                 </div>
             </form>
-        </div><br>
+        </div>
 
-        <div class="chat-card" >
-            <img src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg" class="img">
+        <div class="chat-card" (click)="navigateTo()">
+            <img src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg"
+                class="img">
             <div class="text-container">
                 <h3 class="name">Nombre</h3>
                 <small class="last-message">Ultimo mensaje</small>
             </div>
         </div>
-
     </div>
 </body>

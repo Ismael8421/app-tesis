@@ -1,9 +1,12 @@
 <div class="chat">
   <div class="chat-title">
-    <h1>Fabio Ottaviani</h1>
-    <h2>Supah</h2>
+    <a (click)="goBack()" style="cursor: pointer;"><app-back-icon class="back-icon"></app-back-icon></a>
+    <div class="title-container">
+      <h1>Nombre</h1>
+      <h2>En linea/Desconectado</h2>
+    </div>
     <figure class="avatar">
-    <img />
+      <img />
     </figure>
   </div>
 
@@ -12,14 +15,8 @@
   </div>
 
   <div class="message-box">
-    <input 
-    type="text" 
-    name="mensaje"
-    [(ngModel)]="mensaje"
-    placeholder="Enviar mensaje"
-    class="message-input"
-    >
-    
-    <button class="message-submit">Send</button>
+    <input type="text" name="mensaje" [(ngModel)]="mensaje" placeholder="Enviar mensaje" class="message-input">
+
+    <button class="message-submit" (click)="enviar_mensaje()">Send</button>
   </div>
-  </div>
+</div>

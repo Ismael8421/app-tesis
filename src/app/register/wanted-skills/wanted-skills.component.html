@@ -1,54 +1,40 @@
 <div [formGroup]="form">
     <div formGroupName="wantedSkills">
-        <h1>Habilidades buscadas</h1>
-        <p>Selecciona las habilidades que buscas en tus compañeros de equipo. Puedes elegir más de una.</p>
-        <div>
-            <input
-            type="checkbox" 
-            id="programmingW"
-            formControlName="programmingW"
-            >
-            <label for="programmingW">Programación o Desarrollo de Software</label>
-        </div>
-        <div>
-            <input
-            type="checkbox" 
-            id="graphicDesignW"
-            formControlName="graphicDesignW"
-            >
-            <label for="graphicDesignW">Diseño Gráfico o Creativo</label>
-        </div>
-        <div>
-            <input
-            type="checkbox" 
-            id="knowledgeMEW"
-            formControlName="knowledgeMEW"
-            >
-            <label for="knowledgeMEW">Conocimientos en Mecánica y Electrónica</label>
-        </div>
-        <div>
-            <input
-            type="checkbox" 
-            id="leadershipW"
-            formControlName="leadershipW"
-            >
-            <label for="leadershipW">Habilidades de Liderazgo o Gestión</label>
-        </div>
-        <div>
-            <input
-            type="checkbox" 
-            id="communicationW"
-            formControlName="communicationW"
-            >
-            <label for="communicationW">Comunicación y Trabajo en Equipo</label>
-        </div>
-        <div>
-            <input
-            type="checkbox" 
-            id="resolutionW"
-            formControlName="resolutionW"
-            >
-            <label for="resolutionW">Resolución de Problemas y Pensamiento Crítico</label>
-        </div>
+        <ion-text>
+            <h1>Habilidades buscadas</h1>
+            <p>Selecciona las habilidades que buscas en tus compañeros de equipo. Puedes elegir más de una.</p>
+        </ion-text>
+
+        <ion-list>
+            <ion-item>
+                <ion-checkbox id="programmingW" formControlName="programmingW" slot="start"></ion-checkbox>
+                <ion-label>Programación o Desarrollo de Software</ion-label>
+            </ion-item>
+
+            <ion-item>
+                <ion-checkbox id="graphicDesignW" formControlName="graphicDesignW" slot="start"></ion-checkbox>
+                <ion-label>Diseño Gráfico o Creativo</ion-label>
+            </ion-item>
+
+            <ion-item>
+                <ion-checkbox id="knowledgeMEW" formControlName="knowledgeMEW" slot="start"></ion-checkbox>
+                <ion-label>Conocimientos en Mecánica y Electrónica</ion-label>
+            </ion-item>
+
+            <ion-item>
+                <ion-checkbox id="leadershipW" formControlName="leadershipW" slot="start"></ion-checkbox>
+                <ion-label>Habilidades de Liderazgo o Gestión</ion-label>
+            </ion-item>
+
+            <ion-item>
+                <ion-checkbox id="communicationW" formControlName="communicationW" slot="start"></ion-checkbox>
+                <ion-label>Comunicación y Trabajo en Equipo</ion-label>
+            </ion-item>
+
+            <ion-item>
+                <ion-checkbox id="resolutionW" formControlName="resolutionW" slot="start"></ion-checkbox>
+                <ion-label>Resolución de Problemas y Pensamiento Crítico</ion-label>
+            </ion-item>
+        </ion-list>
     </div>
 </div>

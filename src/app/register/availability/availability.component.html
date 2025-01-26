@@ -1,52 +1,68 @@
 <div [formGroup]="form">
     <div formGroupName="availability">
+      <ion-text>
         <h1>Disponibilidad</h1>
-        <!-- Horas semales -->
-        <div>
-            <label>¿Cuántas horas puedes dedicar semanalmente al proyecto?</label>
-            <input
+      </ion-text>
+  
+      <!-- Horas semanales -->
+      <ion-list>
+        <ion-list-header>
+          <ion-label>
+            ¿Cuántas horas puedes dedicar semanalmente al proyecto?
+          </ion-label>
+        </ion-list-header>
+  
+        <ion-item>
+          <ion-input
             type="number"
             id="hours"
             formControlName="hours"
-            min="1"
-            max="168"
-            >
-            <div *ngIf="form.get('availability.hours')?.invalid && form.get('availability.hours')?.touched">
-                <small *ngIf="form.get('availability.hours')?.errors?.['required']">Debes ingresar las horas disponibles.</small>
-                <small *ngIf="form.get('availability.hours')?.errors?.['min']">Debe ser al menos 1 hora.</small>
-                <small *ngIf="form.get('availability.hours')?.errors?.['max']">No puede superar las 168 horas.</small>
-            </div>
-        </div>
-        <!-- Modalidad de trabajo -->
-        <div>
-            <label>¿Prefieres trabajar presencialmente, virtualmente o de forma híbrida?</label>
-            <div>
-                <input
-                type="radio"
-                id="workModalityPresencial"
-                value="Presencialmente"
-                formControlName="workModality"
-                >
-                <label for="workModalityPresencial">Presencialmente</label>
-            </div>
-            <div>
-                <input
-                type="radio"
-                id="workModalityVirtual"
-                value="Virtualmente"
-                formControlName="workModality"
-                >
-                <label for="workModalityVirtual">Virtualmente</label>
-            </div>
-            <div>
-                <input
-                type="radio"
-                id="workModalityHibrido"
-                value="Híbrido"
-                formControlName="workModality"
-                >
-                <label for="workModalityHibrido">Híbrido (mezcla de ambas)</label>
-            </div>
-        </div>
+            [min]="1"
+            [max]="168"
+            label="Horas semanales"
+            labelPlacement="floating"
+          ></ion-input>
+        </ion-item>
+  
+        <ion-item lines="none" *ngIf="form.get('availability.hours')?.invalid && form.get('availability.hours')?.touched">
+          <ion-text color="danger">
+            <small *ngIf="form.get('availability.hours')?.errors?.['required']">
+              Debes ingresar las horas disponibles.
+            </small>
+            <small *ngIf="form.get('availability.hours')?.errors?.['min']">
+              Debe ser al menos 1 hora.
+            </small>
+            <small *ngIf="form.get('availability.hours')?.errors?.['max']">
+              No puede superar las 168 horas.
+            </small>
+          </ion-text>
+        </ion-item>
+      </ion-list>
+  
+      <!-- Modalidad de trabajo -->
+      <ion-list>
+        <ion-list-header>
+          <ion-label>
+            ¿Prefieres trabajar presencialmente, virtualmente o de forma híbrida?
+          </ion-label>
+        </ion-list-header>
+  
+        <ion-radio-group formControlName="workModality">
+          <ion-item>
+            <ion-radio id="workModalityPresencial" value="Presencialmente" slot="start"></ion-radio>
+            <ion-label>Presencialmente</ion-label>
+          </ion-item>
+  
+          <ion-item>
+            <ion-radio id="workModalityVirtual" value="Virtualmente" slot="start"></ion-radio>
+            <ion-label>Virtualmente</ion-label>
+          </ion-item>
+  
+          <ion-item>
+            <ion-radio id="workModalityHibrido" value="Híbrido" slot="start"></ion-radio>
+            <ion-label>Híbrido (mezcla de ambas)</ion-label>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
     </div>
-</div>
+  </div>

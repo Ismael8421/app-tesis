@@ -1,83 +1,77 @@
 <div [formGroup]="form">
     <div formGroupName="autoEvaluation">
-        <h1>Autoevaluación de habilidades</h1>
-        <p>Evalúa tus habilidades en las siguientes áreas usando una escala del 1 al 5 (1 = Bajo, 5 = Excelente).</p>
-        <div>
-            <label>Programación o Desarrollo de Software:</label>
-            <input 
-                id="programming"
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                formControlName="programming"
-                >
-                <span>{{ form.get('autoEvaluation.programming')?.value }}</span><br>
-        </div>
+        <ion-text>
+            <h1>Autoevaluación de habilidades</h1>
+            <p>Evalúa tus habilidades en las siguientes áreas usando una escala del 1 al 5 (1 = Bajo, 5 = Excelente).
+            </p>
+        </ion-text>
 
-        <div>
-            <label>Diseño Gráfico o Creativo:</label>
-            <input 
-                id="graphicDesign"
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                formControlName="graphicDesign"
-                >
-                <span>{{ form.get('autoEvaluation.graphicDesign')?.value }}</span><br>
-        </div>
+        <ion-list>
+            <!-- Programación -->
+            <ion-item>
+                <ion-label>Programación o Desarrollo de Software:</ion-label>
+                <ion-range id="programming" min="1" max="5" step="1" formControlName="programming" pin="true"
+                    snaps="true" ticks="true">
+                    <ion-text slot="start">1</ion-text>
+                    <ion-text slot="end">5</ion-text>
+                </ion-range>
+                <ion-note slot="end">{{ form.get('autoEvaluation.programming')?.value }}</ion-note>
+            </ion-item>
 
-        <div>
-            <label>Mecánica Electrónica:</label>
-            <input 
-                id="knowledgeME"
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                formControlName="knowledgeME"
-                >
-                <span>{{ form.get('autoEvaluation.knowledgeME')?.value }}</span><br>
-        </div>
+            <!-- Diseño Gráfico -->
+            <ion-item>
+                <ion-label>Diseño Gráfico o Creativo:</ion-label>
+                <ion-range id="graphicDesign" min="1" max="5" step="1" formControlName="graphicDesign" pin="true"
+                    snaps="true" ticks="true">
+                    <ion-text slot="start">1</ion-text>
+                    <ion-text slot="end">5</ion-text>
+                </ion-range>
+                <ion-note slot="end">{{ form.get('autoEvaluation.graphicDesign')?.value }}</ion-note>
+            </ion-item>
 
-        <div>
-            <label>Liderazgo:</label>
-            <input 
-                id="leadership"
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                formControlName="leadership"
-                >
-                <span>{{ form.get('autoEvaluation.leadership')?.value }}</span><br>
-        </div>
+            <!-- Mecánica Electrónica -->
+            <ion-item>
+                <ion-label>Mecánica Electrónica:</ion-label>
+                <ion-range id="knowledgeME" min="1" max="5" step="1" formControlName="knowledgeME" pin="true"
+                    snaps="true" ticks="true">
+                    <ion-text slot="start">1</ion-text>
+                    <ion-text slot="end">5</ion-text>
+                </ion-range>
+                <ion-note slot="end">{{ form.get('autoEvaluation.knowledgeME')?.value }}</ion-note>
+            </ion-item>
 
-        <div>
-            <label>Comunicación:</label>
-            <input 
-                id="communication"
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                formControlName="communication"
-                >
-                <span>{{ form.get('autoEvaluation.communication')?.value }}</span><br>
-        </div>
+            <!-- Liderazgo -->
+            <ion-item>
+                <ion-label>Liderazgo:</ion-label>
+                <ion-range id="leadership" min="1" max="5" step="1" formControlName="leadership" pin="true" snaps="true"
+                    ticks="true">
+                    <ion-text slot="start">1</ion-text>
+                    <ion-text slot="end">5</ion-text>
+                </ion-range>
+                <ion-note slot="end">{{ form.get('autoEvaluation.leadership')?.value }}</ion-note>
+            </ion-item>
 
-        <div>
-            <label>Resolución de Problemas:</label>
-            <input 
-                id="resolution"
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                formControlName="resolution"
-                >
-                <span>{{ form.get('autoEvaluation.resolution')?.value }}</span><br>
-        </div>
+            <!-- Comunicación -->
+            <ion-item>
+                <ion-label>Comunicación:</ion-label>
+                <ion-range id="communication" min="1" max="5" step="1" formControlName="communication" pin="true"
+                    snaps="true" ticks="true">
+                    <ion-text slot="start">1</ion-text>
+                    <ion-text slot="end">5</ion-text>
+                </ion-range>
+                <ion-note slot="end">{{ form.get('autoEvaluation.communication')?.value }}</ion-note>
+            </ion-item>
+
+            <!-- Resolución de Problemas -->
+            <ion-item>
+                <ion-label>Resolución de Problemas:</ion-label>
+                <ion-range id="resolution" min="1" max="5" step="1" formControlName="resolution" pin="true" snaps="true"
+                    ticks="true">
+                    <ion-text slot="start">1</ion-text>
+                    <ion-text slot="end">5</ion-text>
+                </ion-range>
+                <ion-note slot="end">{{ form.get('autoEvaluation.resolution')?.value }}</ion-note>
+            </ion-item>
+        </ion-list>
     </div>
 </div>

@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, ControlContainer, FormGroupDirective } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-style-work',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule,CommonModule, IonicModule],
   templateUrl: './style-work.component.html',
-  styleUrl: './style-work.component.css'
+  styleUrl: './style-work.component.scss'
 })
 export class StyleWorkComponent implements OnInit{
   form!: FormGroup;

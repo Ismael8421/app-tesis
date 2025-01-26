@@ -9,7 +9,7 @@ import { IonicModule } from '@ionic/angular';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, IonicModule],
   templateUrl: './interests.component.html',
-  styleUrl: './interests.component.css'
+  styleUrl: './interests.component.scss'
 })
 export class InterestsComponent implements OnInit{
   form!: FormGroup;

@@ -11,7 +11,7 @@ import { IonicModule } from '@ionic/angular';
   templateUrl: './personal-data.component.html',
   styleUrl: './personal-data.component.scss'
 })
-export class PersonalDataComponent implements OnInit{
+export class PersonalDataComponent implements OnInit {
   form!: FormGroup;
 
   ngOnInit() {
@@ -19,6 +19,6 @@ export class PersonalDataComponent implements OnInit{
     this.form = parentForm;
   }
 
-  constructor(private controlContainer: ControlContainer) {}
+  constructor(private controlContainer: ControlContainer) { }
 
 }

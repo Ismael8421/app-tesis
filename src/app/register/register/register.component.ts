@@ -4,6 +4,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { RegisterService, userCreate } from '../data-access/register.service';
 import { AuthService } from '../../account/auth/data-access/auth.service';
 import { Router } from '@angular/router';
+
 import { PersonalDataComponent } from '../personal-data/personal-data.component';
 import { AutoEvaluationComponent } from '../auto-evaluation/auto-evaluation.component';
 import { WantedSkillsComponent } from '../wanted-skills/wanted-skills.component';
@@ -18,13 +19,13 @@ import { IonicModule } from '@ionic/angular';
   standalone: true,
   imports: [ReactiveFormsModule, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, FormsModule, PersonalDataComponent, AutoEvaluationComponent, WantedSkillsComponent, PreferencesComponent, AvailabilityComponent, InterestsComponent, StyleWorkComponent, IonicModule],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
   private _userCreate = inject(RegisterService);
   private _authService = inject(AuthService);
   private _router = inject(Router);
-  
+
   loading = signal(false);
 
   form: FormGroup;
@@ -54,7 +55,7 @@ export class RegisterComponent {
         resolutionW: new FormControl()
       }),
       preferences: new FormGroup({
-        professionWanted: new FormControl('',Validators.required),
+        professionWanted: new FormControl('', Validators.required),
         styleWorkP: new FormControl('', Validators.required),
         levelCommitment: new FormControl('', Validators.required)
       }),
@@ -108,7 +109,7 @@ export class RegisterComponent {
         apellido: lastName || '',
         anioLectivo: course || '',
         carrera: profession || '',
-        autoevaluacion:{
+        autoevaluacion: {
           comuniacion: this.form.get('autoEvaluation.communication')?.value || 0,
           disenoGrafico: this.form.get('autoEvaluation.graphicDesign')?.value || 0,
           liderazgo: this.form.get('autoEvaluation.leadership')?.value || 0,
@@ -116,33 +117,33 @@ export class RegisterComponent {
           programacion: this.form.get('autoEvaluation.programming')?.value || 0,
           resolucionProblemas: this.form.get('autoEvaluation.resolution')?.value || 0,
         },
-      
+
         habilidadesBuscadas: {
           comunicacion: this.form.get('wantedSkills.communicationW')?.value || false,
           disenoGrafico: this.form.get('wantedSkills.graphicDesignW')?.value || false,
           liderazgo: this.form.get('wantedSkills.leadershipW')?.value || false,
           mecanicaElectronica: this.form.get('wantedSkills.knowledgeMEW')?.value || false,
           programacion: this.form.get('wantedSkills.programmingW')?.value || false,
-          resolucionProblemas: this.form.get('wantedSkills.resolutionW')?.value || false 
+          resolucionProblemas: this.form.get('wantedSkills.resolutionW')?.value || false
         },
-      
-        preferencias:{
-          carrera: this.form.get('preferences.professionWanted')?.value ,
-          estiloTrabajoP: this.form.get('preferences.styleWorkP')?.value ,
-          nivelCompromiso: this.form.get('preferences.levelCommitment')?.value 
+
+        preferencias: {
+          carrera: this.form.get('preferences.professionWanted')?.value,
+          estiloTrabajoP: this.form.get('preferences.styleWorkP')?.value,
+          nivelCompromiso: this.form.get('preferences.levelCommitment')?.value
         },
-        
-        disponibilidad:{
-          horasSemanales: this.form.get('availability.hours')?.value ,
+
+        disponibilidad: {
+          horasSemanales: this.form.get('availability.hours')?.value,
           modalidadTrabajo: this.form.get('availability.workModality')?.value
         },
-      
-        intereses:{
+
+        intereses: {
           analisisDatos: this.form.get('interests.analysis')?.value || false,
           construccionDispositivos: this.form.get('interests.construction')?.value || false,
           desarrolloSoftware: this.form.get('interests.softwareDevelop')?.value || false,
           disenoGrafico: this.form.get('interests.graphicDesignI')?.value || false,
-          investigacionCientifica: this.form.get('interests.investigation')?.value || false 
+          investigacionCientifica: this.form.get('interests.investigation')?.value || false
         },
         estiloTrabajo: this.form.get('styleWork')?.value
       };

@@ -1,36 +1,58 @@
-<ion-content>
-    <form [formGroup]="form">
-      <div formGroupName="interests">
-        <ion-list>
-          <ion-list-header>
-            <ion-title>Intereses en proyectos</ion-title>
-          </ion-list-header>
-          
-          <ion-item>
-            <ion-label>Desarrollo de software</ion-label>
-            <ion-checkbox formControlName="softwareDevelop" slot="start"></ion-checkbox>
-          </ion-item>
-          
-          <ion-item>
-            <ion-label>Diseño gráfico y creativo</ion-label>
-            <ion-checkbox formControlName="graphicDesignI" slot="start"></ion-checkbox>
-          </ion-item>
-          
-          <ion-item>
-            <ion-label>Construcción de máquinas o dispositivos electrónicos</ion-label>
-            <ion-checkbox formControlName="construction" slot="start"></ion-checkbox>
-          </ion-item>
-          
-          <ion-item>
-            <ion-label>Análisis de datos</ion-label>
-            <ion-checkbox formControlName="analysis" slot="start"></ion-checkbox>
-          </ion-item>
-          
-          <ion-item>
-            <ion-label>Investigación científica</ion-label>
-            <ion-checkbox formControlName="investigation" slot="start"></ion-checkbox>
-          </ion-item>
-        </ion-list>
-      </div>
-    </form>
-  </ion-content>
+<div [formGroup]="form">
+  <div formGroupName="interests">
+    <ion-text>
+      <h1>Intereses en proyectos</h1>
+    </ion-text>
+    
+    <ion-text>
+      <p>Selecciona las áreas de proyecto que más te interesan. Puedes elegir más de una</p>
+    </ion-text>
+
+    <ion-list>
+      <ion-item>
+        <ion-checkbox
+          id="softwareDevelop"
+          formControlName="softwareDevelop"
+          slot="start"
+        ></ion-checkbox>
+        <ion-label>Desarrollo de software</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-checkbox
+          id="graphicDesignI"
+          formControlName="graphicDesignI"
+          slot="start"
+        ></ion-checkbox>
+        <ion-label>Diseño gráfico y creativo</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-checkbox
+          id="construction"
+          formControlName="construction"
+          slot="start"
+        ></ion-checkbox>
+        <ion-label>Construcción de máquinas o dispositivos electrónicos</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-checkbox
+          id="analysis"
+          formControlName="analysis"
+          slot="start"
+        ></ion-checkbox>
+        <ion-label>Análisis de datos</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-checkbox
+          id="investigation"
+          formControlName="investigation"
+          slot="start"
+        ></ion-checkbox>
+        <ion-label>Investigación científica</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</div>

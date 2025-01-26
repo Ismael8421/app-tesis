@@ -1,80 +1,75 @@
-<ion-content>
-  <form [formGroup]="form">
-    <ion-list>
-      <ion-list-header>
-        <ion-title>Datos personales</ion-title>
-      </ion-list-header>
+<div [formGroup]="form">
+  <ion-text>
+    <h1>Datos personales</h1>
+  </ion-text>
+  
+  <ion-list>
+    <!-- Username -->
+    <ion-item>
+      <ion-label position="floating">Nombre de Usuario</ion-label>
+      <ion-input id="username" type="text" formControlName="username"></ion-input>
+    </ion-item>
+    <div *ngIf="form.controls['username'].invalid && form.controls['username'].touched">
+      <ion-text color="danger">
+        <small>Este campo es obligatorio</small>
+      </ion-text>
+    </div>
 
-      <ion-item>
-        <ion-label position="stacked">Nombre de Usuario</ion-label>
-        <ion-input 
-          id="username"
-          formControlName="username"
-          type="text"
-        ></ion-input>
-        <ion-text color="danger" *ngIf="form.controls['username'].invalid && form.controls['username'].touched">
-          <small>Este campo es obligatorio</small>
-        </ion-text>
-      </ion-item>
+    <!-- Name -->
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input id="name" type="text" formControlName="name"></ion-input>
+    </ion-item>
+    <div *ngIf="form.controls['name'].invalid && form.controls['name'].touched">
+      <ion-text color="danger">
+        <small>Este campo es obligatorio</small>
+      </ion-text>
+    </div>
 
-      <ion-item>
-        <ion-label position="stacked">Nombre</ion-label>
-        <ion-input 
-          id="name"
-          formControlName="name"
-          type="text"
-        ></ion-input>
-        <ion-text color="danger" *ngIf="form.controls['name'].invalid && form.controls['name'].touched">
-          <small>Este campo es obligatorio</small>
-        </ion-text>
-      </ion-item>
+    <!-- Last Name -->
+    <ion-item>
+      <ion-label position="floating">Apellido</ion-label>
+      <ion-input id="lastName" type="text" formControlName="lastName"></ion-input>
+    </ion-item>
+    <div *ngIf="form.controls['lastName'].invalid && form.controls['lastName'].touched">
+      <ion-text color="danger">
+        <small>Este campo es obligatorio</small>
+      </ion-text>
+    </div>
 
-      <ion-item>
-        <ion-label position="stacked">Apellido</ion-label>
-        <ion-input 
-          id="lastName"
-          formControlName="lastName"
-          type="text"
-        ></ion-input>
-        <ion-text color="danger" *ngIf="form.controls['lastName'].invalid && form.controls['lastName'].touched">
-          <small>Este campo es obligatorio</small>
-        </ion-text>
-      </ion-item>
+    <!-- Course -->
+    <ion-item>
+      <ion-label position="floating">Año Lectivo</ion-label>
+      <ion-select id="course" formControlName="course">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Primero">Primero</ion-select-option>
+        <ion-select-option value="Segundo">Segundo</ion-select-option>
+        <ion-select-option value="Tercero">Tercero</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="form.controls['course'].invalid && form.controls['course'].touched">
+      <ion-text color="danger">
+        <small>Este campo es obligatorio</small>
+      </ion-text>
+    </div>
 
-      <ion-item>
-        <ion-label position="stacked">Año Lectivo</ion-label>
-        <ion-select 
-          id="course" 
-          formControlName="course" 
-          placeholder="Elige una opción"
-        >
-          <ion-select-option value="Primero">Primero</ion-select-option>
-          <ion-select-option value="Segundo">Segundo</ion-select-option>
-          <ion-select-option value="Tercero">Tercero</ion-select-option>
-        </ion-select>
-        <ion-text color="danger" *ngIf="form.controls['course'].invalid && form.controls['course'].touched">
-          <small>Este campo es obligatorio</small>
-        </ion-text>
-      </ion-item>
-
-      <ion-item>
-        <ion-label position="stacked">Carrera</ion-label>
-        <ion-select 
-          id="profession" 
-          formControlName="profession" 
-          placeholder="Elige una opción"
-        >
-          <ion-select-option value="IEME">IEME</ion-select-option>
-          <ion-select-option value="MCM">MCM</ion-select-option>
-          <ion-select-option value="EMA">EMA</ion-select-option>
-          <ion-select-option value="Mecatrónica">Mecatrónica</ion-select-option>
-          <ion-select-option value="Informática">Informática</ion-select-option>
-          <ion-select-option value="Ciencias">Ciencias</ion-select-option>
-        </ion-select>
-        <ion-text color="danger" *ngIf="form.controls['profession'].invalid && form.controls['profession'].touched">
-          <small>Este campo es obligatorio</small>
-        </ion-text>
-      </ion-item>
-    </ion-list>
-  </form>
-</ion-content>
+    <!-- Profession -->
+    <ion-item>
+      <ion-label position="floating">Carrera</ion-label>
+      <ion-select id="profession" formControlName="profession">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="IEME">IEME</ion-select-option>
+        <ion-select-option value="MCM">MCM</ion-select-option>
+        <ion-select-option value="EMA">EMA</ion-select-option>
+        <ion-select-option value="Mecatrónica">Mecatrónica</ion-select-option>
+        <ion-select-option value="Informática">Informática</ion-select-option>
+        <ion-select-option value="Ciencias">Ciencias</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="form.controls['profession'].invalid && form.controls['profession'].touched">
+      <ion-text color="danger">
+        <small>Este campo es obligatorio</small>
+      </ion-text>
+    </div>
+  </ion-list>
+</div>

@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, ControlContainer, FormGroupDirective } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-wanted-skills',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, IonicModule],
   templateUrl: './wanted-skills.component.html',
-  styleUrl: './wanted-skills.component.css'
+  styleUrl: './wanted-skills.component.scss'
 })
 export class WantedSkillsComponent implements OnInit{
   form!: FormGroup;

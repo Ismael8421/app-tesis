@@ -1,9 +1,9 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
 
   <!-- Página 1: Datos personales -->
-  <div *ngIf="page === 1">
+  <ion-content *ngIf="page === 1">
     <app-personal-data></app-personal-data>
-  </div>
+  </ion-content>
 
   <!-- Página 2: Autoevaluación de Habilidades -->
   <div *ngIf="page === 2">

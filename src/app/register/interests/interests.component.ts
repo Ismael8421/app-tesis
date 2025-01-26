@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, ControlContainer, FormGroupDirective } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-interests',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, IonicModule],
   templateUrl: './interests.component.html',
   styleUrl: './interests.component.css'
 })

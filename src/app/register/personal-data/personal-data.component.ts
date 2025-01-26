@@ -1,20 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, ControlContainer, FormGroupDirective } from '@angular/forms';
+import { FormGroup, ControlContainer } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-personal-data',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, IonicModule],
   templateUrl: './personal-data.component.html',
-  styleUrl: './personal-data.component.css'
+  styleUrl: './personal-data.component.scss'
 })
 export class PersonalDataComponent implements OnInit{
   form!: FormGroup;
 
   ngOnInit() {
-    // Obtiene el FormGroup del componente padre
     const parentForm = this.controlContainer.control as FormGroup;
     this.form = parentForm;
   }

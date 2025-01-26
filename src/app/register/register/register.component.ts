@@ -11,11 +11,12 @@ import { PreferencesComponent } from '../preferences/preferences.component';
 import { AvailabilityComponent } from '../availability/availability.component';
 import { InterestsComponent } from '../interests/interests.component';
 import { StyleWorkComponent } from '../style-work/style-work.component';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, FormsModule, PersonalDataComponent, AutoEvaluationComponent, WantedSkillsComponent, PreferencesComponent, AvailabilityComponent, InterestsComponent, StyleWorkComponent],
+  imports: [ReactiveFormsModule, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, FormsModule, PersonalDataComponent, AutoEvaluationComponent, WantedSkillsComponent, PreferencesComponent, AvailabilityComponent, InterestsComponent, StyleWorkComponent, IonicModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })

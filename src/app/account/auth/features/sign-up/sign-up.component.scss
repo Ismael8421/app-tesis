@@ -1,186 +1,88 @@
-/* Estilo general */
-body {
-  font-family: 'Poppins', sans-serif; /* Fuente más moderna */
-  background: linear-gradient(135deg, #6E6EF5, #9F72A8); /* Fondo degradado */
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
+ion-content {
+  --background: var(--ion-color-light);
 
-/* Contenedor principal */
-section {
-  width: 100%;
-  max-width: 400px;
-  background-color: #2E3440; /* Fondo oscuro del formulario */
-  padding: 30px 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); /* Sombra más intensa */
-  text-align: center;
-  animation: fadeIn 0.8s ease-in-out; /* Animación de entrada */
-}
-
-/* Título principal */
-h1 {
-  font-size: 26px;
-  color: #F5F0B0; /* Color elegante */
-  margin-bottom: 20px;
-  font-weight: bold;
-}
-
-/* Botón de Google */
-.google-button-container {
-  margin-bottom: 20px;
-}
-
-.google-button-container app-google-button {
-  width: 100%;
-}
-
-/* Formularios */
-form {
-  width: 100%;
-  text-align: left;
-}
-
-/* Etiquetas */
-label {
-  font-size: 14px;
-  color: #F5F0B0; /* Color de texto */
-  margin-bottom: 8px;
-  display: block;
-  font-weight: bold;
-  transition: color 0.3s ease;
-}
-
-label:hover {
-  color: #DE6EF5; /* Cambio de color al pasar el ratón */
-}
-
-/* Inputs */
-input {
-  width: 100%;
-  padding: 12px 15px;
-  font-size: 14px;
-  border: 2px solid transparent; /* Borde inicial transparente */
-  border-radius: 8px;
-  background-color: #434C5E; /* Fondo del input */
-  color: #F5F0B0; /* Texto claro */
-  outline: none;
-  margin-bottom: 10px;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
-}
-
-input:focus {
-  border-color: #859CF5; /* Borde al enfocar */
-  background-color: #3B4252; /* Fondo ligeramente más oscuro */
-}
-
-/* Contenedor de inputs con ícono */
-.input-with-icon {
-  position: relative;
-}
-
-.toggle-password {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #F5F0B0; /* Color del botón */
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.3s ease;
-}
-
-.toggle-password:hover {
-  color: #DE6EF5; /* Color al pasar el ratón */
-}
-
-/* Mensajes de error */
-small {
-  display: block;
-  font-size: 12px;
-  color: #F56C6C; /* Color del mensaje de error */
-  margin-top: 5px;
-  animation: fadeIn 0.5s ease-in; /* Animación suave */
-}
-
-/* Botón de enviar */
-button[type="submit"] {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  background: linear-gradient(135deg, #DE6EF5, #859CF5); /* Degradado */
-  color: white; /* Texto blanco */
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin-top: 20px;
-}
-
-button[type="submit"]:hover {
-  transform: translateY(-3px); /* Efecto flotante */
-  box-shadow: 0 6px 12px rgba(222, 110, 245, 0.4); /* Sombra más marcada */
-}
-
-/* Enlaces */
-p {
-  margin-top: 15px;
-  font-size: 14px;
-}
-
-a {
-  color: #DE6EF5; /* Color del enlace */
-  text-decoration: none;
-  font-weight: bold;
-}
-
-a:hover {
-  text-decoration: underline;
-  color: #859CF5; /* Cambio de color al pasar el ratón */
-}
-
-/* Animaciones */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Adaptabilidad móvil */
-@media (max-width: 480px) {
   section {
-    padding: 20px;
-  }
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px 0;
 
-  h1 {
-    font-size: 22px;
-  }
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-  label {
-    font-size: 13px;
-  }
+    .google-button-container {
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+    }
 
-  input {
-    font-size: 13px;
-  }
+    form {
+      div {
+        margin-bottom: 20px;
 
-  button[type="submit"] {
-    font-size: 14px;
-    padding: 12px;
+        ion-label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 500;
+        }
+
+        .input-with-icon {
+          position: relative;
+
+          ion-input {
+            --background: var(--ion-color-light);
+            --border-color: var(--ion-color-medium);
+            --border-radius: 8px;
+            --border-style: solid;
+            --border-width: 1px;
+            --padding-start: 12px;
+            --padding-end: 40px;
+            --placeholder-color: var(--ion-color-medium);
+          }
+
+          .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--ion-color-medium);
+            cursor: pointer;
+          }
+        }
+
+        small {
+          display: block;
+          color: var(--ion-color-danger);
+          margin-top: 4px;
+          font-size: 12px;
+        }
+      }
+
+      ion-button[type="submit"] {
+        margin-top: 24px;
+        --border-radius: 8px;
+      }
+
+      p {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+
+        a {
+          color: var(--ion-color-primary);
+          text-decoration: none;
+          font-weight: 500;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
   }
 }

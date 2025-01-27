@@ -1,38 +1,29 @@
 <ion-content>
-    <div class="chat-container">
-      <div class="chat-title">Chats</div>
-      
-      <div class="search-container">
-        <form>
-          <div class="search-input">
-            <input 
-              type="text" 
-              placeholder="Buscar" 
-              required 
-              class="ion-color-light"
-            />
-            <button type="submit" class="ion-color-light">
-              <app-recomendatio-icon class="icon" />
-            </button>
-          </div>
-        </form>
-      </div>
-  
-      <ion-list lines="full" class="ion-no-padding">
-        <ion-item 
-          (click)="navigateTo()" 
-          button 
-          detail 
-          class="chat-item"
-        >
-          <ion-avatar slot="start">
-            <img src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg">
-          </ion-avatar>
-          <ion-label>
-            <h3>Nombre</h3>
-            <p>Ultimo mensaje</p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+  <div class="chat-container">
+    <div class="chat-title">Chats</div>
+
+    <div class="search-container">
+      <form>
+        <div class="search-input">
+          <input type="text" placeholder="Buscar" required class="ion-color-light" />
+          <button type="submit" class="ion-color-light">
+            <app-recomendatio-icon class="icon" />
+          </button>
+        </div>
+      </form>
     </div>
-  </ion-content>
+
+    <ion-list lines="full" class="ion-no-padding">
+      <ion-item (click)="navigateTo()" button detail class="chat-item">
+        <ion-avatar slot="start">
+          <img
+            src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg">
+        </ion-avatar>
+        <ion-label>
+          <h3>Nombre</h3>
+          <p>Ultimo mensaje</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

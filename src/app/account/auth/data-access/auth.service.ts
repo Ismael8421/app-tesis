@@ -3,7 +3,7 @@ import { Auth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEma
 import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 
 export interface User {
-  email: string;                                                             
+  email: string;
   password: string;
 }
 
@@ -18,25 +18,25 @@ export class AuthService {
     return this.auth.currentUser;
   }
 
-  async resetPassword(email: string):Promise<void>{
+  async resetPassword(email: string): Promise<void> {
     try {
-      return sendPasswordResetEmail(this.auth, email); 
-    } catch (error) {console.log(error)}
+      return sendPasswordResetEmail(this.auth, email);
+    } catch (error) { console.log(error) }
   }
 
   async signUp(user: User) {
     try {
       // 1. Crear el usuario en Authentication
       const userCredential = await createUserWithEmailAndPassword(
-        this.auth, 
-        user.email, 
+        this.auth,
+        user.email,
         user.password
       );
 
       // 2. Guardar en Firestore
       const credentialsCollection = collection(this.firestore, 'credenciales');
       const userDoc = doc(credentialsCollection, userCredential.user.uid);
-      
+
       await setDoc(userDoc, {
         email: user.email,
         password: user.password,
@@ -52,8 +52,8 @@ export class AuthService {
 
   signIn(user: User) {
     return signInWithEmailAndPassword(
-      this.auth, 
-      user.email, 
+      this.auth,
+      user.email,
       user.password
     );
   }

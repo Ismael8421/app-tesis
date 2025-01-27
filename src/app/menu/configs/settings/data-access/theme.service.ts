@@ -10,42 +10,22 @@ export class ThemeService {
   private theme = new BehaviorSubject<ThemeType>('system');
   theme$ = this.theme.asObservable();
   private mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  private systemThemeListener: ((e: MediaQueryListEvent) => void) | null = null;
 
   constructor() {
-    // Recuperar tema guardado
+    // Verificar tema guardado al iniciar
     const savedTheme = localStorage.getItem('theme') as ThemeType;
     if (savedTheme) {
       this.setTheme(savedTheme);
     } else {
       this.setTheme('system');
     }
-  }
 
-  setTheme(theme: ThemeType) {
-    localStorage.setItem('theme', theme);
-    
-    // Remover el listener anterior si existe
-    if (this.systemThemeListener) {
-      this.mediaQuery.removeEventListener('change', this.systemThemeListener);
-      this.systemThemeListener = null;
-    }
-
-    if (theme === 'system') {
-      // Aplicar tema basado en preferencia del sistema
-      this.applyTheme(this.mediaQuery.matches);
-      
-      // Crear y agregar nuevo listener
-      this.systemThemeListener = (e: MediaQueryListEvent) => {
+    // Escuchar cambios en el tema del sistema
+    this.mediaQuery.addEventListener('change', (e) => {
+      if (this.getCurrentTheme() === 'system') {
         this.applyTheme(e.matches);
-      };
-      this.mediaQuery.addEventListener('change', this.systemThemeListener);
-    } else {
-      // Aplicar tema específico
-      this.applyTheme(theme === 'dark');
-    }
-    
-    this.theme.next(theme);
+      }
+    });
   }
 
   private applyTheme(isDark: boolean) {
@@ -56,14 +36,33 @@ export class ThemeService {
     }
   }
 
+  setTheme(theme: ThemeType) {
+    switch (theme) {
+      case 'dark':
+        this.applyTheme(true);
+        break;
+      case 'light':
+        this.applyTheme(false);
+        break;
+      case 'system':
+        this.applyTheme(this.mediaQuery.matches);
+        break;
+    }
+
+    localStorage.setItem('theme', theme);
+    this.theme.next(theme);
+  }
+
   getCurrentTheme(): ThemeType {
     return this.theme.value;
   }
 
-  ngOnDestroy() {
-    // Limpiar listener cuando el servicio se destruye
-    if (this.systemThemeListener) {
-      this.mediaQuery.removeEventListener('change', this.systemThemeListener);
+  // Obtener el estado actual del tema (si está oscuro o no)
+  isDarkMode(): boolean {
+    const currentTheme = this.getCurrentTheme();
+    if (currentTheme === 'system') {
+      return this.mediaQuery.matches;
     }
+    return currentTheme === 'dark';
   }
 }

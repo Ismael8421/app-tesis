@@ -33,8 +33,8 @@ export default class SignUpComponent {
 
   // Nueva función específica para confirmPassword
   isConfirmPasswordRequired(): boolean {
-    return this.form.get('confirmPassword')?.hasError('required') && 
-           this.form.get('confirmPassword')?.touched || false;
+    return this.form.get('confirmPassword')?.hasError('required') &&
+      this.form.get('confirmPassword')?.touched || false;
   }
 
   hasEmailError() {
@@ -68,7 +68,7 @@ export default class SignUpComponent {
 
   // Método para obtener el tipo de input
   getPasswordInputType(field: 'password' | 'confirm'): string {
-    return field === 'password' 
+    return field === 'password'
       ? (this.passwordVisible ? 'text' : 'password')
       : (this.confirmPasswordVisible ? 'text' : 'password');
   }

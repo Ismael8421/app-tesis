@@ -8,7 +8,7 @@ import { GoogleButtonComponent } from '../../ui/google-button/google-button.comp
 import { EyeButtonComponent } from '../../ui/eye-button/eye-button.component';
 import { IonicModule } from '@ionic/angular';
 
-export interface FormSignIn{
+export interface FormSignIn {
   email: FormControl<string | null>;
   password: FormControl<string | null>;
 }
@@ -52,14 +52,14 @@ export default class SignInComponent {
   }
 
   async submit() {
-    if(this.form.invalid) return;
+    if (this.form.invalid) return;
 
     try {
-      const {email, password} = this.form.value;
-      if(!email || !password) return;
+      const { email, password } = this.form.value;
+      if (!email || !password) return;
       await this._authServices.signIn({ email, password });
       this._router.navigateByUrl('/menu');
-      
+
     } catch (error) {
 
     }
@@ -73,4 +73,3 @@ export default class SignInComponent {
     }
   }
 }
-  

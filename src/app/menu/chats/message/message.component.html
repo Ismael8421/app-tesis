@@ -3,19 +3,16 @@
     <ion-header>
       <ion-toolbar class="chat-title">
         <ion-buttons slot="start">
-          <ion-back-button 
-            defaultHref="/menu/chats" 
-            (click)="goBack()"
-          >
+          <ion-back-button defaultHref="/menu/chats" (click)="goBack()">
             <app-back-icon class="back-icon"></app-back-icon>
           </ion-back-button>
         </ion-buttons>
-        
+
         <ion-title class="title-container">
           <h1>Nombre</h1>
           <h2>En linea/Desconectado</h2>
         </ion-title>
-        
+
         <ion-avatar slot="end" class="avatar">
           <img [src]="avatarUrl || ''">
         </ion-avatar>
@@ -29,16 +26,9 @@
     </div>
 
     <div class="message-box">
-      <ion-input 
-        [(ngModel)]="mensaje" 
-        placeholder="Enviar mensaje" 
-        class="message-input"
-      ></ion-input>
+      <ion-input [(ngModel)]="mensaje" placeholder="Enviar mensaje" class="message-input"></ion-input>
 
-      <ion-button 
-        (click)="enviar_mensaje()" 
-        class="message-submit"
-      >
+      <ion-button (click)="enviar_mensaje()" class="message-submit">
         Enviar
       </ion-button>
     </div>

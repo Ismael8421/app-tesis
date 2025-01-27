@@ -1,77 +1,48 @@
-<ion-content class="login-section">
-  <div class="login-container ion-padding">
-    <div class="ion-text-center">
+<ion-content class="ion-padding">
+  <section>
+    <div>
       <h1>Inicia sesión</h1>
-      
-      <div class="google-button-container ion-margin-vertical">
+
+      <div class="google-button-container">
         <app-google-button (onClick)="submitWithGoogle()"></app-google-button>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <ion-item class="ion-margin-bottom">
-          <ion-input 
-            type="email"
-            name="email" 
-            placeholder="usuario@gmail.com" 
-            formControlName="email"
-            [clearInput]="true"
-          ></ion-input>
-        </ion-item>
-        <ion-text color="danger" *ngIf="isRequired('email')">
-          <small>Este campo es requerido</small>
-        </ion-text>
-        <ion-text color="danger" *ngIf="hasEmailError()">
-          <small>Correo invalido</small>
-        </ion-text>
+        <div>
+          <ion-label position="stacked" for="email">Correo</ion-label>
+          <div class="input-with-icon">
+            <ion-input type="email" name="email" id="email" placeholder="usuario@gmail.com" formControlName="email"
+              [clearInput]="true"></ion-input>
+          </div>
+          <small *ngIf="isRequired('email')">Este campo es requerido</small>
+          <small *ngIf="hasEmailError()">Correo invalido</small>
+        </div>
 
-        <ion-item class="ion-margin-bottom">
-          <ion-input 
-            [type]="passwordInputType"
-            name="password" 
-            placeholder="••••••••" 
-            formControlName="password"
-            [clearInput]="true"
-          ></ion-input>
-          <ion-button 
-            fill="clear" 
-            class="toggle-password" 
-            (click)="togglePasswordVisibility()"
-          >
-            <app-eye-button />
-          </ion-button>
-        </ion-item>
+        <div>
+          <ion-label position="stacked" for="password">Contraseña</ion-label>
+          <div class="input-with-icon">
+            <ion-input [type]="passwordInputType" name="password" id="password" placeholder="••••••••"
+              formControlName="password" [clearInput]="true"></ion-input>
+            <button type="button" class="toggle-password"
+              (click)="$event.preventDefault(); $event.stopPropagation(); togglePasswordVisibility()">
+              <app-eye-button />
+            </button>
+          </div>
+          <small *ngIf="isRequired('password')">Este campo es requerido</small>
+        </div>
 
-        <ion-text class="ion-margin-bottom ion-text-right">
-          <ion-button 
-            fill="clear" 
-            color="medium" 
-            routerLink="/auth/forgot-password"
-          >
+        <div class="forgot-password">
+          <ion-button fill="clear" color="medium" routerLink="/auth/forgot-password">
             Olvidaste tu contraseña?
           </ion-button>
-        </ion-text>
+        </div>
 
-        <ion-button 
-          type="submit" 
-          expand="block" 
-          class="ion-margin-top"
-        >
-          Iniciar
-        </ion-button>
+        <ion-button type="submit" expand="block">Iniciar</ion-button>
 
-        <ion-text class="ion-text-center ion-margin-top">
-          <p>
-            No tienes una cuenta? 
-            <ion-button 
-              fill="clear" 
-              color="primary" 
-              routerLink="/auth/sign-up"
-            >
-              Registrarse
-            </ion-button>
-          </p>
-        </ion-text>
+        <p>
+          No tienes una cuenta? <a routerLink="/auth/sign-up">Registrarse</a>
+        </p>
       </form>
     </div>
-  </div>
+  </section>
 </ion-content>

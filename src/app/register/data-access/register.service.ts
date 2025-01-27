@@ -9,7 +9,7 @@ export interface userCreate {
   anioLectivo: string;
   carrera: string;
   uid?: string;
-  autoevaluacion:{
+  autoevaluacion: {
     comuniacion: number;
     disenoGrafico: number;
     liderazgo: number;
@@ -27,18 +27,18 @@ export interface userCreate {
     resolucionProblemas: boolean
   }
 
-  preferencias:{
+  preferencias: {
     carrera: string;
     estiloTrabajoP: string;
     nivelCompromiso: string;
   }
 
-  disponibilidad:{
+  disponibilidad: {
     horasSemanales: number;
     modalidadTrabajo: string;
   }
 
-  intereses:{
+  intereses: {
     analisisDatos: boolean;
     construccionDispositivos: boolean;
     desarrolloSoftware: boolean;
@@ -76,5 +76,5 @@ export class RegisterService {
       throw error; // Para manejar el error en el componente
     }
   }
-  
+
 }

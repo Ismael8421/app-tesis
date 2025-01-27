@@ -39,11 +39,7 @@
     <ion-footer>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button 
-            (click)="prevPage()" 
-            [disabled]="page === 1" 
-            fill="solid" 
-            color="primary">
+          <ion-button (click)="prevPage()" [disabled]="page === 1" fill="solid" color="primary">
             <ion-icon slot="start" name="arrow-back"></ion-icon>
             Atrás
           </ion-button>
@@ -51,11 +47,7 @@
 
         <!-- Botón Siguiente (se muestra en todas las páginas excepto la última) -->
         <ion-buttons slot="end" *ngIf="!shouldShowRegisterButton()">
-          <ion-button 
-            (click)="nextPage()" 
-            [disabled]="!isCurrentPageValid()" 
-            fill="solid" 
-            color="primary">
+          <ion-button (click)="nextPage()" [disabled]="!isCurrentPageValid()" fill="solid" color="primary">
             Siguiente
             <ion-icon slot="end" name="arrow-forward"></ion-icon>
           </ion-button>
@@ -63,11 +55,7 @@
 
         <!-- Botón Registrar (solo se muestra en la última página) -->
         <ion-buttons slot="end" *ngIf="shouldShowRegisterButton()">
-          <ion-button 
-            type="submit" 
-            [disabled]="loading() || !isCurrentPageValid()" 
-            fill="solid" 
-            color="success">
+          <ion-button type="submit" [disabled]="loading() || !isCurrentPageValid()" fill="solid" color="success">
             <ion-icon slot="start" name="save"></ion-icon>
             {{loading() ? 'Cargando...' : 'Registrar'}}
           </ion-button>

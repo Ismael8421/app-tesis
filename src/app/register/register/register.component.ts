@@ -17,7 +17,22 @@ import { IonicModule } from '@ionic/angular';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, FormsModule, PersonalDataComponent, AutoEvaluationComponent, WantedSkillsComponent, PreferencesComponent, AvailabilityComponent, InterestsComponent, StyleWorkComponent, IonicModule],
+  imports: [
+    ReactiveFormsModule, 
+    NgIf, 
+    NgSwitch, 
+    NgSwitchCase, 
+    NgSwitchDefault, 
+    FormsModule, 
+    PersonalDataComponent, 
+    AutoEvaluationComponent, 
+    WantedSkillsComponent, 
+    PreferencesComponent, 
+    AvailabilityComponent, 
+    InterestsComponent, 
+    StyleWorkComponent, 
+    IonicModule
+  ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -29,7 +44,7 @@ export class RegisterComponent {
   loading = signal(false);
 
   form: FormGroup;
-  page: number = 1; // Página actual del formulario
+  page: number = 1;
 
   constructor() {
     this.form = new FormGroup({
@@ -74,8 +89,65 @@ export class RegisterComponent {
     });
   }
 
+  isCurrentPageValid(): boolean {
+    switch (this.page) {
+      case 1:
+        return Boolean(
+          this.form.get('username')?.valid && 
+          this.form.get('name')?.valid && 
+          this.form.get('lastName')?.valid && 
+          this.form.get('course')?.valid && 
+          this.form.get('profession')?.valid
+        );
+      
+      case 2:
+        const autoEval = this.form.get('autoEvaluation');
+        return Boolean(
+          autoEval?.get('programming')?.valid &&
+          autoEval?.get('graphicDesign')?.valid &&
+          autoEval?.get('knowledgeME')?.valid &&
+          autoEval?.get('leadership')?.valid &&
+          autoEval?.get('communication')?.valid &&
+          autoEval?.get('resolution')?.valid
+        );
+      
+      case 3:
+        // Para habilidades buscadas, al ser checkboxes opcionales, siempre es válido
+        return true;
+      
+      case 4:
+        const pref = this.form.get('preferences');
+        return Boolean(
+          pref?.get('professionWanted')?.valid &&
+          pref?.get('styleWorkP')?.valid &&
+          pref?.get('levelCommitment')?.valid
+        );
+      
+      case 5:
+        const avail = this.form.get('availability');
+        return Boolean(
+          avail?.get('hours')?.valid &&
+          avail?.get('workModality')?.valid
+        );
+      
+      case 6:
+        // Para intereses, al ser checkboxes opcionales, siempre es válido
+        return true;
+      
+      case 7:
+        return Boolean(this.form.get('styleWork')?.valid);
+      
+      default:
+        return false;
+    }
+  }
+
+  shouldShowRegisterButton(): boolean {
+    return this.page === 7;
+  }
+
   nextPage() {
-    if (this.page < 7) {
+    if (this.page < 7 && this.isCurrentPageValid()) {
       this.page++;
     }
   }
@@ -117,7 +189,6 @@ export class RegisterComponent {
           programacion: this.form.get('autoEvaluation.programming')?.value || 0,
           resolucionProblemas: this.form.get('autoEvaluation.resolution')?.value || 0,
         },
-
         habilidadesBuscadas: {
           comunicacion: this.form.get('wantedSkills.communicationW')?.value || false,
           disenoGrafico: this.form.get('wantedSkills.graphicDesignW')?.value || false,
@@ -126,18 +197,15 @@ export class RegisterComponent {
           programacion: this.form.get('wantedSkills.programmingW')?.value || false,
           resolucionProblemas: this.form.get('wantedSkills.resolutionW')?.value || false
         },
-
         preferencias: {
           carrera: this.form.get('preferences.professionWanted')?.value,
           estiloTrabajoP: this.form.get('preferences.styleWorkP')?.value,
           nivelCompromiso: this.form.get('preferences.levelCommitment')?.value
         },
-
         disponibilidad: {
           horasSemanales: this.form.get('availability.hours')?.value,
           modalidadTrabajo: this.form.get('availability.workModality')?.value
         },
-
         intereses: {
           analisisDatos: this.form.get('interests.analysis')?.value || false,
           construccionDispositivos: this.form.get('interests.construction')?.value || false,
@@ -159,5 +227,4 @@ export class RegisterComponent {
       this.loading.set(false);
     }
   }
-
 }

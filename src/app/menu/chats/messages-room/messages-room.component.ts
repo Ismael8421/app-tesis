@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RecomendatioIconComponent } from '../../UI/recomendatio-icon/recomendatio-icon.component';
+import { RecomendatioIconComponent } from '../../../UI/recomendatio-icon/recomendatio-icon.component';
 
 @Component({
   selector: 'app-messages-room',

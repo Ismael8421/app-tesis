@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../account/auth/data-access/auth.service';
-import { IonicModule } from '@ionic/angular';
+import { AlertController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import {
   updateEmail,
@@ -10,22 +10,37 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider
 } from '@angular/fire/auth';
+import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-change-pws-email',
   standalone: true,
-  imports: [ReactiveFormsModule, IonicModule, CommonModule],
+  imports: [ReactiveFormsModule, IonicModule, CommonModule, BackIconComponent],
   templateUrl: './change-pws-email.component.html',
   styleUrls: ['./change-pws-email.component.scss']
 })
 export default class ChangePwsEmailComponent {
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
-
-  isPressed: boolean = false;
+  private alertController = inject(AlertController);
+  private _router = inject(Router);
 
   emailLoading = false;
   passwordLoading = false;
+
+  navigateTo() {
+    this._router.navigateByUrl('/menu/configuraciones');
+  }
+
+  async showAlert(message: string) {
+    const alert = await this.alertController.create({
+      message,
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
 
   emailForm = this.fb.group({
     newEmail: ['', [Validators.required, Validators.email]],
@@ -55,8 +70,7 @@ export default class ChangePwsEmailComponent {
 
       // Iniciamos el proceso de verificación del nuevo email
       await this.authService.initiateEmailUpdate(newEmail);
-
-      alert('Se ha enviado un correo de verificación a la nueva dirección. Por favor, verifica tu nuevo correo para completar el cambio.');
+      await this.showAlert('Se ha enviado un correo de verificación a la nueva dirección. Por favor, verifica tu nuevo correo para completar el cambio.');
       this.emailForm.reset();
     } catch (error: any) {
       console.error('Error al cambiar email:', error);
@@ -64,19 +78,19 @@ export default class ChangePwsEmailComponent {
 
       switch (error.code) {
         case 'auth/requires-recent-login':
-          errorMessage = 'Por favor, vuelve a iniciar sesión e intenta nuevamente';
+          await this.showAlert('Por favor, vuelve a iniciar sesión e intenta nuevamente');
           break;
         case 'auth/invalid-credential':
-          errorMessage = 'La contraseña actual es incorrecta';
+          await this.showAlert('La contraseña actual es incorrecta');
           break;
         case 'auth/email-already-in-use':
-          errorMessage = 'Este correo electrónico ya está en uso';
+          await this.showAlert('Este correo electrónico ya está en uso');
           break;
         case 'auth/invalid-email':
-          errorMessage = 'El correo electrónico no es válido';
+          await this.showAlert('El correo electrónico no es válido');
           break;
         case 'auth/operation-not-allowed':
-          errorMessage = 'Esta operación no está permitida en este momento';
+          await this.showAlert('Esta operación no está permitida en este momento');
           break;
       }
 
@@ -87,7 +101,7 @@ export default class ChangePwsEmailComponent {
   }
 
   async onPasswordChange() {
-    
+
     if (this.passwordLoading || this.passwordForm.invalid) return;
 
     this.passwordLoading = true;
@@ -103,13 +117,12 @@ export default class ChangePwsEmailComponent {
 
         // Actualizar contraseña
         await updatePassword(user, newPassword);
-        
-        alert('Contraseña actualizada exitosamente');
+        await this.showAlert('Contraseña actualizada exitosamente');
         this.passwordForm.reset();
       }
     } catch (error: any) {
       console.error('Error al cambiar contraseña:', error);
-      alert(error.message || 'Error al cambiar la contraseña');
+      await this.showAlert('Error al cambiar la contraseña');
     } finally {
       this.passwordLoading = false;
     }
@@ -120,11 +133,11 @@ export default class ChangePwsEmailComponent {
       const user = this.authService.currentUser;
       if (user?.email) {
         await this.authService.resetPassword(user.email);
-        alert('Se ha enviado un correo para restablecer tu contraseña');
+        await this.showAlert('Se ha enviado un correo para restablecer tu contraseña');
       }
     } catch (error: any) {
       console.error('Error al enviar correo de recuperación:', error);
-      alert(error.message || 'Error al enviar el correo de recuperación');
+      await this.showAlert('Error al enviar el correo de recuperación');
     }
   }
 }

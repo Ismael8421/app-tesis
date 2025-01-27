@@ -4,8 +4,8 @@ import { hasEmailError, isRequired } from '../utils/validators';
 import { NgIf } from '@angular/common';
 import { AuthService } from '../../data-access/auth.service';
 import { Router, RouterLink } from '@angular/router';
-import { GoogleButtonComponent } from '../../ui/google-button/google-button.component';
-import { EyeButtonComponent } from '../../ui/eye-button/eye-button.component';
+import { GoogleButtonComponent } from '../../../../UI/google-button/google-button.component';
+import { EyeButtonComponent } from '../../../../UI/eye-button/eye-button.component';
 import { IonicModule } from '@ionic/angular';
 
 interface FormSignUp {

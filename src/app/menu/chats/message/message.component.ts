@@ -3,7 +3,7 @@ import { IonicModule } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BackIconComponent } from '../../UI/back-icon/back-icon.component';
+import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 
 @Component({
   selector: 'app-message',

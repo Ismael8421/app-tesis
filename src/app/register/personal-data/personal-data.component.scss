@@ -1,0 +1,173 @@
+:root {
+    /* Light mode variables */
+    --background-color: #f4f5f8;
+    --text-color: #333333;
+    --secondary-text-color: #666666;
+    --input-background: #ffffff;
+    --input-border: #d7d8da;
+    --input-focus-border: #3880ff;
+    --error-color: #eb445a;
+    --item-background: #ffffff;
+    --item-border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Dark mode variables */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background-color: #121212;
+      --text-color: #ffffff;
+      --secondary-text-color: #b0b0b0;
+      --input-background: #1e1e1e;
+      --input-border: #2e2e2e;
+      --input-focus-border: #4c8dff;
+      --error-color: #ff4961;
+      --item-background: #1e1e1e;
+      --item-border-color: #2e2e2e;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  .personal-data-form {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--text-color);
+  }
+  
+  ion-list {
+    background: transparent;
+  }
+  
+  ion-item {
+    --background: var(--item-background);
+    --border-color: var(--item-border-color);
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --highlight-height: 0;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  ion-item:hover {
+    box-shadow: 0 4px 8px var(--shadow-color);
+  }
+  
+  ion-label {
+    color: var(--text-color) !important;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  ion-input,
+  ion-select {
+    --background: var(--input-background);
+    --color: var(--text-color);
+    --placeholder-color: var(--secondary-text-color);
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    font-size: 16px;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  ion-input:focus,
+  ion-select:focus {
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px rgba(56, 128, 255, 0.2);
+  }
+  
+  ion-select::part(icon) {
+    color: var(--text-color);
+    opacity: 0.7;
+  }
+  
+  ion-text[color="danger"] {
+    color: var(--error-color) !important;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+    padding-left: 16px;
+  }
+  
+  /* Animations */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-5px);
+    }
+    75% {
+      transform: translateX(5px);
+    }
+  }
+  
+  ion-item.ion-invalid.ion-touched {
+    animation: shake 0.4s ease-in-out;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .personal-data-form {
+      padding: 16px;
+    }
+  
+    h1 {
+      font-size: 20px;
+    }
+  
+    ion-label {
+      font-size: 14px;
+    }
+  
+    ion-input,
+    ion-select {
+      font-size: 14px;
+    }
+  }
+  
+  /* Ionic overrides */
+  ion-item::part(native) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  ion-select::part(text) {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  ion-select::part(placeholder) {
+    color: var(--secondary-text-color);
+    opacity: 0.7;
+  }
+  
+  

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BackIconComponent } from '../../UI/back-icon/back-icon.component';
+import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 import { IonicModule } from '@ionic/angular';
 
 @Component({

@@ -4,9 +4,9 @@ import { AuthService } from '../../data-access/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { hasEmailError, isRequired } from '../utils/validators';
 import { NgIf } from '@angular/common';
-import { GoogleButtonComponent } from '../../ui/google-button/google-button.component';
-import { EyeButtonComponent } from '../../ui/eye-button/eye-button.component';
-import { IonicModule } from '@ionic/angular';
+import { GoogleButtonComponent } from '../../../../UI/google-button/google-button.component';
+import { EyeButtonComponent } from '../../../../UI/eye-button/eye-button.component';
+import { IonicModule, ToastController } from '@ionic/angular';
 
 export interface FormSignIn {
   email: FormControl<string | null>;
@@ -24,6 +24,17 @@ export default class SignInComponent {
   private _formBuilder = inject(FormBuilder);
   private _authServices = inject(AuthService);
   private _router = inject(Router);
+  private toastController = inject(ToastController);
+
+  async showToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000, // duración en milisegundos
+      position: 'bottom', // 'top' | 'middle' | 'bottom'
+    });
+  
+    await toast.present();
+  }
 
   isRequired(field: 'email' | 'password') {
     return isRequired(field, this.form)
@@ -59,7 +70,7 @@ export default class SignInComponent {
       if (!email || !password) return;
       await this._authServices.signIn({ email, password });
       this._router.navigateByUrl('/menu');
-
+      await this.showToast('Inicio de sesión correcto');
     } catch (error) {
 
     }

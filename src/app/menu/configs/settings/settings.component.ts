@@ -29,6 +29,10 @@ export class SettingsComponent {
     this._router.navigateByUrl('/menu/perfil');
   }
 
+  navigateToCPE() {
+    this._router.navigateByUrl('/menu/chagePwsEmail');
+  }
+
   async logOut() {
     await this._authState.logOut();
     this._router.navigateByUrl('/auth/sign-in');

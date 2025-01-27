@@ -9,7 +9,10 @@ export default [
         path: 'perfil',
         loadComponent: () => import('./configs/profile/profile.component').then(m => m.ProfileComponent)
     },
-    
+    {
+        path: 'chagePwsEmail',
+        loadComponent: () => import('./configs/change-pws-email/change-pws-email.component').then(m => m.default)
+    },
     {
         path: '',
         loadComponent: () => import('./menu/menu.component').then(m => m.MenuComponent),

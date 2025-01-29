@@ -1,0 +1,98 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #333;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 65px;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+
+  .nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #ffffff;
+    transition: all 0.3s ease;
+    height: 100%;
+    flex: 1;
+
+    i {
+      font-size: 24px;
+      margin-bottom: 4px;
+      transition: transform 0.3s ease;
+    }
+
+    span {
+      font-size: 12px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background-color: #ffffff;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    &:hover, &:focus {
+      background-color: rgba(255, 255, 255, 0.1);
+
+      i {
+        transform: translateY(-2px);
+      }
+
+      span {
+        opacity: 1;
+      }
+    }
+
+    &.active {
+      i {
+        transform: translateY(-4px);
+      }
+
+      span {
+        opacity: 1;
+      }
+
+      &::after {
+        width: 50%;
+      }
+    }
+  }
+}
+
+// Asegurarse de que el contenido no se oculte detrás de la barra de navegación
+router-outlet + * {
+  padding-bottom: 65px;
+}
+
+// Estilos para los componentes de iconos personalizados
+app-messages-icon,
+app-recomendatio-icon,
+app-settings-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+// Animación suave para cambios de ruta
+.nav-item {
+  i, span, &::after {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+}

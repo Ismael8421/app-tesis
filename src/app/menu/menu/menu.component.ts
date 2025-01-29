@@ -9,7 +9,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [MessagesIconComponent, SettingsIconComponent, RecomendatioIconComponent, RouterOutlet, RouterLink],
   templateUrl: './menu.component.html',
-  styleUrl: './menu.component.css'
+  styleUrl: './menu.component.scss'
 })
 export class MenuComponent {
   

@@ -1,23 +1,68 @@
-<div>
-    <!-- Barra de navegacion -->
-    <div>
-        <button (click)="navigateTo()">
-            <app-back-icon />
-        </button>
+<ion-content>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="navigateTo()">
+            <app-back-icon></app-back-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title>Perfil</ion-title>
+      </ion-toolbar>
+    </ion-header>
+  
+    <div class="profile-menu">
+      <!-- Estado de carga -->
+      <div class="loading-container" *ngIf="loading">
+        <ion-spinner></ion-spinner>
+        <p>Cargando perfil...</p>
+      </div>
+  
+      <!-- Estado de error -->
+      <div class="error-container" *ngIf="error">
+        <ion-text color="danger">
+          <p>{{ error }}</p>
+        </ion-text>
+      </div>
+  
+      <!-- Contenido del Perfil -->
+      <ng-container *ngIf="!loading && !error && userData">
+        <!-- Cabecera del Perfil -->
+        <div class="profile-header">
+          <ion-avatar>
+            <ion-img
+              src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg"
+              alt="Foto de perfil"
+            ></ion-img>
+          </ion-avatar>
+          <div class="profile-info">
+            <h2>{{ userData.nombreUsuario }}</h2>
+            <p>{{ userData.nombre }} {{ userData.apellido }}</p>
+          </div>
+        </div>
+  
+        <!-- Información del Perfil -->
+        <ion-card>
+          <ion-card-content>
+            <!-- Información Académica -->
+            <ion-list>
+              <ion-item>
+                <ion-label>Año Lectivo:</ion-label>
+                <ion-note slot="end">{{ userData.anioLectivo }}</ion-note>
+              </ion-item>
+  
+              <ion-item>
+                <ion-label>Carrera:</ion-label>
+                <ion-note slot="end">{{ userData.carrera }}</ion-note>
+              </ion-item>
+            </ion-list>
+  
+            <ion-button expand="block">
+              Editar perfil
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+  
+        <!-- Aquí puedes agregar más secciones del menú de perfil si es necesario -->
+      </ng-container>
     </div>
-
-    <!-- Foto de perfil -->
-    <div>
-
-    </div>
-
-    <!-- Informacion personal -->
-    <div>
-
-    </div>
-
-    <!-- Informacion el formulario -->
-    <div>
-
-    </div>
-</div>
+  </ion-content>

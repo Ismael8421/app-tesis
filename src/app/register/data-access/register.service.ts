@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, setDoc, doc } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
+import { Firestore, setDoc, doc, getDoc } from '@angular/fire/firestore';
 
 export interface userCreate {
   nombreUsuario: string;
@@ -54,6 +53,23 @@ export interface userCreate {
 })
 export class RegisterService {
   private _firestore = inject(Firestore);
+
+  async getUserData(uid: string): Promise<userCreate | null> {
+    try {
+      const userDoc = doc(this._firestore, `usuarios/${uid}`);
+      const userSnapshot = await getDoc(userDoc);
+      
+      if (userSnapshot.exists()) {
+        return userSnapshot.data() as userCreate;
+      } else {
+        console.log('No se encontró el documento del usuario');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener datos del usuario:', error);
+      throw error;
+    }
+  }
 
   async create(uid: string, user: userCreate) {
     try {

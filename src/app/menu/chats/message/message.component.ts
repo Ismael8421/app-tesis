@@ -1,35 +1,63 @@
-import { Component } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ChatService } from '../data-access/chat.service';
+import { Auth } from '@angular/fire/auth';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 
 @Component({
   selector: 'app-message',
-  standalone: true,
-  imports: [BackIconComponent, IonicModule, CommonModule, FormsModule],
   templateUrl: './message.component.html',
-  styleUrl: './message.component.scss'
+  styleUrls: ['./message.component.scss'],
+  standalone: true,
+  imports: [CommonModule, IonicModule, FormsModule, BackIconComponent]
 })
-export class MessageComponent {
-  mensaje: string = '';
-  avatarUrl: string = '';
+export class MessageComponent implements OnInit {
+  private chatService = inject(ChatService);
+  private auth = inject(Auth);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
-    // Optional: get ID from route
-    const id = this.route.snapshot.paramMap.get('id');
+  mensaje: string = '';
+  messages$: Observable<any>;
+  currentUser = this.auth.currentUser;
+
+  constructor() {
+    const chatId = this.route.snapshot.paramMap.get('id') || '';
+    this.messages$ = this.chatService.getMessages(chatId);
+  }
+
+  ngOnInit() {
+    if (!this.currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+  }
+
+  private getChatId(): string {
+    return this.route.snapshot.paramMap.get('id') || '';
+  }
+
+  async enviar_mensaje() {
+    if (!this.mensaje.trim() || !this.currentUser) return;
+
+    try {
+      await this.chatService.sendMessage(
+        this.getChatId(),
+        this.currentUser.uid,
+        this.currentUser.displayName || 'Usuario',
+        this.mensaje
+      );
+      this.mensaje = '';
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   }
 
   goBack() {
-    this.router.navigateByUrl('/menu/chats');
-  }
-
-  enviar_mensaje() {
-    console.log(this.mensaje);
-    // Implement message sending logic
+    this.router.navigate(['/menu/chats']);
   }
 }

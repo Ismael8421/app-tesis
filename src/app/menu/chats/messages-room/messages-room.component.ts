@@ -1,20 +1,46 @@
-import { Component, inject } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit, inject } from '@angular/core';
+import { ChatService } from '../data-access/chat.service';
+import { Auth } from '@angular/fire/auth';
+import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import { RecomendatioIconComponent } from '../../../UI/recomendatio-icon/recomendatio-icon.component';
 
 @Component({
   selector: 'app-messages-room',
-  standalone: true,
-  imports: [RecomendatioIconComponent, IonicModule, CommonModule],
   templateUrl: './messages-room.component.html',
-  styleUrl: './messages-room.component.scss'
+  styleUrls: ['./messages-room.component.scss'],
+  standalone: true,
+  imports: [CommonModule, IonicModule, RecomendatioIconComponent]
 })
-export class MessagesRoomComponent {
-  private _router = inject(Router);
+export class MessagesRoomComponent implements OnInit {
+  private chatService = inject(ChatService);
+  private auth = inject(Auth);
+  private router = inject(Router);
 
-  navigateTo() {
-    this._router.navigateByUrl('/menu/mensajes');
+  chats$: Observable<any[]> = of([]);
+
+  ngOnInit() {
+    const currentUser = this.auth.currentUser;
+    if (currentUser) {
+      this.chats$ = this.chatService.getUserChats(currentUser.uid);
+    }
   }
-} 
+
+  navigateTo(chatId: string) {
+    if (!chatId) {
+      console.error('No chat ID provided');
+      return;
+    }
+    console.log('Navigating to chat:', chatId);
+    this.router.navigate(['/menu/mensajes', chatId]);
+  }
+
+  getUserName(participants: string[]): string {
+    if (!this.auth.currentUser) return '';
+    
+    const otherUserId = participants.find(id => id !== this.auth.currentUser?.uid);
+    return otherUserId === 'edcYJuV03NfrH46iw26FZ02oo3m2' ? 'IsmaelP2007' : 'fabianB94';
+  }
+}

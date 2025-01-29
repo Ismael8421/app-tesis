@@ -53,6 +53,16 @@ export class RegisterComponent {
       lastName: new FormControl('', Validators.required),
       course: new FormControl('', Validators.required),
       profession: new FormControl('', Validators.required),
+
+      wantedSkills: new FormGroup({
+        IEME: new FormControl(),
+        MCM: new FormControl(),
+        EMA: new FormControl(),
+        Mechatronics: new FormControl(),
+        Computing: new FormControl(),
+        Sciences: new FormControl()
+      }),
+
       autoEvaluation: new FormGroup({
         programming: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
         graphicDesign: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
@@ -61,14 +71,7 @@ export class RegisterComponent {
         communication: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
         resolution: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
       }),
-      wantedSkills: new FormGroup({
-        programmingW: new FormControl(),
-        graphicDesignW: new FormControl(),
-        knowledgeMEW: new FormControl(),
-        leadershipW: new FormControl(),
-        communicationW: new FormControl(),
-        resolutionW: new FormControl()
-      }),
+      
       preferences: new FormGroup({
         professionWanted: new FormControl('', Validators.required),
         styleWorkP: new FormControl('', Validators.required),
@@ -101,6 +104,9 @@ export class RegisterComponent {
         );
       
       case 2:
+        return true;
+      case 3:
+        // Para habilidades buscadas, al ser checkboxes opcionales, siempre es válido
         const autoEval = this.form.get('autoEvaluation');
         return Boolean(
           autoEval?.get('programming')?.valid &&
@@ -110,10 +116,6 @@ export class RegisterComponent {
           autoEval?.get('communication')?.valid &&
           autoEval?.get('resolution')?.valid
         );
-      
-      case 3:
-        // Para habilidades buscadas, al ser checkboxes opcionales, siempre es válido
-        return true;
       
       case 4:
         const pref = this.form.get('preferences');
@@ -190,12 +192,12 @@ export class RegisterComponent {
           resolucionProblemas: this.form.get('autoEvaluation.resolution')?.value || 0,
         },
         habilidadesBuscadas: {
-          comunicacion: this.form.get('wantedSkills.communicationW')?.value || false,
-          disenoGrafico: this.form.get('wantedSkills.graphicDesignW')?.value || false,
-          liderazgo: this.form.get('wantedSkills.leadershipW')?.value || false,
-          mecanicaElectronica: this.form.get('wantedSkills.knowledgeMEW')?.value || false,
-          programacion: this.form.get('wantedSkills.programmingW')?.value || false,
-          resolucionProblemas: this.form.get('wantedSkills.resolutionW')?.value || false
+          ieme: this.form.get('wantedSkills.IEME')?.value || false,
+          mcm: this.form.get('wantedSkills.MCM')?.value || false,
+          ema: this.form.get('wantedSkills.EMA')?.value || false,
+          mecatronica: this.form.get('wantedSkills.Mechatronics')?.value || false,
+          informatica: this.form.get('wantedSkills.Computing')?.value || false,
+          ciencias: this.form.get('wantedSkills.Sciences')?.value || false
         },
         preferencias: {
           carrera: this.form.get('preferences.professionWanted')?.value,

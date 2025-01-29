@@ -1,8 +1,12 @@
-import { NgIf, NgFor } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Output, EventEmitter, Input } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { NgIf, NgFor, CommonModule } from '@angular/common';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, inject } from '@angular/core';
+import { Auth, User } from '@angular/fire/auth';
+import { ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { register } from 'swiper/element/bundle';
+import { ChatService } from '../chats/data-access/chat.service';
+import { Observable } from 'rxjs';
+import { IonicModule } from '@ionic/angular';
 
 register();
 
@@ -12,55 +16,37 @@ register();
   imports: [
     NgIf,
     NgFor,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CommonModule,
+    IonicModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',
   styleUrl: './search.component.css'
 })
 export class SearchComponent {
-  @Input() placeholder: string = 'Buscar...';
-  @Input() suggestions: string[] = [];
-  @Output() search = new EventEmitter<string>();
-  @Output() selected = new EventEmitter<string>();
+  private auth = inject(Auth);
+  private router = inject(Router);
+  private chatService = inject(ChatService);
 
-  searchControl = new FormControl('');
-  showClearButton = false;
-  showSuggestions = false;
-  isSearchFocused = false;
+  currentUser$ = new Observable<User | null>(observer => {
+    return this.auth.onAuthStateChanged(observer);
+  });
 
-  ngOnInit() {
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(value => {
-      this.search.emit(value || '');
-      this.showClearButton = !!value;
-      this.showSuggestions = !!value && this.isSearchFocused;
-    });
-  }
-
-  onFocus() {
-    this.isSearchFocused = true;
-    this.showSuggestions = !!this.searchControl.value;
-  }
-
-  onBlur() {
-    setTimeout(() => {
-      this.isSearchFocused = false;
-      this.showSuggestions = false;
-    }, 200);
-  }
-
-  clearSearch() {
-    this.searchControl.setValue('');
-    this.showClearButton = false;
-    this.showSuggestions = false;
-  }
-
-  selectSuggestion(suggestion: string) {
-    this.searchControl.setValue(suggestion);
-    this.selected.emit(suggestion);
-    this.showSuggestions = false;
+  async startChat(otherUserId: string, otherUserName: string) {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) {
+      console.error('No user logged in');
+      return;
+    }
+  
+    try {
+      const chatId = await this.chatService.startChat(currentUser.uid, otherUserId);
+      if (chatId) {
+        this.router.navigate(['/menu/mensajes', chatId]);
+      }
+    } catch (error) {
+      console.error('Error starting chat:', error);
+    }
   }
 }

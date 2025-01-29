@@ -1,17 +1,11 @@
 import { Routes } from "@angular/router";
 
 export default [
+    // La ruta del mensaje ahora está al mismo nivel que el menú
     {
-        path: 'mensajes',
-        loadComponent: () => import('./chats/message/message.component').then(m => m.MessageComponent),
-    },
-    {
-        path: 'perfil',
-        loadComponent: () => import('./configs/profile/profile.component').then(m => m.ProfileComponent)
-    },
-    {
-        path: 'chagePwsEmail',
-        loadComponent: () => import('./configs/change-pws-email/change-pws-email.component').then(m => m.default)
+        path: 'mensajes/:id',
+        loadComponent: () => import('./chats/message/message.component')
+            .then(m => m.MessageComponent)
     },
     {
         path: '',
@@ -35,5 +29,13 @@ export default [
                 loadComponent: () => import('./configs/settings/settings.component').then(m => m.SettingsComponent)
             }
         ]
+    },
+    {
+        path: 'perfil',
+        loadComponent: () => import('./configs/profile/profile.component').then(m => m.ProfileComponent)
+    },
+    {
+        path: 'chagePwsEmail',
+        loadComponent: () => import('./configs/change-pws-email/change-pws-email.component').then(m => m.default)
     }
 ] as Routes;

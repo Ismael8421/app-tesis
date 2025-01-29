@@ -8,6 +8,16 @@ export interface userCreate {
   anioLectivo: string;
   carrera: string;
   uid?: string;
+
+  habilidadesBuscadas: {
+    ieme: boolean;
+    mcm: boolean;
+    ema: boolean;
+    mecatronica: boolean;
+    informatica: boolean;
+    ciencias: boolean
+  }
+
   autoevaluacion: {
     comuniacion: number;
     disenoGrafico: number;
@@ -17,14 +27,7 @@ export interface userCreate {
     resolucionProblemas: number;
   }
 
-  habilidadesBuscadas: {
-    comunicacion: boolean;
-    disenoGrafico: boolean;
-    liderazgo: boolean;
-    mecanicaElectronica: boolean;
-    programacion: boolean;
-    resolucionProblemas: boolean
-  }
+  
 
   preferencias: {
     carrera: string;

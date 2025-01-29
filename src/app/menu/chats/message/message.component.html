@@ -9,26 +9,49 @@
         </ion-buttons>
 
         <ion-title class="title-container">
-          <h1>Nombre</h1>
-          <h2>En linea/Desconectado</h2>
+          <h1>{{ 
+            currentUser?.uid === 'edcYJuV03NfrH46iw26FZ02oo3m2' ? 'fabianB94' : 'IsmaelP2007'
+          }}</h1>
+          <h2>En línea</h2>
         </ion-title>
 
         <ion-avatar slot="end" class="avatar">
-          <img [src]="avatarUrl || ''">
+          <img src="https://pbs.twimg.com/profile_images/1602554587499601920/wUov6Tgl_400x400.jpg">
         </ion-avatar>
       </ion-toolbar>
     </ion-header>
 
     <div class="messages">
-      <div class="messages-content">
-        <!-- Mensaje content -->
+      <div class="messages-content" #scrollContainer>
+        <ng-container *ngIf="messages$ | async as messages">
+          <div *ngFor="let message of messages" 
+               [ngClass]="{'message-sent': message.senderId === currentUser?.uid,
+                          'message-received': message.senderId !== currentUser?.uid}"
+               class="message">
+            <div class="message-bubble">
+              <div class="message-text">{{ message.content }}</div>
+              <div class="message-time">
+                {{ message.timestamp | date:'shortTime' }}
+              </div>
+            </div>
+          </div>
+          
+          <div *ngIf="messages.length === 0" class="no-messages">
+            <p>No hay mensajes aún. ¡Sé el primero en escribir!</p>
+          </div>
+        </ng-container>
       </div>
     </div>
 
     <div class="message-box">
-      <ion-input [(ngModel)]="mensaje" placeholder="Enviar mensaje" class="message-input"></ion-input>
+      <ion-input [(ngModel)]="mensaje" 
+                 placeholder="Enviar mensaje" 
+                 class="message-input"
+                 (keyup.enter)="enviar_mensaje()"></ion-input>
 
-      <ion-button (click)="enviar_mensaje()" class="message-submit">
+      <ion-button (click)="enviar_mensaje()" 
+                  class="message-submit"
+                  [disabled]="!mensaje.trim()">
         Enviar
       </ion-button>
     </div>

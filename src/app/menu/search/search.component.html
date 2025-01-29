@@ -1,6 +1,6 @@
-<div class="search-container" [class.focused]="isSearchFocused">
+<!-- <div class="search-container" [class.focused]="isSearchFocused">
     <div class="search-input-wrapper">
-      <!-- Icono de búsqueda -->
+      
       <i class="search-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
@@ -8,7 +8,7 @@
         </svg>
       </i>
       
-      <!-- Campo de búsqueda -->
+      
       <input
         type="text"
         [formControl]="searchControl"
@@ -18,7 +18,7 @@
         class="search-input"
       />
       
-      <!-- Botón de limpiar -->
+     
       <button
         *ngIf="showClearButton"
         class="clear-button"
@@ -32,7 +32,7 @@
       </button>
     </div>
   
-    <!-- Lista de sugerencias -->
+    
     <div class="suggestions-container" *ngIf="showSuggestions && suggestions.length > 0">
       <ul class="suggestions-list">
         <li *ngFor="let suggestion of suggestions"
@@ -47,5 +47,22 @@
           {{ suggestion }}
         </li>
       </ul>
+    </div>
+  </div> -->
+
+
+  <div class="search-container">
+    <h2>Iniciar chat con:</h2>
+    <!-- Para propósitos de demostración, mostramos botones para ambos usuarios -->
+    <div *ngIf="currentUser$ | async as currentUser">
+      <!-- Solo mostrar el botón del otro usuario -->
+      <button *ngIf="currentUser.uid !== 'edcYJuV03NfrH46iw26FZ02oo3m2'"
+              (click)="startChat('edcYJuV03NfrH46iw26FZ02oo3m2', 'IsmaelP2007')">
+        Chat con IsmaelP2007
+      </button>
+      <button *ngIf="currentUser.uid !== 'nFq9GHgmxWhs0ojGpq9F9yjjc7R2'"
+              (click)="startChat('nFq9GHgmxWhs0ojGpq9F9yjjc7R2', 'fabianB94')">
+        Chat con fabianB94
+      </button>
     </div>
   </div>

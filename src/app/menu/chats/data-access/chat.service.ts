@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Database, ref, push, set, onValue, get } from '@angular/fire/database';
+import { Database, ref, push, set, onValue, get, update } from '@angular/fire/database';
 import { Observable } from 'rxjs';
 
 interface Message {
@@ -7,6 +7,7 @@ interface Message {
   senderId: string;
   senderName: string;
   timestamp: number;
+  readBy: { [key: string]: boolean }; // New field to track who has read the message
 }
 
 interface Chat {
@@ -86,23 +87,22 @@ export class ChatService {
   }
 
   async getChat(chatId: string): Promise<Chat | null> {
-    try {
-      const chatRef = ref(this.db, `chats/${chatId}`);
-      const snapshot = await get(chatRef);
-      
-      if (snapshot.exists()) {
-        const chatData = snapshot.val();
-        return {
-          ...chatData,
-          id: chatId
-        };
-      }
-      return null;
-    } catch (error) {
-      console.error('Error getting chat:', error);
-      return null;
+  try {
+    const chatRef = ref(this.db, `chats/${chatId}`);
+    const snapshot = await get(chatRef);
+    if (snapshot.exists()) {
+      const chatData = snapshot.val();
+      return {
+        ...chatData,
+        id: chatId
+      };
     }
+    return null;
+  } catch (error) {
+    console.error('Error getting chat:', error);
+    return null;
   }
+}
 
   private async findExistingChat(user1Id: string, user2Id: string): Promise<string | null> {
     try {
@@ -136,30 +136,76 @@ export class ChatService {
     try {
       const messagesRef = ref(this.db, `messages/${chatId}`);
       const newMessageRef = push(messagesRef);
-
       const message: Message = {
         content,
         senderId,
         senderName,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        readBy: {
+          [senderId]: true // Sender has read the message by default
+        }
       };
-
+      
       await set(newMessageRef, message);
-
-      // Actualizar el último mensaje del chat
+      
+      // Update chat with unread status for other participants
       const chatRef = ref(this.db, `chats/${chatId}`);
       const chatSnapshot = await get(chatRef);
       const chatData = chatSnapshot.val();
-
+      
+      // Mark message as unread for other participants
+      const unreadStatus: { [key: string]: boolean } = {};
+      chatData.participants.forEach((participantId: string) => {
+        if (participantId !== senderId) {
+          unreadStatus[participantId] = true;
+        }
+      });
+  
       await set(chatRef, {
         ...chatData,
         lastMessage: content,
-        lastMessageTimestamp: message.timestamp
+        lastMessageTimestamp: message.timestamp,
+        unreadMessages: unreadStatus
       });
-
     } catch (error) {
       console.error('Error sending message:', error);
       throw new Error('Failed to send message');
+    }
+  }
+  
+  // Add new method to mark messages as read
+  async markMessagesAsRead(chatId: string, userId: string): Promise<void> {
+    try {
+      const messagesRef = ref(this.db, `messages/${chatId}`);
+      const snapshot = await get(messagesRef);
+      
+      if (!snapshot.exists()) return;
+      
+      const updates: { [key: string]: any } = {};
+      snapshot.forEach((childSnapshot) => {
+        const message = childSnapshot.val();
+        if (!message.readBy?.[userId]) {
+          updates[`${childSnapshot.key}/readBy/${userId}`] = true;
+        }
+      });
+      
+      if (Object.keys(updates).length > 0) {
+        await update(ref(this.db, `messages/${chatId}`), updates);
+        
+        // Clear unread status for this user in chat
+        const chatRef = ref(this.db, `chats/${chatId}`);
+        const chatSnapshot = await get(chatRef);
+        const chatData = chatSnapshot.val();
+        
+        if (chatData.unreadMessages?.[userId]) {
+          await update(chatRef, {
+            [`unreadMessages/${userId}`]: false
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+      throw new Error('Failed to mark messages as read');
     }
   }
 

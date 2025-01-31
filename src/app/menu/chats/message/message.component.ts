@@ -35,6 +35,25 @@ export class MessageComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+
+    // Mark messages as read when entering the chat
+    this.markMessagesAsRead();
+
+    // Set up a subscription to mark messages as read when new ones arrive
+    this.messages$.subscribe(() => {
+      this.markMessagesAsRead();
+    });
+  }
+
+  private async markMessagesAsRead() {
+    if (!this.currentUser) return;
+    
+    const chatId = this.getChatId();
+    try {
+      await this.chatService.markMessagesAsRead(chatId, this.currentUser.uid);
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
   }
 
   private getChatId(): string {

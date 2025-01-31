@@ -20,12 +20,16 @@ export class MessagesRoomComponent implements OnInit {
   private router = inject(Router);
 
   chats$: Observable<any[]> = of([]);
+  currentUser: any = null;
 
   ngOnInit() {
-    const currentUser = this.auth.currentUser;
-    if (currentUser) {
-      this.chats$ = this.chatService.getUserChats(currentUser.uid);
-    }
+    // Suscripción a cambios en el estado de autenticación
+    this.auth.onAuthStateChanged(user => {
+      this.currentUser = user;
+      if (user) {
+        this.chats$ = this.chatService.getUserChats(user.uid);
+      }
+    });
   }
 
   navigateTo(chatId: string) {

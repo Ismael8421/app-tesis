@@ -14,7 +14,7 @@ export const routes: Routes = [
         loadChildren: () => import('./menu/menu.routes'),
     },
     {
-        canActivateChild: [publicGuard()],
+        canActivateChild: [privateGuard()],
         path: 'register',
         loadChildren: () => import('./register/register.routes'),
     },

@@ -16,8 +16,11 @@
     <ion-list lines="full" class="ion-no-padding">
       <ng-container *ngIf="chats$ | async as chats">
         <!-- Añadimos un click handler al ion-item -->
-        <ion-item *ngFor="let chat of chats" button detail class="chat-item"
-          [class.unread]="chat.unreadMessages?.[currentUser?.uid]" (click)="navigateTo(chat.id)">
+        <ng-container *ngIf="currentUser">
+          <ion-item *ngFor="let chat of chats" button detail
+          class="chat-item"
+          [class.unread]="chat.unreadMessages?.[currentUser.uid]"
+          (click)="navigateTo(chat.id)">
           <ion-avatar slot="start">
             <img
               src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg">
@@ -33,7 +36,8 @@
             </small>
           </ion-label>
         </ion-item>
-
+        </ng-container>
+        
         <div *ngIf="chats.length === 0" class="no-chats">
           <p>No hay conversaciones activas</p>
         </div>

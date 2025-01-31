@@ -23,10 +23,12 @@
 
     <div class="messages">
       <div class="messages-content" #scrollContainer>
-        <ng-container *ngIf="messages$ | async as messages">
+        <ng-container *ngIf="currentUser && messages$ | async as messages">
           <div *ngFor="let message of messages" 
-               [ngClass]="{'message-sent': message.senderId === currentUser?.uid,
-                          'message-received': message.senderId !== currentUser?.uid}"
+               [ngClass]="{
+                 'message-sent': currentUser && message.senderId === currentUser.uid,
+                 'message-received': currentUser && message.senderId !== currentUser.uid
+               }"
                class="message">
             <div class="message-bubble">
               <div class="message-text">{{ message.content }}</div>
@@ -35,7 +37,7 @@
               </div>
             </div>
           </div>
-          
+                  
           <div *ngIf="messages.length === 0" class="no-messages">
             <p>No hay mensajes aún. ¡Sé el primero en escribir!</p>
           </div>

@@ -7,15 +7,17 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
 import { provideIonicAngular } from '@ionic/angular/standalone';
+import { getMessaging, provideMessaging } from '@angular/fire/messaging';
+import { getStorage, provideStorage } from '@angular/fire/storage';
 
 const firebaseConfig = {
-  projectId: "base-datos-ad943",
-  appId: "1:1090314566944:web:569f5f71e406077db2eb45",
-  databaseURL: "https://base-datos-ad943-default-rtdb.firebaseio.com",
-  storageBucket: "base-datos-ad943.firebasestorage.app",
-  apiKey: "AIzaSyC1Njm1p5d7PKieXz3rswGhnj3Gwc8wMb8",
-  authDomain: "base-datos-ad943.firebaseapp.com",
-  messagingSenderId: "1090314566944"
+  apiKey: "AIzaSyDWICQxQQutJ-7t3hjIZP9QRuhtszoNkM8",
+  authDomain: "base-datos-f12f5.firebaseapp.com",
+  databaseURL: "https://base-datos-f12f5-default-rtdb.firebaseio.com",
+  projectId: "base-datos-f12f5",
+  storageBucket: "base-datos-f12f5.firebasestorage.app",
+  messagingSenderId: "649337349797",
+  appId: "1:649337349797:web:6790307f6f4800003d8f4c"
 };
 
 export const appConfig: ApplicationConfig = {
@@ -25,6 +27,9 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(firebaseConfig)), 
     provideAuth(() => getAuth()), 
     provideFirestore(() => getFirestore()),
-    provideDatabase(() => getDatabase()), provideIonicAngular({})
+    provideDatabase(() => getDatabase()), 
+    provideIonicAngular({}),
+    provideMessaging(() => getMessaging()), 
+    provideStorage(() => getStorage())
   ]
 };

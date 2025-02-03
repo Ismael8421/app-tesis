@@ -56,12 +56,12 @@
     <!-- Para propósitos de demostración, mostramos botones para ambos usuarios -->
     <div *ngIf="currentUser$ | async as currentUser">
       <!-- Solo mostrar el botón del otro usuario -->
-      <button *ngIf="currentUser.uid !== 'edcYJuV03NfrH46iw26FZ02oo3m2'"
-              (click)="startChat('edcYJuV03NfrH46iw26FZ02oo3m2', 'IsmaelP2007')">
+      <button *ngIf="currentUser.uid !== 'yeRfZnKOkoYBUbCYtpRJMPwHs7v1'"
+              (click)="startChat('yeRfZnKOkoYBUbCYtpRJMPwHs7v1', 'IsmaelP2007')">
         Chat con IsmaelP2007
       </button>
-      <button *ngIf="currentUser.uid !== 'nFq9GHgmxWhs0ojGpq9F9yjjc7R2'"
-              (click)="startChat('nFq9GHgmxWhs0ojGpq9F9yjjc7R2', 'fabianB94')">
+      <button *ngIf="currentUser.uid !== 'plcE9hTEInPPooU5z6xZLWoL8AM2'"
+              (click)="startChat('plcE9hTEInPPooU5z6xZLWoL8AM2', 'fabianB94')">
         Chat con fabianB94
       </button>
     </div>

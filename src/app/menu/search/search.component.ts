@@ -29,6 +29,10 @@ export class SearchComponent {
   private router = inject(Router);
   private chatService = inject(ChatService);
 
+  isFormComplete: boolean = false;
+
+  
+
   currentUser$ = new Observable<User | null>(observer => {
     return this.auth.onAuthStateChanged(observer);
   });

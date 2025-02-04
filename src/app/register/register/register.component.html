@@ -1,66 +1,13 @@
 <ion-content>
   <form [formGroup]="form" (ngSubmit)="submit()">
     <!-- Página 1: Datos personales -->
-    <div *ngIf="page === 1">
-      <app-personal-data></app-personal-data>
-    </div>
+    <app-personal-data />
 
-    <!-- Pagina 2: Habilidades buscadas -->
-    <div *ngIf="page === 2">
-      <app-wanted-skills></app-wanted-skills>
-    </div>
-    
-    <!-- Página 3: Autoevaluación de Habilidades -->
-    <div *ngIf="page === 3">
-      <app-auto-evaluation></app-auto-evaluation>
-    </div>
+    <!-- Botón Registrar (solo se muestra en la última página) -->
+    <ion-button type="submit" [disabled]="loading()" fill="solid" color="success">
+      <ion-icon slot="start" name="save"></ion-icon>
+      {{loading() ? 'Cargando...' : 'Registrar'}}
+    </ion-button>
 
-    <!-- Pagina 4: Preferencias de compañeros -->
-    <div *ngIf="page === 4">
-      <app-preferences></app-preferences>
-    </div>
-
-    <!-- Pagina 5: Disponibilidad -->
-    <div *ngIf="page === 5">
-      <app-availability></app-availability>
-    </div>
-
-    <!-- Pagina 6: Intereses en proyectos -->
-    <div *ngIf="page === 6">
-      <app-interests></app-interests>
-    </div>
-
-    <!-- Página 7: Estilo de trabajo -->
-    <div *ngIf="page === 7">
-      <app-style-work></app-style-work>
-    </div>
-
-    <!-- Botones de navegación -->
-    <ion-footer>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button (click)="prevPage()" [disabled]="page === 1" fill="solid" color="primary">
-            <ion-icon slot="start" name="arrow-back"></ion-icon>
-            Atrás
-          </ion-button>
-        </ion-buttons>
-
-        <!-- Botón Siguiente (se muestra en todas las páginas excepto la última) -->
-        <ion-buttons slot="end" *ngIf="!shouldShowRegisterButton()">
-          <ion-button (click)="nextPage()" [disabled]="!isCurrentPageValid()" fill="solid" color="primary">
-            Siguiente
-            <ion-icon slot="end" name="arrow-forward"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-
-        <!-- Botón Registrar (solo se muestra en la última página) -->
-        <ion-buttons slot="end" *ngIf="shouldShowRegisterButton()">
-          <ion-button type="submit" [disabled]="loading() || !isCurrentPageValid()" fill="solid" color="success">
-            <ion-icon slot="start" name="save"></ion-icon>
-            {{loading() ? 'Cargando...' : 'Registrar'}}
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-footer>
   </form>
 </ion-content>

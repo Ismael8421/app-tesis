@@ -8,46 +8,6 @@ export interface userCreate {
   anioLectivo: string;
   carrera: string;
   uid?: string;
-
-  habilidadesBuscadas: {
-    ieme: boolean;
-    mcm: boolean;
-    ema: boolean;
-    mecatronica: boolean;
-    informatica: boolean;
-    ciencias: boolean
-  }
-
-  autoevaluacion: {
-    comuniacion: number;
-    disenoGrafico: number;
-    liderazgo: number;
-    mecanicaElectronica: number;
-    programacion: number;
-    resolucionProblemas: number;
-  }
-
-  
-
-  preferencias: {
-    carrera: string;
-    estiloTrabajoP: string;
-    nivelCompromiso: string;
-  }
-
-  disponibilidad: {
-    horasSemanales: number;
-    modalidadTrabajo: string;
-  }
-
-  intereses: {
-    analisisDatos: boolean;
-    construccionDispositivos: boolean;
-    desarrolloSoftware: boolean;
-    disenoGrafico: boolean;
-    investigacionCientifica: boolean;
-  }
-  estiloTrabajo: string;
 }
 
 

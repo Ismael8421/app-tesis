@@ -6,12 +6,6 @@ import { AuthService } from '../../account/auth/data-access/auth.service';
 import { Router } from '@angular/router';
 
 import { PersonalDataComponent } from '../personal-data/personal-data.component';
-import { AutoEvaluationComponent } from '../auto-evaluation/auto-evaluation.component';
-import { WantedSkillsComponent } from '../wanted-skills/wanted-skills.component';
-import { PreferencesComponent } from '../preferences/preferences.component';
-import { AvailabilityComponent } from '../availability/availability.component';
-import { InterestsComponent } from '../interests/interests.component';
-import { StyleWorkComponent } from '../style-work/style-work.component';
 import { IonicModule } from '@ionic/angular';
 
 @Component({
@@ -25,12 +19,6 @@ import { IonicModule } from '@ionic/angular';
     NgSwitchDefault, 
     FormsModule, 
     PersonalDataComponent, 
-    AutoEvaluationComponent, 
-    WantedSkillsComponent, 
-    PreferencesComponent, 
-    AvailabilityComponent, 
-    InterestsComponent, 
-    StyleWorkComponent, 
     IonicModule
   ],
   templateUrl: './register.component.html',
@@ -53,111 +41,7 @@ export class RegisterComponent {
       lastName: new FormControl('', Validators.required),
       course: new FormControl('', Validators.required),
       profession: new FormControl('', Validators.required),
-
-      wantedSkills: new FormGroup({
-        IEME: new FormControl(),
-        MCM: new FormControl(),
-        EMA: new FormControl(),
-        Mechatronics: new FormControl(),
-        Computing: new FormControl(),
-        Sciences: new FormControl()
-      }),
-
-      autoEvaluation: new FormGroup({
-        programming: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        graphicDesign: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        knowledgeME: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        leadership: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        communication: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required]),
-        resolution: new FormControl('', [Validators.min(1), Validators.max(5), Validators.required])
-      }),
-      
-      preferences: new FormGroup({
-        professionWanted: new FormControl('', Validators.required),
-        styleWorkP: new FormControl('', Validators.required),
-        levelCommitment: new FormControl('', Validators.required)
-      }),
-      availability: new FormGroup({
-        hours: new FormControl('', [Validators.min(1), Validators.max(168), Validators.required]),
-        workModality: new FormControl('', Validators.required)
-      }),
-      interests: new FormGroup({
-        softwareDevelop: new FormControl(),
-        graphicDesignI: new FormControl(),
-        construction: new FormControl(),
-        analysis: new FormControl(),
-        investigation: new FormControl()
-      }),
-      styleWork: new FormControl('', Validators.required)
     });
-  }
-
-  isCurrentPageValid(): boolean {
-    switch (this.page) {
-      case 1:
-        return Boolean(
-          this.form.get('username')?.valid && 
-          this.form.get('name')?.valid && 
-          this.form.get('lastName')?.valid && 
-          this.form.get('course')?.valid && 
-          this.form.get('profession')?.valid
-        );
-      
-      case 2:
-        return true;
-      case 3:
-        // Para habilidades buscadas, al ser checkboxes opcionales, siempre es válido
-        const autoEval = this.form.get('autoEvaluation');
-        return Boolean(
-          autoEval?.get('programming')?.valid &&
-          autoEval?.get('graphicDesign')?.valid &&
-          autoEval?.get('knowledgeME')?.valid &&
-          autoEval?.get('leadership')?.valid &&
-          autoEval?.get('communication')?.valid &&
-          autoEval?.get('resolution')?.valid
-        );
-      
-      case 4:
-        const pref = this.form.get('preferences');
-        return Boolean(
-          pref?.get('professionWanted')?.valid &&
-          pref?.get('styleWorkP')?.valid &&
-          pref?.get('levelCommitment')?.valid
-        );
-      
-      case 5:
-        const avail = this.form.get('availability');
-        return Boolean(
-          avail?.get('hours')?.valid &&
-          avail?.get('workModality')?.valid
-        );
-      
-      case 6:
-        // Para intereses, al ser checkboxes opcionales, siempre es válido
-        return true;
-      
-      case 7:
-        return Boolean(this.form.get('styleWork')?.valid);
-      
-      default:
-        return false;
-    }
-  }
-
-  shouldShowRegisterButton(): boolean {
-    return this.page === 7;
-  }
-
-  nextPage() {
-    if (this.page < 7 && this.isCurrentPageValid()) {
-      this.page++;
-    }
-  }
-
-  prevPage() {
-    if (this.page > 1) {
-      this.page--;
-    }
   }
 
   async submit() {
@@ -183,44 +67,14 @@ export class RegisterComponent {
         apellido: lastName || '',
         anioLectivo: course || '',
         carrera: profession || '',
-        autoevaluacion: {
-          comuniacion: this.form.get('autoEvaluation.communication')?.value || 0,
-          disenoGrafico: this.form.get('autoEvaluation.graphicDesign')?.value || 0,
-          liderazgo: this.form.get('autoEvaluation.leadership')?.value || 0,
-          mecanicaElectronica: this.form.get('autoEvaluation.knowledgeME')?.value || 0,
-          programacion: this.form.get('autoEvaluation.programming')?.value || 0,
-          resolucionProblemas: this.form.get('autoEvaluation.resolution')?.value || 0,
-        },
-        habilidadesBuscadas: {
-          ieme: this.form.get('wantedSkills.IEME')?.value || false,
-          mcm: this.form.get('wantedSkills.MCM')?.value || false,
-          ema: this.form.get('wantedSkills.EMA')?.value || false,
-          mecatronica: this.form.get('wantedSkills.Mechatronics')?.value || false,
-          informatica: this.form.get('wantedSkills.Computing')?.value || false,
-          ciencias: this.form.get('wantedSkills.Sciences')?.value || false
-        },
-        preferencias: {
-          carrera: this.form.get('preferences.professionWanted')?.value,
-          estiloTrabajoP: this.form.get('preferences.styleWorkP')?.value,
-          nivelCompromiso: this.form.get('preferences.levelCommitment')?.value
-        },
-        disponibilidad: {
-          horasSemanales: this.form.get('availability.hours')?.value,
-          modalidadTrabajo: this.form.get('availability.workModality')?.value
-        },
-        intereses: {
-          analisisDatos: this.form.get('interests.analysis')?.value || false,
-          construccionDispositivos: this.form.get('interests.construction')?.value || false,
-          desarrolloSoftware: this.form.get('interests.softwareDevelop')?.value || false,
-          disenoGrafico: this.form.get('interests.graphicDesignI')?.value || false,
-          investigacionCientifica: this.form.get('interests.investigation')?.value || false
-        },
-        estiloTrabajo: this.form.get('styleWork')?.value
       };
 
       await this._userCreate.create(uid, userData);
+
+      // Eliminar despues
       console.log('Usuario registrado con éxito en Firestore.');
       console.log(this.form.value);
+
       this._router.navigateByUrl('/menu');
 
     } catch (error) {

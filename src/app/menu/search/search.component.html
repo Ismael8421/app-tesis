@@ -51,23 +51,26 @@
   </div> -->
 
 
-  <div class="search-container">
-    <h2>Iniciar chat con:</h2>
-    <!-- Para propósitos de demostración, mostramos botones para ambos usuarios -->
-    <div *ngIf="currentUser$ | async as currentUser">
-      <!-- Solo mostrar el botón del otro usuario -->
-      <button *ngIf="currentUser.uid !== 'yeRfZnKOkoYBUbCYtpRJMPwHs7v1'"
-              (click)="startChat('yeRfZnKOkoYBUbCYtpRJMPwHs7v1', 'IsmaelP2007')">
-        Chat con IsmaelP2007
-      </button>
-      <button *ngIf="currentUser.uid !== 'plcE9hTEInPPooU5z6xZLWoL8AM2'"
-              (click)="startChat('plcE9hTEInPPooU5z6xZLWoL8AM2', 'fabianB94')">
-        Chat con fabianB94
-      </button>
-    </div>
-
-    <ion-alert
-    
-    >
-    </ion-alert>
+<div class="search-container">
+  <h2>Iniciar chat con:</h2>
+  <!-- Para propósitos de demostración, mostramos botones para ambos usuarios -->
+  <div *ngIf="currentUser$ | async as currentUser">
+    <!-- Solo mostrar el botón del otro usuario -->
+    <button *ngIf="currentUser.uid !== 'yeRfZnKOkoYBUbCYtpRJMPwHs7v1'"
+      (click)="startChat('yeRfZnKOkoYBUbCYtpRJMPwHs7v1', 'IsmaelP2007')">
+      Chat con IsmaelP2007
+    </button>
+    <button *ngIf="currentUser.uid !== 'plcE9hTEInPPooU5z6xZLWoL8AM2'"
+      (click)="startChat('plcE9hTEInPPooU5z6xZLWoL8AM2', 'fabianB94')">
+      Chat con fabianB94
+    </button>
   </div>
+
+  <ion-alert 
+  [isOpen]="!isFormComplete" 
+  message="Para personalizar tus recomendaciones, necesitamos conocerte mejor a través de un breve formulario"
+  [buttons]="alertButtons"  
+  (didDismiss)="isFormComplete = true"
+  >
+  </ion-alert>
+</div>

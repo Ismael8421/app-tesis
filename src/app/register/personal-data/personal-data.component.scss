@@ -1,176 +1,182 @@
-:root {
-    /* Light mode variables */
-    --background-color: #f4f5f8;
-    --text-color: #333333;
-    --secondary-text-color: #666666;
-    --input-background: #ffffff;
-    --input-border: #d7d8da;
-    --input-focus-border: #3880ff;
-    --error-color: #eb445a;
-    --item-background: #ffffff;
-    --item-border-color: #e0e0e0;
-    --shadow-color: rgba(0, 0, 0, 0.1);
+// Variables
+$primary-color: #2962ff;
+$gradient-secondary: #2979ff;
+$white: #ffffff;
+$error-color: #ff4444;
+$background-color: #f4f5f8;
+$shadow-color: rgba(0, 0, 0, 0.1);
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: $background-color;
+}
+
+// Contenedor principal con fondo ondulado
+div[formGroup] {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, $primary-color, $gradient-secondary);
+  padding: 20px;
+  overflow: hidden;
+
+  // Onda decorativa
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,224C672,213,768,171,864,149.3C960,128,1056,128,1152,149.3C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
   }
-  
-  /* Dark mode variables */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background-color: #121212;
-      --text-color: #ffffff;
-      --secondary-text-color: #b0b0b0;
-      --input-background: #1e1e1e;
-      --input-border: #2e2e2e;
-      --input-focus-border: #4c8dff;
-      --error-color: #ff4961;
-      --item-background: #1e1e1e;
-      --item-border-color: #2e2e2e;
-      --shadow-color: rgba(0, 0, 0, 0.3);
-    }
-  }
-  
-  .personal-data-form {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    padding: 20px;
-    animation: fadeIn 0.3s ease-out;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+}
+
+// Título
+ion-text {
+  position: relative;
+  z-index: 1;
   
   h1 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: var(--text-color);
+    color: $white;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin: 30px 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  
-  ion-list {
-    background: transparent;
-  }
-  
+}
+
+// Lista de elementos del formulario
+ion-list {
+  position: relative;
+  z-index: 1;
+  background: $white;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 400px;
+  box-shadow: 0 8px 20px $shadow-color;
+
+  // Items del formulario
   ion-item {
-    --background: var(--item-background);
-    --border-color: var(--item-border-color);
+    --background: transparent;
     --padding-start: 0;
+    --padding-end: 0;
     --inner-padding-end: 0;
-    --highlight-height: 0;
     margin-bottom: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px var(--shadow-color);
-    transition: box-shadow 0.3s ease;
-  }
-  
-  ion-item:hover {
-    box-shadow: 0 4px 8px var(--shadow-color);
-  }
-  
-  ion-label {
-    color: var(--text-color) !important;
-    font-size: 16px;
-    font-weight: 500;
-  }
-  
-  ion-input,
-  ion-select {
-    --background: var(--input-background);
-    --color: var(--text-color);
-    --placeholder-color: var(--secondary-text-color);
-    --padding-start: 16px;
-    --padding-end: 16px;
-    --padding-top: 12px;
-    --padding-bottom: 12px;
-    font-size: 16px;
-    border: 1px solid var(--input-border);
-    border-radius: 4px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  ion-input:focus,
-  ion-select:focus {
-    border-color: var(--input-focus-border);
-    box-shadow: 0 0 0 2px rgba(56, 128, 255, 0.2);
-   
+    --border-color: transparent;
+    --highlight-height: 0;
 
+    &::part(native) {
+      padding: 8px 16px;
+      border-radius: 12px;
+      background: rgba($primary-color, 0.05);
+    }
 
-  }
-  
-  ion-select::part(icon) {
-    color: var(--text-color);
-    opacity: 0.7;
-  }
-  
-  ion-text[color="danger"] {
-    color: var(--error-color) !important;
-    font-size: 12px;
-    margin-top: 4px;
-    display: block;
-    padding-left: 16px;
-  }
-  
-  /* Animations */
-  @keyframes shake {
-    0%,
-    100% {
-      transform: translateX(0);
-    }
-    25% {
-      transform: translateX(-5px);
-    }
-    75% {
-      transform: translateX(5px);
-    }
-  }
-  
-  ion-item.ion-invalid.ion-touched {
-    animation: shake 0.4s ease-in-out;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .personal-data-form {
-      padding: 16px;
-    }
-  
-    h1 {
-      font-size: 20px;
-    }
-  
+    // Labels flotantes
     ion-label {
+      --color: #{$primary-color};
       font-size: 14px;
+      font-weight: 500;
+      opacity: 0.9;
     }
-  
-    ion-input,
-    ion-select {
-      font-size: 14px;
+
+    // Inputs y selects
+    ion-input, ion-select {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+      font-size: 16px;
+      --placeholder-color: rgba(0, 0, 0, 0.5);
+      --placeholder-opacity: 0.7;
+      margin-top: 8px;
+    }
+
+    // Estado focus
+    &.item-has-focus {
+      --background: rgba($primary-color, 0.1);
+      
+      ion-label {
+        color: $primary-color;
+        opacity: 1;
+      }
     }
   }
-  
-  /* Ionic overrides */
-  ion-item::part(native) {
-    padding-left: 0;
-    padding-right: 0;
+}
+
+// Mensajes de error
+ion-text[color="danger"] {
+  margin-left: 16px;
+  margin-top: -12px;
+  margin-bottom: 16px;
+  display: block;
+
+  small {
+    color: $error-color;
+    font-size: 12px;
   }
-  
-  ion-select::part(text) {
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+// Animaciones
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-list {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+// Media queries para responsividad
+@media screen and (max-width: 600px) {
+  ion-text h1 {
+    font-size: 24px;
+    margin: 20px 0;
+  }
+
+  ion-list {
+    margin: 10px;
+    padding: 15px;
+
+    ion-item {
+      margin-bottom: 12px;
+
+      ion-label {
+        font-size: 13px;
+      }
+
+      ion-input, ion-select {
+        font-size: 15px;
+      }
+    }
+  }
+}
+
+// Estilos específicos para select
+ion-select {
+  width: 100%;
+  max-width: 100%;
+  padding-left: 0;
   
-  ion-select::part(placeholder) {
-    color: var(--secondary-text-color);
+  &::part(icon) {
     opacity: 0.7;
+    color: $primary-color;
   }
-  
-  
+}
+
+// Efecto hover en items
+ion-item:hover {
+  --background: rgba($primary-color, 0.07);
+  transition: --background 0.3s ease;
+}

@@ -37,5 +37,9 @@ export default [
     {
         path: 'chagePwsEmail',
         loadComponent: () => import('./configs/change-pws-email/change-pws-email.component').then(m => m.default)
+    },
+    {
+        path: 'form',
+        loadComponent: () => import('../form/form/form.component').then(m => m.FormComponent)
     }
 ] as Routes;

@@ -6,7 +6,8 @@ import { Router } from '@angular/router';
 import { register } from 'swiper/element/bundle';
 import { ChatService } from '../chats/data-access/chat.service';
 import { Observable } from 'rxjs';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, AlertController } from '@ionic/angular';
+import { FormStateService } from '../../form/data-access/form-state.service';
 
 register();
 
@@ -29,9 +30,18 @@ export class SearchComponent {
   private router = inject(Router);
   private chatService = inject(ChatService);
 
-  isFormComplete: boolean = false;
+  isFormComplete: boolean = true;
 
-  
+  alertButtons = [{
+    text: 'Ir',
+    handler: () => {
+      this.navegateToForm();
+    }
+  }];
+
+  navegateToForm() {
+    this.router.navigateByUrl('/menu/form');
+  }
 
   currentUser$ = new Observable<User | null>(observer => {
     return this.auth.onAuthStateChanged(observer);

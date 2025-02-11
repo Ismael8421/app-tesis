@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-wanted-profession',
+  standalone: true,
+  imports: [ ],
   templateUrl: './wanted-profession.component.html',
   styleUrls: ['./wanted-profession.component.scss'],
 })

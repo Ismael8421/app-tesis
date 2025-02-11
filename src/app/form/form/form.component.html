@@ -1,3 +1,40 @@
-<p>
-  form works!
-</p>
+<div>
+  <!-- Preguntas Generales -->
+  <div *ngIf="page === 1">
+    <app-preferences></app-preferences>
+  </div>
+
+  <!-- Preguntas de que carrera busca -->
+  <div *ngIf="page === 2">
+    <app-wanted-profession></app-wanted-profession>
+  </div>
+  
+  <!-- Preguntas de que habilidades busca de la carrera -->
+  <div *ngIf="page === 3">
+    <app-computing></app-computing>
+  </div>
+
+  <!-- Preguntas de sus habilidades -->
+  <div *ngIf="page === 4">
+    <h1>Habilidades propias</h1>
+    <p>Califica tus habilidades en las materias de tu área</p>
+    <app-pers-computing></app-pers-computing>
+  </div>
+
+  <!-- Boton Atras -->
+  <div>
+    <button (click)="prevPage()" [disabled]="page === 1">
+      Atras
+    </button>
+  </div>
+
+  <!-- Boton Siguiente  -->
+  <div>
+    <button (click)="nextPage()" [disabled]="page === 4">
+      Siguiente
+    </button>
+  </div>
+
+  <!-- Boton Registrar -->
+  <div></div>
+</div>

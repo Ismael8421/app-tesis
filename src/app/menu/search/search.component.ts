@@ -23,14 +23,14 @@ register();
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',
-  styleUrl: './search.component.css'
+  styleUrl: './search.component.scss'
 })
 export class SearchComponent {
   private auth = inject(Auth);
   private router = inject(Router);
   private chatService = inject(ChatService);
 
-  isFormComplete: boolean = true;
+  isFormComplete: boolean = false;
 
   alertButtons = [{
     text: 'Ir',

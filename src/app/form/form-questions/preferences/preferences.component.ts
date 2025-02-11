@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component} from '@angular/core';
 
 @Component({
   selector: 'app-preferences',
+  standalone: true,
+  imports: [],
   templateUrl: './preferences.component.html',
   styleUrls: ['./preferences.component.scss'],
 })
-export class PreferencesComponent  implements OnInit {
+export class PreferencesComponent {
 
   constructor() { }
-
-  ngOnInit() {}
 
 }

@@ -3,15 +3,22 @@ import { RegisterService, userCreate } from '../../../../register/data-access/re
 import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, ControlContainer, FormGroupDirective } from '@angular/forms';
 
 @Component({
   selector: 'app-computing',
   standalone: true,
-  imports: [ CommonModule ],
+  imports: [ CommonModule, ReactiveFormsModule ],
   templateUrl: './computing.component.html',
   styleUrls: ['./computing.component.scss'],
+  viewProviders: [
+    {
+      provide: ControlContainer,
+      useExisting: FormGroupDirective
+    }
+  ]
 })
-export class ComputingComponent  implements OnInit {
+export class ComputingComponent implements OnInit {
   private _registerService = inject(RegisterService);
   private _auth = inject(Auth);
   private _router = inject(Router);
@@ -22,18 +29,15 @@ export class ComputingComponent  implements OnInit {
 
   async ngOnInit() {
     try {
-      // Obtener el usuario actual
       const currentUser = this._auth.currentUser;
       if (!currentUser) {
         this._router.navigate(['/login']);
         return;
       }
 
-      // Obtener los datos del usuario
       this.userData = await this._registerService.getUserData(currentUser.uid);
     } catch (error) {
       console.error('Error al cargar datos del perfil:', error);
     }
   }
-
 }

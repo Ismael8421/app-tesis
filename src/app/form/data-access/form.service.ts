@@ -2,14 +2,25 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, setDoc, getDoc, updateDoc, DocumentReference  } from '@angular/fire/firestore';
 
 export interface formCreate {
-  horario:{
-    durante_almuezo: boolean,
-    despues_clases: boolean,
-    manana_fines: boolean,
-    tarde_fines: boolean
-  }
+  horario: string[];
   metodo: string;
   horas: string;
+  carrera_buscada: string[];
+  habilidad_buscada_seg?: {
+    programacion: string;
+    soporte: string;
+    web: string;
+    redes: string;
+  };
+  habilidad_buscada_ter?: {
+    programacion: string;
+    diseño: string;
+    cad: string;
+    soporte: string;
+    mobile: string;
+    web: string;
+    redes: string;
+  };
 }
 
 @Injectable({
@@ -32,7 +43,10 @@ export class FormService {
           ...existingData,  // Mantener todos los datos existentes
           horario: formData.horario,
           metodo: formData.metodo,
-          horas: formData.horas
+          horas: formData.horas,
+          carrera_buscada: formData.carrera_buscada,
+          habilida_buscada_seg: formData.habilidad_buscada_seg,
+          habilidades_buscada_ter: formData.habilidad_buscada_ter,
         });
       } else {
         // Si no existe el documento, crearlo

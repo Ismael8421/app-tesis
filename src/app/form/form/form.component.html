@@ -1,31 +1,40 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
+  <div class="wave-header">
+    <h1>Preferencias Generales</h1>
+  </div>
+
   <!-- Preguntas Generales -->
-  <div *ngIf="page === 1">
+  <div *ngIf="page === 1" class="page-container">
     <app-preferences></app-preferences>
   </div>
 
   <!-- Preguntas de que carrera busca -->
-  <div *ngIf="page === 2">
+  <div *ngIf="page === 2" class="page-container">
     <app-wanted-profession></app-wanted-profession>
   </div>
 
   <!-- Preguntas de que habilidades busca de la carrera -->
-  <div *ngIf="page === 3">
-    <app-computing></app-computing>
+  <div *ngIf="page === 3" class="page-container">
+    <app-ieme *ngIf="shouldShowComponent('ieme')"></app-ieme>
+    <app-mcm *ngIf="shouldShowComponent('mcm')"></app-mcm>
+    <app-ema *ngIf="shouldShowComponent('ema')"></app-ema>
+    <app-mechatronics *ngIf="shouldShowComponent('mechatronics')"></app-mechatronics>
+    <app-computing *ngIf="shouldShowComponent('computing')"></app-computing>
+    <p *ngIf="shouldShowComponent('sciences')">Ciencias basicas</p>
   </div>
 
   <!-- Preguntas de sus habilidades -->
-  <div *ngIf="page === 4">
+  <div *ngIf="page === 4" class="page-container">
     <h1>Habilidades propias</h1>
     <p>Califica tus habilidades en las materias de tu área</p>
-    <app-pers-computing *ngIf="userData?.carrera === 'Informática'"></app-pers-computing>
+    <app-pers-computing *ngIf="userData?.carrera === 'Informática'" ></app-pers-computing>
   </div>
 
-  <!-- Boton Atras -->
-  <div>
-    <button type="button" (click)="prevPage()" [disabled]="page === 1">Atras</button>
-    <button type="button" (click)="nextPage()" [disabled]="page === 4">Siguiente</button>
-    <button type="submit" [disabled]="form.invalid || loading()">
+  <!-- Botones de navegación -->
+  <div class="button-container">
+    <button type="button" class="secondary-button" (click)="prevPage()" [disabled]="page === 1">Atrás</button>
+    <button type="button" class="primary-button" (click)="nextPage()" [disabled]="page === 4">Siguiente</button>
+    <button type="submit" class="submit-button" [disabled]="form.invalid || loading()">
       {{loading() ? 'Cargando...' : 'Registrar'}}
     </button>
   </div>

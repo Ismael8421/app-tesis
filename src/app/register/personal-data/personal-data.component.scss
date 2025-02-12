@@ -1,115 +1,160 @@
 // Variables
-$primary-color: #2962ff;
-$gradient-secondary: #2979ff;
+$primary-color: #000000;
+$button-color: #333333;
 $white: #ffffff;
-$error-color: #ff4444;
-$background-color: #f4f5f8;
+$error-color: #dc3545;
+$background-color: #f8f9fa;
 $shadow-color: rgba(0, 0, 0, 0.1);
+$gray-light: #e9ecef;
+$gray-medium: #6c757d;
+
+// Dark mode variables
+$dark-background: #121212;
+$dark-surface: #1e1e1e;
+$dark-text: #ffffff;
+$dark-secondary-text: #a0a0a0;
+$dark-input-bg: rgba(255, 255, 255, 0.05);
 
 :host {
   display: block;
   min-height: 100vh;
-  background: $background-color;
+  width: 100%;
 }
 
-// Contenedor principal con fondo ondulado
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+// Main container
 div[formGroup] {
   position: relative;
   min-height: 100vh;
-  background: linear-gradient(135deg, $primary-color, $gradient-secondary);
-  padding: 20px;
-  overflow: hidden;
+  width: 100%;
+  background: $background-color;
+  padding: min(5vw, 20px);
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-  // Onda decorativa
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,224C672,213,768,171,864,149.3C960,128,1056,128,1152,149.3C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-    background-size: cover;
-    background-position: center;
-    z-index: 0;
+  @include dark-mode {
+    background: $dark-background;
   }
 }
 
-// Título
+// Title
 ion-text {
   position: relative;
   z-index: 1;
+  width: 100%;
   
   h1 {
-    color: $white;
-    font-size: 28px;
+    color: $primary-color;
+    font-size: clamp(20px, 5vw, 28px);
     font-weight: 700;
     text-align: center;
-    margin: 30px 0;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: clamp(20px, 4vh, 40px) 0;
+    padding: 0 15px;
+
+    @include dark-mode {
+      color: $dark-text;
+    }
   }
 }
 
-// Lista de elementos del formulario
+// Form list
 ion-list {
   position: relative;
   z-index: 1;
   background: $white;
   border-radius: 20px;
-  padding: 20px;
+  padding: clamp(15px, 4vw, 25px);
   margin: 20px auto;
-  max-width: 400px;
+  width: min(90%, 400px);
   box-shadow: 0 8px 20px $shadow-color;
 
-  // Items del formulario
-  ion-item {
-    --background: transparent;
-    --padding-start: 0;
-    --padding-end: 0;
-    --inner-padding-end: 0;
-    margin-bottom: 16px;
-    --border-color: transparent;
-    --highlight-height: 0;
+  @include dark-mode {
+    background: $dark-surface;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+}
 
-    &::part(native) {
-      padding: 8px 16px;
-      border-radius: 12px;
-      background: rgba($primary-color, 0.05);
+// Form items
+ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 16px;
+  --border-color: transparent;
+  --highlight-height: 0;
+
+  &::part(native) {
+    padding: clamp(8px, 2vw, 16px);
+    border-radius: 12px;
+    background: $gray-light;
+
+    @include dark-mode {
+      background: $dark-input-bg;
     }
+  }
 
-    // Labels flotantes
-    ion-label {
-      --color: #{$primary-color};
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0.9;
+  // Labels
+  ion-label {
+    --color: #{$gray-medium};
+    font-size: clamp(13px, 3.5vw, 15px);
+    font-weight: 500;
+
+    @include dark-mode {
+      --color: #{$dark-text};
     }
+  }
 
-    // Inputs y selects
-    ion-input, ion-select {
-      --padding-start: 8px;
-      --padding-end: 8px;
-      --padding-top: 8px;
-      --padding-bottom: 8px;
-      font-size: 16px;
-      --placeholder-color: rgba(0, 0, 0, 0.5);
-      --placeholder-opacity: 0.7;
-      margin-top: 8px;
-    }
+  // Inputs and selects
+  ion-input, ion-select {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    font-size: clamp(14px, 4vw, 16px);
+    --placeholder-opacity: 0.7;
+    color: $primary-color;
 
-    // Estado focus
-    &.item-has-focus {
-      --background: rgba($primary-color, 0.1);
-      
-      ion-label {
-        color: $primary-color;
-        opacity: 1;
-      }
+    @include dark-mode {
+      --placeholder-color: #{$dark-secondary-text};
+      color: $dark-text;
     }
   }
 }
 
-// Mensajes de error
+// Button styles
+ion-button {
+  --background: #{$button-color};
+  --background-hover: #{lighten($button-color, 10%)};
+  --color: #{$white};
+  --border-radius: 25px;
+  width: min(200px, 60%);
+  height: 45px;
+  margin: 30px auto;
+  position: relative;
+  z-index: 1;
+  font-size: clamp(14px, 4vw, 16px);
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px $shadow-color;
+  transition: transform 0.2s ease;
+
+  @include dark-mode {
+    --background: #{$gray-medium};
+    --background-hover: #{lighten($gray-medium, 10%)};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+// Error messages
 ion-text[color="danger"] {
   margin-left: 16px;
   margin-top: -12px;
@@ -118,65 +163,68 @@ ion-text[color="danger"] {
 
   small {
     color: $error-color;
-    font-size: 12px;
+    font-size: clamp(11px, 3vw, 12px);
   }
 }
 
-// Animaciones
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+// Responsive breakpoints
+@media (max-width: 320px) {
+  ion-list {
+    padding: 12px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  ion-item {
+    margin-bottom: 12px;
+  }
+
+  ion-button {
+    height: 40px;
+    width: 80%;
   }
 }
 
-ion-list {
-  animation: fadeInUp 0.6s ease-out forwards;
+@media (min-width: 768px) {
+  ion-list {
+    padding: 30px;
+  }
+
+  ion-button {
+    width: 220px;
+  }
 }
 
-// Media queries para responsividad
-@media screen and (max-width: 600px) {
+// Support for foldable devices
+@media (max-width: 280px) {
+  ion-list {
+    padding: 10px;
+    width: 95%;
+  }
+
+  ion-item {
+    margin-bottom: 10px;
+  }
+
+  ion-button {
+    width: 90%;
+    height: 38px;
+  }
+}
+
+// Landscape orientation
+@media (max-height: 500px) and (orientation: landscape) {
+  div[formGroup] {
+    padding: 10px;
+  }
+
   ion-text h1 {
-    font-size: 24px;
-    margin: 20px 0;
+    margin: 15px 0;
   }
 
   ion-list {
-    margin: 10px;
-    padding: 15px;
-
-    ion-item {
-      margin-bottom: 12px;
-
-      ion-label {
-        font-size: 13px;
-      }
-
-      ion-input, ion-select {
-        font-size: 15px;
-      }
-    }
+    margin: 10px auto;
   }
-}
 
-// Estilos específicos para select
-ion-select {
-  width: 100%;
-  max-width: 100%;
-  padding-left: 0;
-  
-  &::part(icon) {
-    opacity: 0.7;
-    color: $primary-color;
+  ion-button {
+    margin: 20px auto;
   }
-}
-
-// Efecto hover en items
-ion-item:hover {
-  --background: rgba($primary-color, 0.07);
-  transition: --background 0.3s ease;
 }

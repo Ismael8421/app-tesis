@@ -1,99 +1,159 @@
+// Variables principales
+:host {
+  --page-background-light: #f2f2f7;
+  --page-background-dark: #000000;
+  --item-background-light: #ffffff;
+  --item-background-dark: #1c1c1e;
+  --text-primary-light: #000000;
+  --text-primary-dark: #ffffff;
+  --text-secondary-light: #6b6b6b;
+  --text-secondary-dark: #98989d;
+  --border-light: rgba(0, 0, 0, 0.1);
+  --border-dark: rgba(255, 255, 255, 0.1);
+  --ion-color-danger: #ff3b30;
+}
+
+// Estilos base
 ion-content {
-    --background: #f4f5f8;
+  --background: var(--page-background-light);
+
+  @media (prefers-color-scheme: dark) {
+    --background: var(--page-background-dark);
   }
-  
-  ion-list {
-    background: transparent;
+}
+
+// Lista de configuraciones
+.settings-list {
+  background: transparent;
+  margin: 0;
+  padding: 20px 0;
+}
+
+// Grupos de secciones
+.section-group {
+  margin-bottom: 24px;
+  background: var(--item-background-light);
+  border-radius: 12px;
+  overflow: hidden;
+
+  @media (prefers-color-scheme: dark) {
+    background: var(--item-background-dark);
   }
-  
-  ion-item {
-    --padding-start: 16px;
-    --padding-end: 16px;
-    --background: #ffffff;
-    margin-bottom: 1px;
+}
+
+// Estilos de items
+ion-item {
+  --background: var(--item-background-light);
+  --color: var(--text-primary-light);
+  --border-color: var(--border-light);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 50px;
+  font-size: 17px;
+
+  @media (prefers-color-scheme: dark) {
+    --background: var(--item-background-dark);
+    --color: var(--text-primary-dark);
+    --border-color: var(--border-dark);
   }
-  
-  ion-item:last-child {
-    margin-bottom: 0;
+
+  &::part(native) {
+    padding-right: 16px;
   }
-  
-  ion-avatar {
-    width: 40px;
-    height: 40px;
+}
+
+// Item de perfil
+.profile-item {
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  margin-bottom: 24px;
+
+  ion-label {
+    h2 {
+      font-size: 20px;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: var(--text-primary-light);
+
+      @media (prefers-color-scheme: dark) {
+        color: var(--text-primary-dark);
+      }
+    }
+
+    p {
+      font-size: 15px;
+      color: var(--text-secondary-light);
+
+      @media (prefers-color-scheme: dark) {
+        color: var(--text-secondary-dark);
+      }
+    }
   }
-  
-  ion-img {
-    border-radius: 50%;
+}
+
+// Avatar
+ion-avatar {
+  width: 60px;
+  height: 60px;
+  margin-right: 12px;
+}
+
+// Iconos
+.custom-icon {
+  font-size: 22px;
+  margin-right: 12px;
+  color: #007AFF;
+
+  @media (prefers-color-scheme: dark) {
+    color: #0A84FF;
   }
+
+  &.danger {
+    color: var(--ion-color-danger);
+  }
+}
+
+// Iconos de navegación
+ion-icon[slot="end"] {
+  color: var(--text-secondary-light);
+  font-size: 20px;
+
+  @media (prefers-color-scheme: dark) {
+    color: var(--text-secondary-dark);
+  }
+}
+
+// Select
+ion-select {
+  --placeholder-color: var(--text-secondary-light);
+  max-width: 120px;
+
+  @media (prefers-color-scheme: dark) {
+    --placeholder-color: var(--text-secondary-dark);
+  }
+}
+
+// Item de cierre de sesión
+.logout-item {
+  --border-color: transparent;
   
   ion-label {
-    font-size: 16px;
-    color: #333333;
+    font-weight: 500;
   }
-  
-  ion-list-header {
-    padding-top: 20px;
-    padding-bottom: 8px;
+}
+
+// Responsive
+@media (min-width: 768px) {
+  ion-content {
+    --padding-start: max(16px, calc((100% - 600px) / 2));
+    --padding-end: max(16px, calc((100% - 600px) / 2));
   }
-  
-  ion-list-header ion-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #666666;
-    text-transform: uppercase;
+}
+
+// Safe areas iOS
+.ios {
+  ion-content {
+    --padding-top: max(16px, env(safe-area-inset-top));
+    --padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
-  
-  ion-select {
-    max-width: 100%;
-  }
-  
-  ion-item.ion-activatable {
-    --ripple-color: rgba(0, 0, 0, 0.1);
-  }
-  
-  ion-item[button] {
-    --detail-icon-color: #999999;
-    --detail-icon-opacity: 1;
-    --detail-icon-font-size: 20px;
-  }
-  
-  /* Estilos para el tema oscuro */
-  @media (prefers-color-scheme: dark) {
-    ion-content {
-      --background: #121212;
-    }
-  
-    ion-item {
-      --background: #1e1e1e;
-    }
-  
-    ion-label {
-      color: #ffffff;
-    }
-  
-    ion-list-header ion-label {
-      color: #b0b0b0;
-    }
-  
-    ion-item.ion-activatable {
-      --ripple-color: rgba(255, 255, 255, 0.1);
-    }
-  
-    ion-item[button] {
-      --detail-icon-color: #666666;
-    }
-  }
-  
-  /* Estilos responsivos */
-  @media (min-width: 768px) {
-    ion-content {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-  
-    ion-list {
-      margin-top: 20px;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-  }
+}

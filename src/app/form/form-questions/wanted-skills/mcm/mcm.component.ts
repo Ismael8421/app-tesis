@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-mcm',
+  standalone: true,
+  imports: [ ], 
   templateUrl: './mcm.component.html',
   styleUrls: ['./mcm.component.scss'],
 })

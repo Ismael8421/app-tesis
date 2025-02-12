@@ -1,0 +1,290 @@
+// Variables - Light Mode
+$primary-color: #000000;
+$secondary-color: #333333;
+$background-color: #ffffff;
+$surface-color: #f5f5f5;
+$border-color: #e0e0e0;
+$text-color: #000000;
+$text-secondary: #666666;
+$error-color: #dc3545;
+$shadow-color: rgba(0, 0, 0, 0.1);
+
+// Variables - Dark Mode
+$dark-background: #121212;
+$dark-surface: #1e1e1e;
+$dark-border: #333333;
+$dark-text: #ffffff;
+$dark-text-secondary: #cccccc;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  width: 100%;
+  background: $background-color;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, sans-serif;
+
+  @media (prefers-color-scheme: dark) {
+    background: $dark-background;
+  }
+}
+
+// Form container
+form {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+}
+
+// Wave header
+.wave-header {
+  position: relative;
+  background: $secondary-color;
+  padding: 20px;
+  border-radius: 16px 16px 0 0;
+  margin-bottom: -10px;
+  z-index: 2;
+
+  h1 {
+    color: $background-color;
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+    letter-spacing: -0.5px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background: $dark-text;
+    
+    h1 {
+      color: $dark-background;
+    }
+  }
+}
+
+// Page containers
+.page-container {
+  background: $background-color;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px $shadow-color;
+  z-index: 1;
+  border: 1px solid $border-color;
+
+  @media (prefers-color-scheme: dark) {
+    background: $dark-surface;
+    color: $dark-text;
+    border-color: $dark-border;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// Form elements
+ion-item {
+  --background: #{$surface-color};
+  --border-radius: 10px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 56px;
+  margin-bottom: 16px;
+  border: 1px solid $border-color;
+
+  @media (prefers-color-scheme: dark) {
+    --background: #{$dark-surface};
+    border-color: $dark-border;
+  }
+
+  &::part(native) {
+    border-radius: 10px;
+  }
+
+  ion-label {
+    --color: #{$text-color};
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+
+    @media (prefers-color-scheme: dark) {
+      --color: #{$dark-text};
+    }
+  }
+
+  ion-input, ion-select {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    font-size: 18px;
+    font-weight: 400;
+    --placeholder-color: #{$text-secondary};
+    color: $text-color;
+
+    @media (prefers-color-scheme: dark) {
+      --placeholder-color: #{$dark-text-secondary};
+      color: $dark-text;
+    }
+  }
+}
+
+// Checkboxes and radio buttons
+ion-checkbox, ion-radio {
+  --size: 24px;
+  
+  & + ion-label {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-left: 12px;
+  }
+  --border-radius: 4px;
+  --border-color: #{$secondary-color};
+  --border-color-checked: #{$secondary-color};
+  --background-checked: #{$secondary-color};
+  margin-right: 8px;
+
+  @media (prefers-color-scheme: dark) {
+    --border-color: #{$dark-text};
+    --border-color-checked: #{$dark-text};
+    --background-checked: #{$dark-text};
+  }
+}
+
+// Button container
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 0;
+  margin-top: auto;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+}
+
+// Button styles
+button {
+  padding: 12px 24px;
+  border-radius: 25px;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+
+  @media (max-width: 480px) {
+    width: 100%;
+  }
+
+  &.primary-button {
+    background: $secondary-color;
+    color: $background-color;
+
+    &:hover:not(:disabled) {
+      background: lighten($secondary-color, 10%);
+      transform: translateY(-1px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      background: $dark-text;
+      color: $dark-background;
+
+      &:hover:not(:disabled) {
+        background: darken($dark-text, 10%);
+      }
+    }
+  }
+
+  &.secondary-button {
+    background: $surface-color;
+    color: $text-color;
+    border: 1px solid $border-color;
+
+    &:hover:not(:disabled) {
+      background: darken($surface-color, 5%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      background: $dark-surface;
+      color: $dark-text;
+      border-color: $dark-border;
+
+      &:hover:not(:disabled) {
+        background: lighten($dark-surface, 10%);
+      }
+    }
+  }
+
+  &.submit-button {
+    background: $primary-color;
+    color: $background-color;
+    font-weight: 600;
+
+    &:hover:not(:disabled) {
+      background: lighten($primary-color, 15%);
+      transform: translateY(-1px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      background: $dark-text;
+      color: $dark-background;
+
+      &:hover:not(:disabled) {
+        background: darken($dark-text, 10%);
+      }
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Error messages
+ion-text[color="danger"] {
+  display: block;
+  color: $error-color;
+  font-size: 14px;
+  margin-top: -8px;
+  margin-bottom: 16px;
+  padding-left: 16px;
+
+  @media (prefers-color-scheme: dark) {
+    color: lighten($error-color, 10%);
+  }
+}
+
+// Responsive design
+@media (max-width: 320px) {
+  .page-container {
+    padding: 16px;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+// Animation
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-container {
+  animation: slideIn 0.3s ease-out;
+}

@@ -1,41 +1,52 @@
-<ion-content>
-  <ion-list>
-    <ion-item (click)="navigateTo()" class="ion-activatable" button>
+<ion-content class="ion-padding">
+  <ion-list class="settings-list">
+    <!-- Perfil -->
+    <ion-item (click)="navigateTo()" class="profile-item ion-activatable" button>
       <ion-avatar slot="start">
         <ion-img
           src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg"
-          alt="Perfil"></ion-img>
+          alt="Perfil">
+        </ion-img>
       </ion-avatar>
-      <ion-label>Ver perfil</ion-label>
-      <ion-ripple-effect></ion-ripple-effect>
+      <ion-label>
+        <h2>Ver perfil</h2>
+        <p>Configuración de cuenta</p>
+      </ion-label>
+      <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
     </ion-item>
 
-    <ion-list-header>
-      <ion-label>Configuraciones</ion-label>
-    </ion-list-header>
+    <!-- Secciones de configuración -->
+    <div class="section-group">
+      <ion-item>
+        <ion-icon name="contrast-outline" slot="start" class="custom-icon"></ion-icon>
+        <ion-label>Tema</ion-label>
+        <ion-select [value]="currentTheme" (ionChange)="onThemeChange($event)" interface="action-sheet">
+          <ion-select-option *ngFor="let option of themeOptions" [value]="option.value">
+            {{ option.label }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
 
-    <ion-item>
-      <ion-label>Tema</ion-label>
-      <ion-select [value]="currentTheme" (ionChange)="onThemeChange($event)" interface="action-sheet"
-        placeholder="Selecciona un tema">
-        <ion-select-option *ngFor="let option of themeOptions" [value]="option.value">
-          {{ option.label }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
+    <div class="section-group">
+      <ion-item button (click)="navigateToCPE()">
+        <ion-icon name="key-outline" slot="start" class="custom-icon"></ion-icon>
+        <ion-label>Cambiar correo o contraseña</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </ion-item>
 
-    <ion-item button (click)="navigateToCPE()">
-      <ion-label>Cambiar correo o contraseña</ion-label>
-    </ion-item>
+      <ion-item button>
+        <ion-icon name="alert-circle-outline" slot="start" class="custom-icon"></ion-icon>
+        <ion-label>Reportar un error</ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </ion-item>
+    </div>
 
-    <ion-item button>
-      <ion-label>Reportar un error</ion-label>
-    </ion-item>
-
-    <ion-item button (click)="logOut()">
-      <ion-label>Cerrar sesión</ion-label>
-    </ion-item>
+    <div class="section-group">
+      <ion-item button (click)="logOut()" class="logout-item">
+        <ion-icon name="log-out-outline" slot="start" class="custom-icon danger"></ion-icon>
+        <ion-label color="danger">Cerrar sesión</ion-label>
+      </ion-item>
+    </div>
   </ion-list>
 </ion-content>
-
-<router-outlet></router-outlet>

@@ -7,6 +7,7 @@ export interface userCreate {
   apellido: string;
   anioLectivo: string;
   carrera: string;
+  mencion?: string;
   uid?: string;
 }
 
@@ -17,9 +18,19 @@ export interface userCreate {
 export class RegisterService {
   private _firestore = inject(Firestore);
 
-  async getUserData(uid: string): Promise<userCreate | null> {
+  private getCollectionName(carrera: string): string {
+    // Eliminar tildes y espacios para mayor consistencia
+    const normalizeCarrera = carrera.normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "");
+    
+    return normalizeCarrera;
+  }
+
+  async getUserData(uid: string, carrera: string): Promise<userCreate | null> {
     try {
-      const userDoc = doc(this._firestore, `usuarios/${uid}`);
+      const collectionName = this.getCollectionName(carrera);
+      const userDoc = doc(this._firestore, `${collectionName}/${uid}`);
       const userSnapshot = await getDoc(userDoc);
       
       if (userSnapshot.exists()) {
@@ -37,11 +48,23 @@ export class RegisterService {
   async create(uid: string, user: userCreate) {
     try {
       const userWithUID = { ...user, uid };
-      const userDoc = doc(this._firestore, `usuarios/${uid}`); // Usar UID como nombre del documento
+      const collectionName = this.getCollectionName(user.carrera);
+      
+      // Crear el documento en la colección específica de la carrera
+      const userDoc = doc(this._firestore, `${collectionName}/${uid}`);
       await setDoc(userDoc, userWithUID);
-      console.log('Documento creado con éxito');
+      
+      // También guardamos una referencia en la colección general de usuarios
+      const generalUserDoc = doc(this._firestore, `usuarios/${uid}`);
+      await setDoc(generalUserDoc, {
+        carrera: user.carrera,
+        uid: uid
+      });
+
+      console.log(`Documento creado con éxito en la colección ${collectionName}`);
     } catch (error) {
       console.error('Error al escribir en Firestore:', error);
+      throw error;
     }
   }
 
@@ -52,7 +75,7 @@ export class RegisterService {
       console.log('Nombre de usuario vinculado con éxito');
     } catch (error) {
       console.error('Error al vincular el nombre de usuario:', error);
-      throw error; // Para manejar el error en el componente
+      throw error;
     }
   }
 

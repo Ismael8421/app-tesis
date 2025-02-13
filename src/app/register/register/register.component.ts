@@ -41,46 +41,54 @@ export class RegisterComponent {
       lastName: new FormControl('', Validators.required),
       course: new FormControl('', Validators.required),
       profession: new FormControl('', Validators.required),
+      mencion: new FormControl('') 
     });
   }
 
-  async submit() {
-    if (this.form.invalid) return
+  // register.component.ts
+async submit() {
+  if (this.form.invalid) {
+    // Marcar campos como touched para mostrar errores
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
+      control?.markAsTouched();
+    });
+    return;
+  }
 
-    try {
-      this.loading.set(true);
+  try {
+    this.loading.set(true);
+    const user = this._authService.currentUser;
 
-      const user = this._authService.currentUser;
-
-      if (!user || !user.uid) {
-        console.error('No se encontró un usuario autenticado.');
-        return;
-      }
-
-      const uid = user.uid;
-
-      const { username, name, lastName, course, profession } = this.form.value;
-
-      const userData: userCreate = {
-        nombreUsuario: username || '',
-        nombre: name || '',
-        apellido: lastName || '',
-        anioLectivo: course || '',
-        carrera: profession || '',
-      };
-
-      await this._userCreate.create(uid, userData);
-
-      // Eliminar despues
-      console.log('Usuario registrado con éxito en Firestore.');
-      console.log(this.form.value);
-
-      this._router.navigateByUrl('/menu');
-
-    } catch (error) {
-      console.error('Error al crear el documento:', error);
-    } finally {
-      this.loading.set(false);
+    if (!user || !user.uid) {
+      console.error('No se encontró un usuario autenticado.');
+      return;
     }
+
+    const uid = user.uid;
+    const { username, name, lastName, course, profession, mencion } = this.form.value;
+
+    const userData: userCreate = {
+      nombreUsuario: username || '',
+      nombre: name || '',
+      apellido: lastName || '',
+      anioLectivo: course || '',
+      carrera: profession || '',
+      mencion: mencion || '' // Si no hay mención, será string vacío
+    };
+
+    await this._userCreate.create(uid, userData);
+    this._router.navigateByUrl('/menu');
+
+  } catch (error) {
+    console.error('Error al crear el documento:', error);
+  } finally {
+    this.loading.set(false);
+  }
+}
+  
+  // Función auxiliar para verificar si una carrera requiere mención
+  private requiereMencion(carrera: string): boolean {
+    return ['Informática', 'IEME', 'MCM', 'EMA', 'Ciencias'].includes(carrera);
   }
 }

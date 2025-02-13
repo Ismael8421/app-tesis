@@ -2,12 +2,5 @@
   <form [formGroup]="form" (ngSubmit)="submit()">
     <!-- Página 1: Datos personales -->
     <app-personal-data />
-
-    <!-- Botón Registrar (solo se muestra en la última página) -->
-    <ion-button type="submit" [disabled]="loading()" fill="solid" color="success">
-      <ion-icon slot="start" name="save"></ion-icon>
-      {{loading() ? 'Cargando...' : 'Registrar'}}
-    </ion-button>
-
   </form>
 </ion-content>

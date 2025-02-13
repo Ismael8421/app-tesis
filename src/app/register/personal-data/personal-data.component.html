@@ -42,7 +42,6 @@
       <ion-label position="floating">Nivel</ion-label>
       <ion-select id="course" formControlName="course">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
-        <ion-select-option value="Primero">Primero</ion-select-option>
         <ion-select-option value="Segundo">Segundo</ion-select-option>
         <ion-select-option value="Tercero">Tercero</ion-select-option>
       </ion-select>
@@ -71,6 +70,22 @@
         <small>Este campo es obligatorio</small>
       </ion-text>
     </div>
+
+    <ion-item *ngIf="showMencion">
+      <ion-label position="floating">Mención</ion-label>
+      <ion-select formControlName="mencion">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option *ngFor="let mencion of mencionesActuales" [value]="mencion">
+          {{mencion}}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="showMencion && form.get('mencion')?.invalid && form.get('mencion')?.touched">
+      <ion-text color="danger">
+        <small>Debe seleccionar una mención</small>
+      </ion-text>
+    </div>
+
   </ion-list>
   <ion-button expand="block" type="submit">
     Registrar

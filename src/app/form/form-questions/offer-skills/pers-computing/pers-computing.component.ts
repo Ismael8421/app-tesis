@@ -21,19 +21,19 @@ export class PersComputingComponent  implements OnInit {
   constructor() { }
 
   async ngOnInit() {
-    try {
-      // Obtener el usuario actual
-      const currentUser = this._auth.currentUser;
-      if (!currentUser) {
-        this._router.navigate(['/login']);
-        return;
-      }
+    // try {
+    //   // Obtener el usuario actual
+    //   const currentUser = this._auth.currentUser;
+    //   if (!currentUser) {
+    //     this._router.navigate(['/login']);
+    //     return;
+    //   }
 
-      // Obtener los datos del usuario
-      this.userData = await this._registerService.getUserData(currentUser.uid);
-    } catch (error) {
-      console.error('Error al cargar datos del perfil:', error);
-    }
+    //   // Obtener los datos del usuario
+    //   this.userData = await this._registerService.getUserData(currentUser.uid);
+    // } catch (error) {
+    //   console.error('Error al cargar datos del perfil:', error);
+    // }
   }
 
 }

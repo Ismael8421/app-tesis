@@ -1,61 +1,7 @@
-<!-- <div class="search-container" [class.focused]="isSearchFocused">
-    <div class="search-input-wrapper">
-      
-      <i class="search-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </i>
-      
-      
-      <input
-        type="text"
-        [formControl]="searchControl"
-        [placeholder]="placeholder"
-        (focus)="onFocus()"
-        (blur)="onBlur()"
-        class="search-input"
-      />
-      
-     
-      <button
-        *ngIf="showClearButton"
-        class="clear-button"
-        (click)="clearSearch()"
-        type="button"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-  
-    
-    <div class="suggestions-container" *ngIf="showSuggestions && suggestions.length > 0">
-      <ul class="suggestions-list">
-        <li *ngFor="let suggestion of suggestions"
-            (click)="selectSuggestion(suggestion)"
-            class="suggestion-item">
-          <i class="suggestion-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </i>
-          {{ suggestion }}
-        </li>
-      </ul>
-    </div>
-  </div> -->
-
-
-<div class="search-container">
-  <h2>Iniciar chat con:</h2>
+<div>
   <!-- Para propósitos de demostración, mostramos botones para ambos usuarios -->
-  <div *ngIf="currentUser$ | async as currentUser">
-    <!-- Solo mostrar el botón del otro usuario -->
+  <!-- <div *ngIf="currentUser$ | async as currentUser">
+    Solo mostrar el botón del otro usuario
     <button *ngIf="currentUser.uid !== 'yeRfZnKOkoYBUbCYtpRJMPwHs7v1'"
       (click)="startChat('yeRfZnKOkoYBUbCYtpRJMPwHs7v1', 'IsmaelP2007')">
       Chat con IsmaelP2007
@@ -64,13 +10,145 @@
       (click)="startChat('plcE9hTEInPPooU5z6xZLWoL8AM2', 'fabianB94')">
       Chat con fabianB94
     </button>
-  </div>
+  </div> -->
 
-  <ion-alert 
-  [isOpen]="!isFormComplete" 
-  message="Para personalizar tus recomendaciones, necesitamos conocerte mejor a través de un breve formulario"
-  [buttons]="alertButtons"  
-  (didDismiss)="isFormComplete = true"
-  >
+  <!-- <div >
+    <img src="icons/fondo.png" style="padding-top: 20px;">
+    
+  </div> -->
+  <swiper-container>
+    <swiper-slide>
+      <ion-card class="content-container ion-no-margin">
+        <ion-card-content class="profile-section">
+          <!-- Sección superior: Avatar y nombre -->
+          <div class="profile-header">
+            <ion-avatar class="profile-img">
+              <ion-img src="icons/logo_tesis.png" alt="Profile"></ion-img>
+            </ion-avatar>
+
+            <ion-text>
+              <h3>NombreUsuario</h3>
+            </ion-text>
+
+            <ion-text color="medium">
+              <small>Nombre Apellido</small>
+            </ion-text>
+          </div>
+
+          <!-- Sección central: Información -->
+          <div class="info-section">
+            <ion-text>
+              <p>Carrera</p>
+            </ion-text>
+
+            <ion-text>
+              <p>Curso</p>
+            </ion-text>
+          </div>
+
+          <!-- Sección inferior: Botones -->
+          <div class="buttons-container">
+            <ion-button fill="solid" shape="round" mode="ios">
+              <app-messages-icon></app-messages-icon>
+            </ion-button>
+
+            <ion-button fill="solid" shape="round" mode="ios">
+              <app-check-icon></app-check-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </swiper-slide>
+
+    <swiper-slide>
+      <ion-card class="content-container ion-no-margin">
+        <ion-card-content class="profile-section">
+          <!-- Sección superior: Avatar y nombre -->
+          <div class="profile-header">
+            <ion-avatar class="profile-img">
+              <ion-img src="icons/logo_tesis.png" alt="Profile"></ion-img>
+            </ion-avatar>
+            
+            <ion-text>
+              <h3>NombreUsuario</h3>
+            </ion-text>
+            
+            <ion-text color="medium">
+              <small>Nombre Apellido</small>
+            </ion-text>
+          </div>
+    
+          <!-- Sección central: Información -->
+          <div class="info-section">
+            <ion-text>
+              <p>Carrera</p>
+            </ion-text>
+            
+            <ion-text>
+              <p>Curso</p>
+            </ion-text>
+          </div>
+    
+          <!-- Sección inferior: Botones -->
+          <div class="buttons-container">
+            <ion-button fill="solid" shape="round" mode="ios">
+              <app-messages-icon></app-messages-icon>
+            </ion-button>
+            
+            <ion-button fill="solid" shape="round" mode="ios">
+              <app-check-icon></app-check-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </swiper-slide>
+
+    <swiper-slide>
+      <ion-card class="content-container ion-no-margin">
+        <ion-card-content class="profile-section">
+          <!-- Sección superior: Avatar y nombre -->
+          <div class="profile-header">
+            <ion-avatar class="profile-img">
+              <ion-img src="icons/logo_tesis.png" alt="Profile"></ion-img>
+            </ion-avatar>
+            
+            <ion-text>
+              <h3>NombreUsuario</h3>
+            </ion-text>
+            
+            <ion-text color="medium">
+              <small>Nombre Apellido</small>
+            </ion-text>
+          </div>
+    
+          <!-- Sección central: Información -->
+          <div class="info-section">
+            <ion-text>
+              <p>Carrera</p>
+            </ion-text>
+            
+            <ion-text>
+              <p>Curso</p>
+            </ion-text>
+          </div>
+    
+          <!-- Sección inferior: Botones -->
+          <div class="buttons-container">
+            <ion-button fill="solid" shape="round" mode="ios">
+              <app-messages-icon></app-messages-icon>
+            </ion-button>
+            
+            <ion-button fill="solid" shape="round" mode="ios">
+              <app-check-icon></app-check-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </swiper-slide>
+  </swiper-container>
+
+  <ion-alert [isOpen]="!isFormComplete"
+    message="Para personalizar tus recomendaciones, necesitamos conocerte mejor a través de un breve formulario"
+    [buttons]="alertButtons" (didDismiss)="isFormComplete = true">
   </ion-alert>
 </div>

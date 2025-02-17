@@ -8,6 +8,8 @@ import { ChatService } from '../chats/data-access/chat.service';
 import { Observable } from 'rxjs';
 import { IonicModule, AlertController } from '@ionic/angular';
 import { FormStateService } from '../../form/data-access/form-state.service';
+import { CheckIconComponent } from '../../UI/check-icon/check-icon.component';
+import { MessagesIconComponent } from '../../UI/messages-icon/messages-icon.component';
 
 register();
 
@@ -19,7 +21,9 @@ register();
     NgFor,
     ReactiveFormsModule,
     CommonModule,
-    IonicModule
+    IonicModule,
+    CheckIconComponent,
+    MessagesIconComponent 
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',

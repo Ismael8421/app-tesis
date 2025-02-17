@@ -1,165 +1,135 @@
-/* :host {
-    display: block;
-    width: 100%;
-  }
-  
-  .search-container {
-    position: relative;
-    width: 100%;
-    background: #fff;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-  }
-  
-  .search-container.focused {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .search-input-wrapper {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    background: #fff;
-  }
-  
-  .search-icon {
-    width: 20px;
-    height: 20px;
-    color: #666;
-    margin-right: 8px;
-  }
-  
-  .search-icon svg {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .search-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    background: transparent;
-    color: #333;
-    padding: 4px 0;
-    width: 100%;
-  }
-  
-  .search-input::placeholder {
-    color: #999;
-  }
-  
-  .clear-button {
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    color: #999;
-    cursor: pointer;
+:host {
+  swiper-slide {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s ease;
-  }
-  
-  .clear-button:hover {
-    color: #666;
-  }
-  
-  .clear-button svg {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .suggestions-container {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-top: 4px;
-    z-index: 1000;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-  
-  .suggestions-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .suggestion-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .suggestion-item:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .suggestion-icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 12px;
-    color: #999;
-  }
-  
-  .suggestion-icon svg {
-    width: 100%;
     height: 100%;
-  }
-  
-  @media (max-width: 768px) {
-    .search-container {
-      border-radius: 8px;
-    }
+    padding: 0.5rem;
     
-    .search-input-wrapper {
-      padding: 10px 12px;
-    }
-    
-    .search-input {
-      font-size: 16px;
-    }
-    
-    .suggestions-container {
-      position: fixed;
-      top: auto;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      max-height: 50vh;
-      border-radius: 20px 20px 0 0;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    .suggestion-item {
-      padding: 16px;
-    }
-  } */
+    ion-card.content-container {
+      width: 100%;
+      max-width: 100%;
+      height: calc(100vh - 70px); // Altura ajustada considerando la barra de navegación
+      margin: 0;
+      background: var(--ion-background-color);
+      border-radius: 20px;
+      overflow: hidden;
 
+      @media (min-width: 768px) {
+        max-width: 500px;
+      }
 
-  .search-container {
-    padding: 1rem;
+      ion-card-content.profile-section {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between; // Distribuye el espacio entre elementos
+        padding: 2rem 1.5rem;
+        background-color: var(--ion-background-color);
+
+        // Contenedor superior para avatar y nombre
+        .profile-header {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          flex: 1;
+          justify-content: center;
+          width: 100%;
+          margin-bottom: 1rem;
+
+          ion-avatar.profile-img {
+            width: clamp(120px, 25vw, 150px);
+            height: clamp(120px, 25vw, 150px);
+            margin-bottom: 2rem;
+            border: 3px solid var(--ion-color-primary);
+          }
+
+          ion-text h3 {
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--ion-text-color);
+          }
+
+          ion-text small {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: var(--ion-color-medium);
+            margin-bottom: 0.5rem;
+          }
+        }
+
+        // Contenedor central para información
+        .info-section {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 100%;
+          text-align: center;
+          margin: 1.5rem 0;
+
+          ion-text p {
+            font-size: clamp(1.2rem, 4vw, 1.4rem);
+            color: var(--ion-text-color);
+            margin-bottom: 1rem;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+
+        // Contenedor de botones
+        .buttons-container {
+          display: flex;
+          gap: 2rem;
+          margin-top: 2rem;
+
+          ion-button {
+            --padding-start: 0;
+            --padding-end: 0;
+            width: clamp(50px, 15vw, 65px);
+            height: clamp(50px, 15vw, 65px);
+            --border-radius: 50%;
+            --background: var(--ion-color-primary);
+            --background-hover: var(--ion-color-primary-shade);
+
+            app-messages-icon,
+            app-check-icon {
+              font-size: clamp(24px, 7vw, 30px);
+              color: var(--ion-color-primary-contrast);
+            }
+
+            &:hover {
+              transform: scale(1.05);
+              transition: transform 0.2s ease;
+            }
+          }
+        }
+      }
+    }
   }
-  button {
-    margin: 0.5rem;
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+}
+
+// Ajustes específicos para modo oscuro
+:host-context(.dark-theme) {
+  ion-card.content-container {
+    --ion-card-background: var(--ion-color-dark);
+    
+    ion-card-content {
+      background-color: var(--ion-color-dark);
+    }
   }
-  button:hover {
-    background-color: #0056b3;
+}
+
+// Ajustes específicos para modo claro
+:host-context(.light-theme) {
+  ion-card.content-container {
+    --ion-card-background: var(--ion-color-light);
+    
+    ion-card-content {
+      background-color: var(--ion-color-light);
+    }
   }
+}

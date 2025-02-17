@@ -27,8 +27,21 @@ export class RegisterService {
     return normalizeCarrera;
   }
 
-  async getUserData(uid: string, carrera: string): Promise<userCreate | null> {
+  async getUserData(uid: string): Promise<userCreate | null> {
     try {
+      // Primero obtener la referencia de la colección general
+      const generalUserDoc = doc(this._firestore, `usuarios/${uid}`);
+      const generalUserSnapshot = await getDoc(generalUserDoc);
+      
+      if (!generalUserSnapshot.exists()) {
+        console.log('No se encontró el documento del usuario');
+        return null;
+      }
+    
+      // Obtener la carrera del usuario
+      const { carrera } = generalUserSnapshot.data();
+      
+      // Obtener los datos específicos de la carrera
       const collectionName = this.getCollectionName(carrera);
       const userDoc = doc(this._firestore, `${collectionName}/${uid}`);
       const userSnapshot = await getDoc(userDoc);
@@ -36,7 +49,7 @@ export class RegisterService {
       if (userSnapshot.exists()) {
         return userSnapshot.data() as userCreate;
       } else {
-        console.log('No se encontró el documento del usuario');
+        console.log('No se encontró el documento específico del usuario');
         return null;
       }
     } catch (error) {

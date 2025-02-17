@@ -4,11 +4,12 @@ import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, ControlContainer, FormGroupDirective } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-computing',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule ],
+  imports: [ CommonModule, ReactiveFormsModule, IonicModule ],
   templateUrl: './computing.component.html',
   styleUrls: ['./computing.component.scss'],
   viewProviders: [
@@ -28,16 +29,16 @@ export class ComputingComponent implements OnInit {
   constructor() { }
 
   async ngOnInit() {
-    // try {
-    //   const currentUser = this._auth.currentUser;
-    //   if (!currentUser) {
-    //     this._router.navigate(['/login']);
-    //     return;
-    //   }
+    try {
+      const currentUser = this._auth.currentUser;
+      if (!currentUser) {
+        this._router.navigate(['/login']);
+        return;
+      }
 
-    //   this.userData = await this._registerService.getUserData(currentUser.uid);
-    // } catch (error) {
-    //   console.error('Error al cargar datos del perfil:', error);
-    // }
+      this.userData = await this._registerService.getUserData(currentUser.uid);
+    } catch (error) {
+      console.error('Error al cargar datos del perfil:', error);
+    }
   }
 }

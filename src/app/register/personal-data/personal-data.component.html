@@ -40,7 +40,7 @@
     <!-- Course -->
     <ion-item>
       <ion-label position="floating">Nivel</ion-label>
-      <ion-select id="course" formControlName="course">
+      <ion-select id="course" formControlName="course" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Segundo">Segundo</ion-select-option>
         <ion-select-option value="Tercero">Tercero</ion-select-option>
@@ -55,14 +55,11 @@
     <!-- Profession -->
     <ion-item>
       <ion-label position="floating">Carrera</ion-label>
-      <ion-select id="profession" formControlName="profession">
+      <ion-select id="profession" formControlName="profession" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
-        <ion-select-option value="IEME">IEME</ion-select-option>
-        <ion-select-option value="MCM">MCM</ion-select-option>
-        <ion-select-option value="EMA">EMA</ion-select-option>
-        <ion-select-option value="Mecatrónica">Mecatrónica</ion-select-option>
-        <ion-select-option value="Informática">Informática</ion-select-option>
-        <ion-select-option value="Ciencias">Ciencias</ion-select-option>
+        <ion-select-option *ngFor="let carrera of carreras" [value]="carrera.value">
+          {{carrera.display}}
+        </ion-select-option>
       </ion-select>
     </ion-item>
     <div *ngIf="form.controls['profession'].invalid && form.controls['profession'].touched">
@@ -71,12 +68,13 @@
       </ion-text>
     </div>
 
+    <!-- Mencion -->
     <ion-item *ngIf="showMencion">
       <ion-label position="floating">Mención</ion-label>
-      <ion-select formControlName="mencion">
+      <ion-select formControlName="mencion" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
-        <ion-select-option *ngFor="let mencion of mencionesActuales" [value]="mencion">
-          {{mencion}}
+        <ion-select-option *ngFor="let mencion of mencionesActuales" [value]="mencion.valor">
+          {{mencion.display}}
         </ion-select-option>
       </ion-select>
     </ion-item>

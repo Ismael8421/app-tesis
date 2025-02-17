@@ -1,126 +1,119 @@
-<div *ngIf="userData?.anioLectivo === 'Segundo'">
-  <div>
-    <p>Desarrollo de programas o aplicaciones</p>
-    <select id="programming">
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="Alto">Alto</option>
-      <option value="Medio selected">Medio</option>
-      <option value="Bajo">Bajo</option>
-    </select>
-  </div>
-
-  <div>
-    <p>Construcción y programación de circuitos electrónicos</p>
-    <select id="support">
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="Alto">Alto</option>
-      <option value="Medio selected">Medio</option>
-      <option value="Bajo">Bajo</option>
-    </select>
-  </div>
-
-  <div>
-    <p>Diseño y desarrollo de páginas web</p>
-    <select id="web">
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="Alto">Alto</option>
-      <option value="Medio selected">Medio</option>
-      <option value="Bajo">Bajo</option>
-    </select>
-  </div>
-
-  <div>
-    <p>Configuración de sistemas operativos y redes de computadoras</p>
-    <select id="networks">
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="Alto">Alto</option>
-      <option value="Medio selected">Medio</option>
-      <option value="Bajo">Bajo</option>
-    </select>
-  </div>
-</div>
-
-<div *ngIf="userData?.anioLectivo === 'Tercero'">
-  <div>
-    <p>Desarrollo de programas o aplicaciones</p>
-    <select id="programming1">
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="Alto">Alto</option>
-      <option value="Medio selected">Medio</option>
-      <option value="Bajo">Bajo</option>
-    </select>
-  </div>
-
-  <div>
-    <p>Manejo de herramientas de diseño como Illutrator, Photoshop, etc</p>
-    <select id="desing">
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="Alto">Alto</option>
-      <option value="Medio selected">Medio</option>
-      <option value="Bajo">Bajo</option>
-    </select>
-  </div>
-
-  <div>
-    <p>Construcción y modelado de piezas en 3D</p>
-    <select id="cad">
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="Alto">Alto</option>
-      <option value="Medio selected">Medio</option>
-      <option value="Bajo">Bajo</option>
-    </select>
-  </div>
-
-  <div>
-    <p>Selecciona a que mención perteneces </p>
-    <select id="mention">
-      <option value="" disabled selected>Elige una opción</option>
-      <option value="Medio selected">Programación Móvil</option>
-      <option value="Bajo">Aplicaciones Web</option>
-    </select>
-  </div>
-
-  <div>
-    <div>
-      <p>Construcción y programación de circuitos electrónicos</p>
-      <select id="support1">
-        <option value="" disabled selected>Elige una opción</option>
-        <option value="Alto">Alto</option>
-        <option value="Medio selected">Medio</option>
-        <option value="Bajo">Bajo</option>
-      </select>
+<div>
+  <ion-list *ngIf="userData?.anioLectivo === 'Segundo'" formGroupName="offer_skills_sec_inf">
+    <ion-item>
+      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
+      <ion-select id="programming" formControlName="programing" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
+      <ion-select id="support" formControlName="support" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
+      <ion-select id="web" formControlName="web" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
+      <ion-select id="networks" formControlName="networks" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+ 
+  <ion-list *ngIf="userData?.anioLectivo === 'Tercero'" formGroupName="offer_skills_third_inf">
+    <ion-item>
+      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
+      <ion-select id="programming1" formControlName="programming1" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Manejo de herramientas de diseño como Illutrator, Photoshop, etc</ion-label>
+      <ion-select id="desing" formControlName="desing" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Construcción y modelado de piezas en 3D</ion-label>
+      <ion-select id="cad" formControlName="cad" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <div *ngIf="userData?.mencion === 'Programacion movil'">
+      <ion-item>
+        <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
+        <ion-select id="support1" formControlName="support1" placeholder="Elige una opción">
+          <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+          <ion-select-option value="Alto">Alto</ion-select-option>
+          <ion-select-option value="Medio">Medio</ion-select-option>
+          <ion-select-option value="Bajo">Bajo</ion-select-option>
+        </ion-select>
+      </ion-item>
+ 
+      <ion-item>
+        <ion-label position="floating">Programación de aplicaciones móviles</ion-label>
+        <ion-select id="mobile" formControlName="mobile" placeholder="Elige una opción">
+          <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+          <ion-select-option value="Alto">Alto</ion-select-option>
+          <ion-select-option value="Medio">Medio</ion-select-option>
+          <ion-select-option value="Bajo">Bajo</ion-select-option>
+        </ion-select>
+      </ion-item>
     </div>
-
-    <div>
-      <p>Programación de aplicaciones móviles </p>
-      <select id="mobile">
-        <option value="" disabled selected>Elige una opción</option>
-        <option value="Alto">Alto</option>
-        <option value="Medio selected">Medio</option>
-        <option value="Bajo">Bajo</option>
-      </select>
+ 
+    <div *ngIf="userData?.mencion === 'Aplicaciones web'">
+      <ion-item>
+        <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
+        <ion-select id="web1" formControlName="web1" placeholder="Elige una opción">
+          <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+          <ion-select-option value="Alto">Alto</ion-select-option>
+          <ion-select-option value="Medio">Medio</ion-select-option>
+          <ion-select-option value="Bajo">Bajo</ion-select-option>
+        </ion-select>
+      </ion-item>
+ 
+      <ion-item>
+        <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
+        <ion-select id="networks1" formControlName="networks1" placeholder="Elige una opción">
+          <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+          <ion-select-option value="Alto">Alto</ion-select-option>
+          <ion-select-option value="Medio">Medio</ion-select-option>
+          <ion-select-option value="Bajo">Bajo</ion-select-option>
+        </ion-select>
+      </ion-item>
     </div>
-  </div>
-
-  <div>
-    <div>
-      <p>Diseño y desarrollo de páginas web</p>
-      <select id="web1">
-        <option value="" disabled selected>Elige una opción</option>
-        <option value="Alto">Alto</option>
-        <option value="Medio selected">Medio</option>
-        <option value="Bajo">Bajo</option>
-      </select>
-    </div>
-
-    <div>
-      <p>Configuración de sistemas operativos y redes de computadoras</p>
-      <select id="networks1">
-        <option value="" disabled selected>Elige una opción</option>
-        <option value="Alto">Alto</option>
-        <option value="Medio selected">Medio</option>
-        <option value="Bajo">Bajo</option>
-      </select>
-    </div>
-  </div>
-</div>
+  </ion-list>
+ </div>

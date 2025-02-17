@@ -26,10 +26,11 @@ import { IonicModule } from '@ionic/angular';
     WantedProfessionComponent,
     PersComputingComponent,
     ComputingComponent,
-    EMAComponent, 
+    EMAComponent,
     IEMEComponent,
     MCMComponent,
-    MechatronicsComponent
+    MechatronicsComponent,
+    IonicModule
   ],
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.scss'],
@@ -77,14 +78,32 @@ export class FormComponent {
         O5: new FormControl(false),
         O1: new FormControl(false),
         O6: new FormControl(false)
-      }, this.atLeastOneCheckedValidator()), 
-      wanted_skills_sec: new FormGroup({
+      }, this.atLeastOneCheckedValidator()),
+      //En base a que carrera busca para segundos
+      wanted_skills_sec_inf: new FormGroup({
         programing: new FormControl(),
         support: new FormControl(),
         web: new FormControl(),
         networks: new FormControl(),
       }),
-      wanted_skilss_third: new FormGroup({
+      //En base a que carrera busca para terceros
+      wanted_skills_third_inf: new FormGroup({
+        programming1: new FormControl(),
+        desing: new FormControl(),
+        cad: new FormControl(),
+        support1: new FormControl(),
+        mobile: new FormControl(),
+        web1: new FormControl(),
+        networks1: new FormControl(),
+      }),
+      //Habilidades que ofrece
+      offer_skills_sec_inf: new FormGroup({
+        programing: new FormControl(),
+        support: new FormControl(),
+        web: new FormControl(),
+        networks: new FormControl(),
+      }),
+      offer_skills_third_inf: new FormGroup({
         programming1: new FormControl(),
         desing: new FormControl(),
         cad: new FormControl(),
@@ -98,8 +117,8 @@ export class FormComponent {
 
   shouldShowComponent(componentName: string): boolean {
     const professionValues = this.form.get('wanted_profession')?.value;
-    
-    switch(componentName) {
+
+    switch (componentName) {
       case 'ieme':
         return professionValues?.O1 === true; // Circuitos eléctricos
       case 'mcm':
@@ -121,7 +140,7 @@ export class FormComponent {
     return (formGroup: AbstractControl): ValidationErrors | null => {
       const selections = Object.values(formGroup.value);
       const hasSelection = selections.some(value => value === true);
-      
+
       return hasSelection ? null : { requireCheckbox: true };
     };
   }
@@ -162,20 +181,44 @@ export class FormComponent {
         horas: this.form.get('hours')?.value,
         carrera_buscada: carreraBuscada,
         habilidad_buscada_seg: {
-          programacion: this.form.get('wanted_skills_sec.programing')?.value,
-          soporte: this.form.get('wanted_skills_sec.support')?.value,
-          web: this.form.get('wanted_skills_sec.web')?.value,
-          redes: this.form.get('wanted_skills_sec.networks')?.value,
+          informatica_seg: {
+            programacion: this.form.get('wanted_skills_sec_inf.programing')?.value,
+            soporte: this.form.get('wanted_skills_sec_inf.support')?.value,
+            web: this.form.get('wanted_skills_sec_inf.web')?.value,
+            redes: this.form.get('wanted_skills_sec_inf.networks')?.value,
+          }
+
         },
         habilidad_buscada_ter: {
-          programacion: this.form.get('wanted_skilss_third.programming1')?.value,
-          diseño: this.form.get('wanted_skilss_third.desing')?.value,
-          cad: this.form.get('wanted_skilss_third.cad')?.value,
-          soporte: this.form.get('wanted_skilss_third.support1')?.value,
-          mobile: this.form.get('wanted_skilss_third.mobile')?.value,
-          web: this.form.get('wanted_skilss_third.web1')?.value,
-          redes: this.form.get('wanted_skilss_third.networks1')?.value,
+          informatica_ter: {
+            programacion: this.form.get('wanted_skills_third_inf.programming1')?.value,
+            diseño: this.form.get('wanted_skills_third_inf.desing')?.value,
+            cad: this.form.get('wanted_skills_third_inf.cad')?.value,
+            soporte: this.form.get('wanted_skills_third_inf.support1')?.value,
+            mobile: this.form.get('wanted_skills_third_inf.mobile')?.value,
+            web: this.form.get('wanted_skills_third_inf.web1')?.value,
+            redes: this.form.get('wanted_skills_third_inf.networks1')?.value,
+          }
         },
+        habilidad_ofrecida_seg: {
+          informatica_seg_of: {
+            programacion: this.form.get('offer_skills_sec_inf.programing')?.value,
+            soporte: this.form.get('offer_skills_sec_inf.support')?.value,
+            web: this.form.get('offer_skills_sec_inf.web')?.value,
+            redes: this.form.get('offer_skills_sec_inf.networks')?.value,
+          }
+        },
+        habilidad_ofrecida_ter: {
+          informatica_ter_of: {
+            programacion: this.form.get('offer_skills_third_inf.programming1')?.value,
+            diseño: this.form.get('offer_skills_third_inf.desing')?.value,
+            cad: this.form.get('offer_skills_third_inf.cad')?.value,
+            soporte: this.form.get('offer_skills_third_inf.support1')?.value,
+            mobile: this.form.get('offer_skills_third_inf.mobile')?.value,
+            web: this.form.get('offer_skills_third_inf.web1')?.value,
+            redes: this.form.get('offer_skills_third_inf.networks1')?.value,
+          }
+        }
       };
 
       // Guardar los datos usando el servicio
@@ -194,18 +237,18 @@ export class FormComponent {
   }
 
   async ngOnInit() {
-    // try {
-    //   // Obtener el usuario actual
-    //   const currentUser = this._auth.currentUser;
-    //   if (!currentUser) {
-    //     this._router.navigate(['/login']);
-    //     return;
-    //   }
+    try {
+      // Obtener el usuario actual
+      const currentUser = this._auth.currentUser;
+      if (!currentUser) {
+        this._router.navigate(['/login']);
+        return;
+      }
 
-    //   // Obtener los datos del usuario
-    //   this.userData = await this._registerService.getUserData(currentUser.uid);
-    // } catch (error) {
-    //   console.error('Error al cargar datos del perfil:', error);
-    // }
+      // Obtener los datos del usuario
+      this.userData = await this._registerService.getUserData(currentUser.uid);
+    } catch (error) {
+      console.error('Error al cargar datos del perfil:', error);
+    }
   }
 }

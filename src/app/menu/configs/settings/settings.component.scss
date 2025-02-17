@@ -1,61 +1,71 @@
 // Variables principales
 :host {
-  --page-background-light: #f2f2f7;
-  --page-background-dark: #000000;
-  --item-background-light: #ffffff;
-  --item-background-dark: #1c1c1e;
-  --text-primary-light: #000000;
-  --text-primary-dark: #ffffff;
-  --text-secondary-light: #6b6b6b;
-  --text-secondary-dark: #98989d;
-  --border-light: rgba(0, 0, 0, 0.1);
-  --border-dark: rgba(255, 255, 255, 0.1);
-  --ion-color-danger: #ff3b30;
+  // Colores base
+  --color-yellow-light: #F2DA5E;
+  --color-yellow-dark: #F3DD6C;
+  --color-blue-darkest: #032B44;
+  --color-blue-dark: #4C626F;
+  --color-blue-medium: #73889B;
+  --color-blue-light: #84A3B5;
+  --color-blue-accent: #5A7F94;
+  --color-gray-light: #D3E3E6;
+  
+  // Nuevos colores para modo oscuro
+  --dark-background: #1A1A2E;  // Azul muy oscuro
+  --dark-surface:#606B73;     // Azul oscuro para elementos
+  --dark-yellow-soft: #F2DA5E; // Amarillo suave
+  --dark-text: #E9E9F0;        // Texto claro
+  --dark-text-secondary: #B4B4C7; // Texto secundario
 }
 
-// Estilos base
+// Estilos base para tema claro (default)
 ion-content {
-  --background: var(--page-background-light);
+  --page-background: var(--color-gray-light);
+  --item-background: #ffffff;
+  --text-primary: var(--color-blue-darkest);
+  --text-secondary: var(--color-blue-medium);
+  --border-color: rgba(3, 43, 68, 0.1);
+  --icon-color: var(--color-blue-accent);
+  --ion-color-danger: #ff3b30;
+  --background: var(--page-background);
+}
 
-  @media (prefers-color-scheme: dark) {
-    --background: var(--page-background-dark);
+// Estilos para tema oscuro
+ion-content[data-theme='dark'] {
+  --page-background: var(--dark-background);
+  --item-background: var(--dark-surface);
+  --text-primary: var(--dark-text);
+  --text-secondary: var(--dark-text-secondary);
+  --border-color: rgba(242, 218, 94, 0.1); // Borde con tono amarillo suave
+  --icon-color: var(--dark-yellow-soft);
+  --background: var(--page-background);
+
+  // Ajustes específicos para modo oscuro
+  .section-group {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  ion-select::part(placeholder),
+  ion-select::part(text) {
+    color: var(--dark-yellow-soft);
+  }
+
+  .custom-icon:not(.danger) {
+    color: var(--dark-yellow-soft);
   }
 }
 
-// Lista de configuraciones
-.settings-list {
-  background: transparent;
-  margin: 0;
-  padding: 20px 0;
-}
-
-// Grupos de secciones
-.section-group {
-  margin-bottom: 24px;
-  background: var(--item-background-light);
-  border-radius: 12px;
-  overflow: hidden;
-
-  @media (prefers-color-scheme: dark) {
-    background: var(--item-background-dark);
-  }
-}
+// El resto del SCSS permanece igual...
 
 // Estilos de items
 ion-item {
-  --background: var(--item-background-light);
-  --color: var(--text-primary-light);
-  --border-color: var(--border-light);
+  --background: var(--item-background);
+  --color: var(--text-primary);
+  --border-color: var(--border-color);
   --padding-start: 16px;
   --padding-end: 16px;
   --min-height: 50px;
   font-size: 17px;
-
-  @media (prefers-color-scheme: dark) {
-    --background: var(--item-background-dark);
-    --color: var(--text-primary-dark);
-    --border-color: var(--border-dark);
-  }
 
   &::part(native) {
     padding-right: 16px;
@@ -73,20 +83,11 @@ ion-item {
       font-size: 20px;
       margin-bottom: 4px;
       font-weight: 500;
-      color: var(--text-primary-light);
-
-      @media (prefers-color-scheme: dark) {
-        color: var(--text-primary-dark);
-      }
+      color: var(--text-primary);
     }
-
     p {
       font-size: 15px;
-      color: var(--text-secondary-light);
-
-      @media (prefers-color-scheme: dark) {
-        color: var(--text-secondary-dark);
-      }
+      color: var(--text-secondary);
     }
   }
 }
@@ -102,11 +103,7 @@ ion-avatar {
 .custom-icon {
   font-size: 22px;
   margin-right: 12px;
-  color: #007AFF;
-
-  @media (prefers-color-scheme: dark) {
-    color: #0A84FF;
-  }
+  color: var(--icon-color);
 
   &.danger {
     color: var(--ion-color-danger);
@@ -115,22 +112,14 @@ ion-avatar {
 
 // Iconos de navegación
 ion-icon[slot="end"] {
-  color: var(--text-secondary-light);
+  color: var(--text-secondary);
   font-size: 20px;
-
-  @media (prefers-color-scheme: dark) {
-    color: var(--text-secondary-dark);
-  }
 }
 
 // Select
 ion-select {
-  --placeholder-color: var(--text-secondary-light);
+  --placeholder-color: var(--text-secondary);
   max-width: 120px;
-
-  @media (prefers-color-scheme: dark) {
-    --placeholder-color: var(--text-secondary-dark);
-  }
 }
 
 // Item de cierre de sesión

@@ -1,19 +1,20 @@
 // Variables
-$primary-color: #000000;
-$button-color: #333333;
-$white: #ffffff;
+$primary-color: #032B44;
+$secondary-color: #4C626F;
+$accent-color: #F2DA5E;
+$button-color: #5A7F94;
+$background-color: #D3E3E6;
+$input-border: #84A3B5;
+$input-background: #ffffff;
+$shadow-color: rgba(3, 43, 68, 0.1);
 $error-color: #dc3545;
-$background-color: #f8f9fa;
-$shadow-color: rgba(0, 0, 0, 0.1);
-$gray-light: #e9ecef;
-$gray-medium: #6c757d;
 
 // Dark mode variables
-$dark-background: #121212;
-$dark-surface: #1e1e1e;
-$dark-text: #ffffff;
-$dark-secondary-text: #a0a0a0;
-$dark-input-bg: rgba(255, 255, 255, 0.05);
+$dark-background: #032B44;
+$dark-surface: #4C626F;
+$dark-text: #F3DD6C;
+$dark-input-bg: #73889B;
+$dark-input-text: #ffffff;
 
 :host {
   display: block;
@@ -52,10 +53,10 @@ ion-text {
   
   h1 {
     color: $primary-color;
-    font-size: clamp(20px, 5vw, 28px);
+    font-size: clamp(24px, 5vw, 32px);
     font-weight: 700;
     text-align: center;
-    margin: clamp(20px, 4vh, 40px) 0;
+    margin: clamp(25px, 4vh, 45px) 0;
     padding: 0 15px;
 
     @include dark-mode {
@@ -68,16 +69,16 @@ ion-text {
 ion-list {
   position: relative;
   z-index: 1;
-  background: $white;
+  background: $input-background;
   border-radius: 20px;
-  padding: clamp(15px, 4vw, 25px);
+  padding: clamp(20px, 4vw, 30px);
   margin: 20px auto;
-  width: min(90%, 400px);
-  box-shadow: 0 8px 20px $shadow-color;
+  width: min(90%, 450px);
+  box-shadow: 0 8px 25px $shadow-color;
 
   @include dark-mode {
     background: $dark-surface;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -87,14 +88,15 @@ ion-item {
   --padding-start: 0;
   --padding-end: 0;
   --inner-padding-end: 0;
-  margin-bottom: 16px;
-  --border-color: transparent;
-  --highlight-height: 0;
+  margin-bottom: 20px;
+  --border-color: #{$input-border};
+  --highlight-height: 2px;
+  --highlight-color-focused: #{$button-color};
 
   &::part(native) {
-    padding: clamp(8px, 2vw, 16px);
+    padding: clamp(10px, 2vw, 16px);
     border-radius: 12px;
-    background: $gray-light;
+    background: rgba($input-border, 0.1);
 
     @include dark-mode {
       background: $dark-input-bg;
@@ -103,8 +105,8 @@ ion-item {
 
   // Labels
   ion-label {
-    --color: #{$gray-medium};
-    font-size: clamp(13px, 3.5vw, 15px);
+    --color: #{$secondary-color};
+    font-size: clamp(14px, 3.5vw, 16px);
     font-weight: 500;
 
     @include dark-mode {
@@ -121,8 +123,8 @@ ion-item {
     color: $primary-color;
 
     @include dark-mode {
-      --placeholder-color: #{$dark-secondary-text};
-      color: $dark-text;
+      --placeholder-color: #{$dark-text};
+      color: $dark-input-text;
     }
   }
 }
@@ -131,46 +133,84 @@ ion-item {
 ion-button {
   --background: #{$button-color};
   --background-hover: #{lighten($button-color, 10%)};
-  --color: #{$white};
+  --color: #{$input-background};
   --border-radius: 25px;
-  width: min(200px, 60%);
-  height: 45px;
-  margin: 30px auto;
+  width: min(220px, 60%);
+  height: 48px;
+  margin: 35px auto;
   position: relative;
   z-index: 1;
   font-size: clamp(14px, 4vw, 16px);
+  font-weight: 500;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 12px $shadow-color;
-  transition: transform 0.2s ease;
+  box-shadow: 0 4px 15px rgba($button-color, 0.3);
+  transition: all 0.3s ease;
 
   @include dark-mode {
-    --background: #{$gray-medium};
-    --background-hover: #{lighten($gray-medium, 10%)};
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --background: #{$accent-color};
+    --background-hover: #{darken($accent-color, 5%)};
+    --color: #{$primary-color};
+    box-shadow: 0 4px 15px rgba($accent-color, 0.3);
   }
 
   &:hover {
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba($button-color, 0.4);
+    
+    @include dark-mode {
+      box-shadow: 0 6px 20px rgba($accent-color, 0.4);
+    }
   }
 }
 
 // Error messages
 ion-text[color="danger"] {
   margin-left: 16px;
-  margin-top: -12px;
-  margin-bottom: 16px;
+  margin-top: -16px;
+  margin-bottom: 20px;
   display: block;
 
   small {
     color: $error-color;
-    font-size: clamp(11px, 3vw, 12px);
+    font-size: clamp(12px, 3vw, 13px);
+    
+    @include dark-mode {
+      color: lighten($error-color, 20%);
+    }
   }
 }
 
-// Responsive breakpoints
+// Responsive adjustments
 @media (max-width: 320px) {
   ion-list {
+    padding: 15px;
+  }
+
+  ion-item {
+    margin-bottom: 15px;
+  }
+
+  ion-button {
+    height: 44px;
+    width: 85%;
+  }
+}
+
+@media (min-width: 768px) {
+  ion-list {
+    padding: 35px;
+  }
+
+  ion-button {
+    width: 250px;
+  }
+}
+
+// Support for smaller screens
+@media (max-width: 280px) {
+  ion-list {
     padding: 12px;
+    width: 95%;
   }
 
   ion-item {
@@ -178,53 +218,26 @@ ion-text[color="danger"] {
   }
 
   ion-button {
-    height: 40px;
-    width: 80%;
-  }
-}
-
-@media (min-width: 768px) {
-  ion-list {
-    padding: 30px;
-  }
-
-  ion-button {
-    width: 220px;
-  }
-}
-
-// Support for foldable devices
-@media (max-width: 280px) {
-  ion-list {
-    padding: 10px;
-    width: 95%;
-  }
-
-  ion-item {
-    margin-bottom: 10px;
-  }
-
-  ion-button {
     width: 90%;
-    height: 38px;
+    height: 40px;
   }
 }
 
 // Landscape orientation
 @media (max-height: 500px) and (orientation: landscape) {
   div[formGroup] {
-    padding: 10px;
+    padding: 12px;
   }
 
   ion-text h1 {
-    margin: 15px 0;
+    margin: 18px 0;
   }
 
   ion-list {
-    margin: 10px auto;
+    margin: 12px auto;
   }
 
   ion-button {
-    margin: 20px auto;
+    margin: 25px auto;
   }
 }

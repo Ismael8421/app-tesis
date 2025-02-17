@@ -1,64 +1,78 @@
 <div [formGroup]="form">
-  <h1>Preferencias Generales</h1>
-  <div>
-    <p>Horario de disponibilidad preferido (seleccionar uno o más)</p>
+  <ion-text>
+    <h1>Preferencias Generales</h1>
+  </ion-text>
+
+  <ion-list>
+    <!-- Horario de disponibilidad -->
+    <ion-text>
+      <p>Horario de disponibilidad preferido (seleccionar uno o más)</p>
+    </ion-text>
+    
     <div formGroupName="schedule">
-      <div>
-        <input type="checkbox" id="Q1O1" formControlName="Q1O1">
-        <label for="Q1O1">Durante el almuerzo</label>
-      </div>
-      
-      <div>
-        <input type="checkbox" id="Q1O2" formControlName="Q1O2">
-        <label for="Q1O2">Tardes después de clases</label>
-      </div>
+      <ion-item>
+        <ion-checkbox #checkbox1 slot="start" id="Q1O1" formControlName="Q1O1"></ion-checkbox>
+        <ion-label (click)="checkbox1.checked = !checkbox1.checked">Durante el almuerzo</ion-label>
+      </ion-item>
 
-      <div>
-        <input type="checkbox" id="Q1O3" formControlName="Q1O3">
-        <label for="Q1O3">Fines de semana por la mañana</label>
-      </div>
+      <ion-item>
+        <ion-checkbox #checkbox2 slot="start" id="Q1O2" formControlName="Q1O2"></ion-checkbox>
+        <ion-label (click)="checkbox2.checked = !checkbox2.checked">Tardes después de clases</ion-label>
+      </ion-item>
 
-      <div>
-        <input type="checkbox" id="Q1O4" formControlName="Q1O4">
-        <label for="Q1O4">Fines de semana por la tarde</label>
-      </div>
-    </div>
-  </div>
+      <ion-item>
+        <ion-checkbox #checkbox3 slot="start" id="Q1O3" formControlName="Q1O3"></ion-checkbox>
+        <ion-label (click)="checkbox3.checked = !checkbox3.checked">Fines de semana por la mañana</ion-label>
+      </ion-item>
 
-  <div>
-    <p>Método de trabajo preferido</p>
-    <div>
-      <input type="radio" id="Q2O1" formControlName="method" value="presencial">
-      <label for="Q2O1">Solo presencial</label>
+      <ion-item>
+        <ion-checkbox #checkbox4 slot="start" id="Q1O4" formControlName="Q1O4"></ion-checkbox>
+        <ion-label (click)="checkbox4.checked = !checkbox4.checked">Fines de semana por la tarde</ion-label>
+      </ion-item>
     </div>
 
-    <div>
-      <input type="radio" id="Q2O2" formControlName="method" value="virtual">
-      <label for="Q2O2">Solo virtual</label>
-    </div>
+    <!-- Método de trabajo -->
+    <ion-text>
+      <p>Método de trabajo preferido</p>
+    </ion-text>
 
-    <div>
-      <input type="radio" id="Q2O3" formControlName="method" value="ambos">
-      <label for="Q2O3">Ambos</label>
-    </div>
-  </div>
+    <ion-radio-group formControlName="method">
+      <ion-item>
+        <ion-radio slot="start" id="Q2O1" value="presencial"></ion-radio>
+        <ion-label (click)="form.get('method')?.setValue('presencial')">Solo presencial</ion-label>
+      </ion-item>
 
-  <div>
-    <p>Nivel de dedicación al proyecto</p>
+      <ion-item>
+        <ion-radio slot="start" id="Q2O2" value="virtual"></ion-radio>
+        <ion-label (click)="form.get('method')?.setValue('virtual')">Solo virtual</ion-label>
+      </ion-item>
 
-    <div>
-      <input type="radio" id="hours" formControlName="hours" value="1-3">
-      <label for="Q3O1">1-3 horas diarias</label>
-    </div>
-    
-    <div>
-      <input type="radio" id="hours" formControlName="hours" value="4-6">
-      <label for="Q3O2">4-6 horas diarias</label>
-    </div>
-    
-    <div>
-      <input type="radio" id="hours" formControlName="hours" value="flexible">
-      <label for="Q3O3">Flexible según necesidad</label>
-    </div>
-  </div>
+      <ion-item>
+        <ion-radio slot="start" id="Q2O3" value="ambos"></ion-radio>
+        <ion-label (click)="form.get('method')?.setValue('ambos')">Ambos</ion-label>
+      </ion-item>
+    </ion-radio-group>
+
+    <!-- Nivel de dedicación -->
+    <ion-text>
+      <p>Nivel de dedicación al proyecto</p>
+    </ion-text>
+
+    <ion-radio-group formControlName="hours">
+      <ion-item>
+        <ion-radio slot="start" id="Q3O1" value="1-3"></ion-radio>
+        <ion-label (click)="form.get('hours')?.setValue('1-3')">1-3 horas diarias</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-radio slot="start" id="Q3O2" value="4-6"></ion-radio>
+        <ion-label (click)="form.get('hours')?.setValue('4-6')">4-6 horas diarias</ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-radio slot="start" id="Q3O3" value="flexible"></ion-radio>
+        <ion-label (click)="form.get('hours')?.setValue('flexible')">Flexible según necesidad</ion-label>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
 </div>

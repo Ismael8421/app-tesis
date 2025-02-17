@@ -1,59 +1,73 @@
-<ion-content class="ion-padding">
+<ion-content>
   <section>
-    <div>
-      <h1>Crea una cuenta</h1>
+    <div class="logo-container">
+      <img src="assets/images/tecnifind-logo.png" alt="Tecnifind Logo" class="logo">
+    </div>
 
-      <div class="google-button-container">
-        <app-google-button (onClick)="submitWithGoogle()"></app-google-button>
+    <h1>Crea una cuenta</h1>
+
+    <div class="google-button-container">
+      <app-google-button (click)="submitWithGoogle()"></app-google-button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <ion-label>Correo</ion-label>
+        <div class="input-with-icon">
+          <ion-input 
+            type="email" 
+            formControlName="email"
+            placeholder="name@company.com"
+            [class.invalid]="isRequired('email') || hasEmailError()"
+          ></ion-input>
+        </div>
+        <small *ngIf="isRequired('email')">Este campo es requerido</small>
+        <small *ngIf="hasEmailError()">Correo invalido</small>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="submit()">
-        <div>
-          <ion-label position="stacked" for="email">Correo</ion-label>
-          <div class="input-with-icon">
-            <ion-input type="email" name="email" id="email" placeholder="name@company.com"
-              formControlName="email"></ion-input>
-          </div>
-          <small *ngIf="isRequired('email')">Este campo es requerido</small>
-          <small *ngIf="hasEmailError()">Correo invalido</small>
+      <div>
+        <ion-label>Contraseña</ion-label>
+        <div class="input-with-icon">
+          <ion-input 
+            [type]="getPasswordInputType('password')"
+            formControlName="password"
+            placeholder="••••••••"
+            [class.invalid]="isRequired('password')"
+          ></ion-input>
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+            <app-eye-button></app-eye-button>
+          </button>
         </div>
+        <small *ngIf="isRequired('password')">Este campo es requerido</small>
+      </div>
 
-        <div>
-          <ion-label position="stacked" for="password">Contraseña</ion-label>
-          <div class="input-with-icon">
-            <ion-input [type]="getPasswordInputType('password')" name="password" id="password" placeholder="••••••••"
-              formControlName="password"></ion-input>
-            <button type="button" class="toggle-password"
-              (click)="$event.preventDefault(); $event.stopPropagation(); togglePasswordVisibility()">
-              <app-eye-button />
-            </button>
-          </div>
-          <small *ngIf="isRequired('password')">Este campo es requerido</small>
+      <div>
+        <ion-label>Confirmar Contraseña</ion-label>
+        <div class="input-with-icon">
+          <ion-input 
+            [type]="getPasswordInputType('confirm')"
+            formControlName="confirmPassword"
+            placeholder="••••••••"
+            [class.invalid]="isConfirmPasswordRequired() || (!passwordsMatch() && form.get('confirmPassword')?.touched)"
+          ></ion-input>
+          <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
+            <app-eye-button></app-eye-button>
+          </button>
         </div>
+        <small *ngIf="isConfirmPasswordRequired()">Este campo es requerido</small>
+        <small *ngIf="!passwordsMatch() && form.get('confirmPassword')?.touched && form.get('confirmPassword')?.value">
+          Las contraseñas no coinciden
+        </small>
+      </div>
 
-        <div>
-          <ion-label position="stacked" for="confirmPassword">Confirmar Contraseña</ion-label>
-          <div class="input-with-icon">
-            <ion-input [type]="getPasswordInputType('confirm')" name="confirmPassword" id="confirmPassword"
-              placeholder="••••••••" formControlName="confirmPassword"></ion-input>
-            <button type="button" class="toggle-password"
-              (click)="$event.preventDefault(); $event.stopPropagation(); toggleConfirmPasswordVisibility()">
-              <app-eye-button />
-            </button>
-          </div>
-          <small *ngIf="isConfirmPasswordRequired()">Este campo es requerido</small>
-          <small
-            *ngIf="!passwordsMatch() && form.get('confirmPassword')?.touched && form.get('confirmPassword')?.value">
-            Las contraseñas no coinciden
-          </small>
-        </div>
+      <ion-button type="submit" expand="block">
+        Crear
+      </ion-button>
 
-        <ion-button type="submit" expand="block">Crear</ion-button>
-
-        <p>
-          Ya tienes una cuenta? <a routerLink="/auth/sign-in">Iniciar sesión</a>
-        </p>
-      </form>
-    </div>
+      <p>
+        Ya tienes una cuenta? 
+        <a routerLink="/auth/sign-in">Iniciar sesión</a>
+      </p>
+    </form>
   </section>
 </ion-content>

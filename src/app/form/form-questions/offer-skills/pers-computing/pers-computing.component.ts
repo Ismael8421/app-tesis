@@ -3,37 +3,39 @@ import { RegisterService, userCreate } from '../../../../register/data-access/re
 import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormGroupDirective, ControlContainer } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-pers-computing',
   standalone: true,
-  imports: [ CommonModule ],
+  imports: [CommonModule, ReactiveFormsModule, IonicModule],
   templateUrl: './pers-computing.component.html',
-  styleUrls: ['./pers-computing.component.scss'],
+  viewProviders: [{
+    provide: ControlContainer,
+    useExisting: FormGroupDirective
+  }]
 })
-export class PersComputingComponent  implements OnInit {
+export class PersComputingComponent implements OnInit {
   private _registerService = inject(RegisterService);
   private _auth = inject(Auth);
   private _router = inject(Router);
 
   userData: userCreate | null = null;
 
-  constructor() { }
+  constructor(private formGroupDir: FormGroupDirective) {}
 
   async ngOnInit() {
-    // try {
-    //   // Obtener el usuario actual
-    //   const currentUser = this._auth.currentUser;
-    //   if (!currentUser) {
-    //     this._router.navigate(['/login']);
-    //     return;
-    //   }
+    try {
+      const currentUser = this._auth.currentUser;
+      if (!currentUser) {
+        this._router.navigate(['/login']);
+        return;
+      }
 
-    //   // Obtener los datos del usuario
-    //   this.userData = await this._registerService.getUserData(currentUser.uid);
-    // } catch (error) {
-    //   console.error('Error al cargar datos del perfil:', error);
-    // }
+      this.userData = await this._registerService.getUserData(currentUser.uid);
+    } catch (error) {
+      console.error('Error al cargar datos del perfil:', error);
+    }
   }
-
 }

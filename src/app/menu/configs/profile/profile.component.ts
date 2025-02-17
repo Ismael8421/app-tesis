@@ -1,4 +1,3 @@
-// profile.component.ts
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
@@ -24,22 +23,22 @@ export class ProfileComponent implements OnInit {
   error: string | null = null;
 
   async ngOnInit() {
-    // try {
-    //   // Obtener el usuario actual
-    //   const currentUser = this._auth.currentUser;
-    //   if (!currentUser) {
-    //     this._router.navigate(['/login']);
-    //     return;
-    //   }
+    try {
+      // Obtener el usuario actual
+      const currentUser = this._auth.currentUser;
+      if (!currentUser) {
+        this._router.navigate(['/login']);
+        return;
+      }
 
-    //   // Obtener los datos del usuario
-    //   this.userData = await this._registerService.getUserData(currentUser.uid);
-    //   this.loading = false;
-    // } catch (error) {
-    //   console.error('Error al cargar datos del perfil:', error);
-    //   this.error = 'Error al cargar los datos del perfil';
-    //   this.loading = false;
-    // }
+      // Obtener los datos del usuario
+      this.userData = await this._registerService.getUserData(currentUser.uid);
+      this.loading = false;
+    } catch (error) {
+      console.error('Error al cargar datos del perfil:', error);
+      this.error = 'Error al cargar los datos del perfil';
+      this.loading = false;
+    }
   }
 
   navigateTo() {

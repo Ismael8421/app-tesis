@@ -35,18 +35,27 @@
     </div>
 
     <!-- Botones de navegación -->
-    <div>
+    <div class="ion-padding">
+      <!-- Botón Atrás -->
       <ion-button expand="block" fill="outline" (click)="prevPage()" [disabled]="page === 1">
         Atrás
       </ion-button>
-      
-      <ion-button expand="block" (click)="nextPage()" [disabled]="page === 4">
+
+      <!-- Botón Siguiente (solo si no es la última página) -->
+      <ion-button *ngIf="!isLastPage" expand="block" (click)="nextPage()" [disabled]="!isPageComplete(page)">
         Siguiente
       </ion-button>
-      
-      <ion-button expand="block" type="submit" [disabled]="form.invalid || loading()">
-        {{loading() ? 'Cargando...' : 'Registrar'}}
-      </ion-button>
+
+      <!-- Botón Registrar (solo en la última página) -->
+      <ion-button 
+  *ngIf="isLastPage"
+  expand="block" 
+  type="submit" 
+  (click)="submit()"
+  [disabled]="!isPageComplete(page) || loading()">
+  {{loading() ? 'Guardando...' : 'Registrar'}}
+</ion-button>
     </div>
+
   </ion-list>
 </form>

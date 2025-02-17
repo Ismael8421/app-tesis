@@ -29,8 +29,10 @@ export class SearchComponent {
   private auth = inject(Auth);
   private router = inject(Router);
   private chatService = inject(ChatService);
+  private formStateService = inject(FormStateService);
 
-  isFormComplete: boolean = false;
+  isFormComplete: boolean = true;
+  showAlert: boolean = false;
 
   alertButtons = [{
     text: 'Ir',
@@ -46,6 +48,23 @@ export class SearchComponent {
   currentUser$ = new Observable<User | null>(observer => {
     return this.auth.onAuthStateChanged(observer);
   });
+
+  async ngOnInit() {
+    setTimeout(async () => {
+      try {
+        const user = this.auth.currentUser;
+        if (user) {
+          const formCompleted = await this.formStateService.checkFormCompletion(user.uid);
+          this.isFormComplete = formCompleted;
+          this.showAlert = !formCompleted;
+        }
+      } catch (error) {
+        console.error('Error al verificar el estado del formulario:', error);
+        this.isFormComplete = false;
+        this.showAlert = true;
+      }
+    }, 1000);
+  }
 
   async startChat(otherUserId: string, otherUserName: string) {
     const currentUser = this.auth.currentUser;

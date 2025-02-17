@@ -3,7 +3,7 @@ import { RegisterService, userCreate } from '../../../../register/data-access/re
 import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, ControlContainer, FormGroupDirective } from '@angular/forms';
+import { ReactiveFormsModule, ControlContainer, FormGroupDirective, FormGroup, Validators } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 @Component({
@@ -23,10 +23,12 @@ export class ComputingComponent implements OnInit {
   private _registerService = inject(RegisterService);
   private _auth = inject(Auth);
   private _router = inject(Router);
+  private _formGroupDirective = inject(FormGroupDirective);
 
+  form!: FormGroup;
   userData: userCreate | null = null;
 
-  constructor() { }
+  constructor() {}
 
   async ngOnInit() {
     try {
@@ -37,8 +39,52 @@ export class ComputingComponent implements OnInit {
       }
 
       this.userData = await this._registerService.getUserData(currentUser.uid);
+      this.form = this._formGroupDirective.form;
+
+      // Asegurarnos de que los controles tengan validadores
+      if (this.userData?.anioLectivo === 'Segundo') {
+        const secInfGroup = this.form.get('wanted_skills_sec_inf');
+        if (secInfGroup) {
+          Object.keys(secInfGroup.value).forEach(key => {
+            const control = secInfGroup.get(key);
+            if (control) {
+              control.setValidators(Validators.required);
+              control.updateValueAndValidity();
+            }
+          });
+        }
+      } else {
+        const thirdInfGroup = this.form.get('wanted_skills_third_inf');
+        if (thirdInfGroup) {
+          Object.keys(thirdInfGroup.value).forEach(key => {
+            const control = thirdInfGroup.get(key);
+            if (control) {
+              control.setValidators(Validators.required);
+              control.updateValueAndValidity();
+            }
+          });
+        }
+      }
+
+      // Monitorear cambios
+      const relevantGroup = this.userData?.anioLectivo === 'Segundo' ? 
+        'wanted_skills_sec_inf' : 'wanted_skills_third_inf';
+
     } catch (error) {
       console.error('Error al cargar datos del perfil:', error);
     }
+  }
+
+  private areAllFieldsCompleted(): boolean {
+    const group = this.userData?.anioLectivo === 'Segundo' ?
+      this.form.get('wanted_skills_sec_inf') :
+      this.form.get('wanted_skills_third_inf');
+
+    if (!group) return false;
+
+    const values = Object.values(group.value);
+    const allCompleted = values.every(value => value !== null && value !== '' && value !== undefined);
+    
+    return allCompleted;
   }
 }

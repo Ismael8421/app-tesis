@@ -13,12 +13,26 @@ import { IonicModule } from '@ionic/angular';
 export class WantedProfessionComponent  implements OnInit {
   form!: FormGroup;
 
-  ngOnInit() {
-    // Obtiene el FormGroup del componente padre
-    const parentForm = this.controlContainer.control as FormGroup;
-    this.form = parentForm;
-  }
-
   constructor(private controlContainer: ControlContainer) {}
 
+  ngOnInit() {
+    this.form = this.controlContainer.control as FormGroup;
+
+  }
+
+  toggleCheckbox(controlName: string) {
+    const control = this.form.get(`wanted_profession.${controlName}`);
+    if (control) {
+      control.setValue(!control.value);
+    }
+  }
+
+  // Helper para verificar si al menos una opción está seleccionada
+  hasSelection(): boolean {
+    const professionGroup = this.form.get('wanted_profession');
+    if (!professionGroup) return false;
+    
+    const values = Object.values(professionGroup.value);
+    return values.some(value => value === true);
+  }
 }

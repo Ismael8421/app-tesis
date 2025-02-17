@@ -10,24 +10,24 @@
     </ion-text>
     
     <div formGroupName="schedule">
-      <ion-item>
-        <ion-checkbox #checkbox1 slot="start" id="Q1O1" formControlName="Q1O1"></ion-checkbox>
-        <ion-label (click)="checkbox1.checked = !checkbox1.checked">Durante el almuerzo</ion-label>
+      <ion-item button (click)="toggleCheckbox('Q1O1')">
+        <ion-checkbox #checkbox1 slot="start" formControlName="Q1O1"></ion-checkbox>
+        <ion-label>Durante el almuerzo</ion-label>
       </ion-item>
 
-      <ion-item>
-        <ion-checkbox #checkbox2 slot="start" id="Q1O2" formControlName="Q1O2"></ion-checkbox>
-        <ion-label (click)="checkbox2.checked = !checkbox2.checked">Tardes después de clases</ion-label>
+      <ion-item button (click)="toggleCheckbox('Q1O2')">
+        <ion-checkbox #checkbox2 slot="start" formControlName="Q1O2"></ion-checkbox>
+        <ion-label>Tardes después de clases</ion-label>
       </ion-item>
 
-      <ion-item>
-        <ion-checkbox #checkbox3 slot="start" id="Q1O3" formControlName="Q1O3"></ion-checkbox>
-        <ion-label (click)="checkbox3.checked = !checkbox3.checked">Fines de semana por la mañana</ion-label>
+      <ion-item button (click)="toggleCheckbox('Q1O3')">
+        <ion-checkbox #checkbox3 slot="start" formControlName="Q1O3"></ion-checkbox>
+        <ion-label>Fines de semana por la mañana</ion-label>
       </ion-item>
 
-      <ion-item>
-        <ion-checkbox #checkbox4 slot="start" id="Q1O4" formControlName="Q1O4"></ion-checkbox>
-        <ion-label (click)="checkbox4.checked = !checkbox4.checked">Fines de semana por la tarde</ion-label>
+      <ion-item button (click)="toggleCheckbox('Q1O4')">
+        <ion-checkbox #checkbox4 slot="start" formControlName="Q1O4"></ion-checkbox>
+        <ion-label>Fines de semana por la tarde</ion-label>
       </ion-item>
     </div>
 
@@ -37,19 +37,19 @@
     </ion-text>
 
     <ion-radio-group formControlName="method">
-      <ion-item>
-        <ion-radio slot="start" id="Q2O1" value="presencial"></ion-radio>
-        <ion-label (click)="form.get('method')?.setValue('presencial')">Solo presencial</ion-label>
+      <ion-item button (click)="selectRadioOption('method', 'presencial')">
+        <ion-radio slot="start" value="presencial"></ion-radio>
+        <ion-label>Solo presencial</ion-label>
       </ion-item>
 
-      <ion-item>
-        <ion-radio slot="start" id="Q2O2" value="virtual"></ion-radio>
-        <ion-label (click)="form.get('method')?.setValue('virtual')">Solo virtual</ion-label>
+      <ion-item button (click)="selectRadioOption('method', 'virtual')">
+        <ion-radio slot="start" value="virtual"></ion-radio>
+        <ion-label>Solo virtual</ion-label>
       </ion-item>
 
-      <ion-item>
-        <ion-radio slot="start" id="Q2O3" value="ambos"></ion-radio>
-        <ion-label (click)="form.get('method')?.setValue('ambos')">Ambos</ion-label>
+      <ion-item button (click)="selectRadioOption('method', 'ambos')">
+        <ion-radio slot="start" value="ambos"></ion-radio>
+        <ion-label>Ambos</ion-label>
       </ion-item>
     </ion-radio-group>
 
@@ -59,19 +59,19 @@
     </ion-text>
 
     <ion-radio-group formControlName="hours">
-      <ion-item>
-        <ion-radio slot="start" id="Q3O1" value="1-3"></ion-radio>
-        <ion-label (click)="form.get('hours')?.setValue('1-3')">1-3 horas diarias</ion-label>
+      <ion-item button (click)="selectRadioOption('hours', '1-3')">
+        <ion-radio slot="start" value="1-3"></ion-radio>
+        <ion-label>1-3 horas diarias</ion-label>
       </ion-item>
 
-      <ion-item>
-        <ion-radio slot="start" id="Q3O2" value="4-6"></ion-radio>
-        <ion-label (click)="form.get('hours')?.setValue('4-6')">4-6 horas diarias</ion-label>
+      <ion-item button (click)="selectRadioOption('hours', '4-6')">
+        <ion-radio slot="start" value="4-6"></ion-radio>
+        <ion-label>4-6 horas diarias</ion-label>
       </ion-item>
 
-      <ion-item>
-        <ion-radio slot="start" id="Q3O3" value="flexible"></ion-radio>
-        <ion-label (click)="form.get('hours')?.setValue('flexible')">Flexible según necesidad</ion-label>
+      <ion-item button (click)="selectRadioOption('hours', 'flexible')">
+        <ion-radio slot="start" value="flexible"></ion-radio>
+        <ion-label>Flexible según necesidad</ion-label>
       </ion-item>
     </ion-radio-group>
   </ion-list>

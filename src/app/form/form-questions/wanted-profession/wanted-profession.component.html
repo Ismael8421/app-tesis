@@ -1,38 +1,38 @@
 <div [formGroup]="form">
   <ion-text>
     <h1>Habilidades generales para tu proyecto</h1>
-    <p>Que habilidades buscas para tu proyenco (seleciona una o más)</p>
+    <p>Que habilidades buscas para tu proyecto (selecciona una o más)</p>
   </ion-text>
 
   <ion-list formGroupName="wanted_profession">
-    <ion-item>
-      <ion-checkbox #checkbox1 id="O1" slot="start" formControlName="O1"></ion-checkbox>
-      <ion-label (click)="checkbox1.checked = !checkbox1.checked">Circuitos eléctricos domésticos o industriales</ion-label>
+    <ion-item button (click)="toggleCheckbox('O1')">
+      <ion-checkbox slot="start" formControlName="O1"></ion-checkbox>
+      <ion-label>Circuitos eléctricos domésticos o industriales</ion-label>
     </ion-item>
 
-    <ion-item>
-      <ion-checkbox #checkbox2 id="O2" slot="start" formControlName="O2"></ion-checkbox>
-      <ion-label (click)="checkbox2.checked = !checkbox2.checked">Construcción de piezas metálicas</ion-label>
+    <ion-item button (click)="toggleCheckbox('O2')">
+      <ion-checkbox slot="start" formControlName="O2"></ion-checkbox>
+      <ion-label>Construcción de piezas metálicas</ion-label>
     </ion-item>
 
-    <ion-item>
-      <ion-checkbox #checkbox3 id="O3" slot="start" formControlName="O3"></ion-checkbox>
-      <ion-label (click)="checkbox3.checked = !checkbox3.checked">Mantenimiento y reparación automotriz</ion-label>
+    <ion-item button (click)="toggleCheckbox('O3')">
+      <ion-checkbox slot="start" formControlName="O3"></ion-checkbox>
+      <ion-label>Mantenimiento y reparación automotriz</ion-label>
     </ion-item>
 
-    <ion-item>
-      <ion-checkbox #checkbox4 id="O4" slot="start" formControlName="O4"></ion-checkbox>
-      <ion-label (click)="checkbox4.checked = !checkbox4.checked">Mecánica, electrónica y automatización</ion-label>
+    <ion-item button (click)="toggleCheckbox('O4')">
+      <ion-checkbox slot="start" formControlName="O4"></ion-checkbox>
+      <ion-label>Mecánica, electrónica y automatización</ion-label>
     </ion-item>
 
-    <ion-item>
-      <ion-checkbox #checkbox5 id="O5" slot="start" formControlName="O5"></ion-checkbox>
-      <ion-label (click)="checkbox5.checked = !checkbox5.checked">Desarrollo de software web y/o móvil</ion-label>
+    <ion-item button (click)="toggleCheckbox('O5')">
+      <ion-checkbox slot="start" formControlName="O5"></ion-checkbox>
+      <ion-label>Desarrollo de software web y/o móvil</ion-label>
     </ion-item>
 
-    <ion-item>
-      <ion-checkbox #checkbox6 id="O6" slot="start" formControlName="O6"></ion-checkbox>
-      <ion-label (click)="checkbox6.checked = !checkbox6.checked">Conocimientos de la biología humana, animal y/o química</ion-label>
+    <ion-item button (click)="toggleCheckbox('O6')">
+      <ion-checkbox slot="start" formControlName="O6"></ion-checkbox>
+      <ion-label>Conocimientos de la biología humana, animal y/o química</ion-label>
     </ion-item>
   </ion-list>
 </div>

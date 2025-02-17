@@ -3,7 +3,7 @@ import { RegisterService, userCreate } from '../../../../register/data-access/re
 import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroupDirective, ControlContainer } from '@angular/forms';
+import { ReactiveFormsModule, FormGroupDirective, ControlContainer, FormGroup } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 @Component({
@@ -21,6 +21,7 @@ export class PersComputingComponent implements OnInit {
   private _auth = inject(Auth);
   private _router = inject(Router);
 
+  form!: FormGroup;
   userData: userCreate | null = null;
 
   constructor(private formGroupDir: FormGroupDirective) {}
@@ -34,6 +35,18 @@ export class PersComputingComponent implements OnInit {
       }
 
       this.userData = await this._registerService.getUserData(currentUser.uid);
+      this.form = this.formGroupDir.form;
+
+      // Monitorear cambios en los grupos relevantes
+      if (this.userData?.anioLectivo === 'Segundo') {
+        this.form.get('offer_skills_sec_inf')?.valueChanges.subscribe((values: any) => {
+          console.log('Second year offer skills values:', values);
+        });
+      } else if (this.userData?.anioLectivo === 'Tercero') {
+        this.form.get('offer_skills_third_inf')?.valueChanges.subscribe((values: any) => {
+          console.log('Third year offer skills values:', values);
+        });
+      }
     } catch (error) {
       console.error('Error al cargar datos del perfil:', error);
     }

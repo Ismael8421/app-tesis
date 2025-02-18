@@ -4,16 +4,16 @@
   import { Auth } from '@angular/fire/auth';
   import { ActivatedRoute, Router } from '@angular/router';
   import { CommonModule } from '@angular/common';
-  import { IonicModule } from '@ionic/angular';
   import { FormsModule } from '@angular/forms';
   import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
   @Component({
     selector: 'app-message',
     templateUrl: './message.component.html',
     styleUrls: ['./message.component.scss'],
     standalone: true,
-    imports: [CommonModule, IonicModule, FormsModule, BackIconComponent]
+    imports: [CommonModule, FormsModule, BackIconComponent, IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonAvatar, IonInput, IonButton ]
   })
   export class MessageComponent implements OnInit {
     @ViewChild('scrollContainer') private scrollContainer!: ElementRef;

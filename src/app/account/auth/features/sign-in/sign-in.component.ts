@@ -6,7 +6,7 @@ import { hasEmailError, isRequired } from '../utils/validators';
 import { NgIf } from '@angular/common';
 import { GoogleButtonComponent } from '../../../../UI/google-button/google-button.component';
 import { EyeButtonComponent } from '../../../../UI/eye-button/eye-button.component';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonInput, IonButton, IonContent, IonLabel, ToastController } from '@ionic/angular/standalone';
 
 export interface FormSignIn {
   email: FormControl<string | null>;
@@ -16,7 +16,7 @@ export interface FormSignIn {
 @Component({
   selector: 'app-sign-in',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonicModule],
+  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonContent, IonLabel, IonInput, IonButton ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss'
 })

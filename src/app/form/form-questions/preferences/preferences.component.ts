@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit} from '@angular/core';
 import { ControlContainer, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonCheckbox, IonItem, IonLabel, IonList, IonRadio, IonRadioGroup, IonText } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-preferences',
   standalone: true,
-  imports: [ ReactiveFormsModule, CommonModule, IonicModule ],
+  imports: [ ReactiveFormsModule, CommonModule, IonText, IonList, IonItem, IonLabel, IonCheckbox, IonRadioGroup, IonRadio ],
   templateUrl: './preferences.component.html',
   styleUrls: ['./preferences.component.scss'],
 })

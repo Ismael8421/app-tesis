@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, ControlContainer, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-
+import { IonButton, IonInput, IonItem, IonLabel, IonList, IonSelect, IonSelectOption, IonText } from '@ionic/angular/standalone';
 @Component({
   selector: 'app-personal-data',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, IonicModule],
+  imports: [ReactiveFormsModule, CommonModule, IonText, IonList, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton ],
   templateUrl: './personal-data.component.html',
   styleUrl: './personal-data.component.scss'
 })

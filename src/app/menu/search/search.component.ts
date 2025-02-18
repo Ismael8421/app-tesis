@@ -6,13 +6,14 @@ import { Router } from '@angular/router';
 import { register } from 'swiper/element/bundle';
 import { ChatService } from '../chats/data-access/chat.service';
 import { Observable } from 'rxjs';
-import { IonicModule, AlertController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { FormStateService } from '../../form/data-access/form-state.service';
 import { CheckIconComponent } from '../../UI/check-icon/check-icon.component';
 import { MessagesIconComponent } from '../../UI/messages-icon/messages-icon.component';
 import { HeartIconComponent } from '../../UI/heart-icon/heart-icon.component';
 import { RegisterService, userCreate } from '../../register/data-access/register.service';
 import { FormService, formCreate } from '../../form/data-access/form.service';
+import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonImg, IonText } from '@ionic/angular/standalone';
 
 register();
 
@@ -24,10 +25,10 @@ register();
     NgFor,
     ReactiveFormsModule,
     CommonModule,
-    IonicModule,
     CheckIconComponent,
     MessagesIconComponent,
-    HeartIconComponent 
+    HeartIconComponent,
+    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',

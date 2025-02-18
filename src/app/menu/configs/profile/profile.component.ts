@@ -1,15 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
-import { IonicModule } from '@ionic/angular';
 import { RegisterService, userCreate } from '../../../register/data-access/register.service';
 import { CommonModule } from '@angular/common';
 import { Auth, user } from '@angular/fire/auth';
+import { IonAvatar, IonButton, IonButtons, IonCard, IonCardContent, IonContent, IonHeader, IonImg, IonItem, IonLabel, IonList, IonNote, IonSpinner, IonText, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [BackIconComponent, IonicModule, CommonModule],
+  imports: [BackIconComponent, CommonModule, IonContent, IonHeader, IonToolbar, IonButton, IonButtons, IonTitle, IonSpinner, IonText, IonAvatar, IonImg, IonCard, IonCardContent, IonList, IonItem, IonLabel, IonNote ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })

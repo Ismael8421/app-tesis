@@ -4,12 +4,12 @@ import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroupDirective, ControlContainer, FormGroup } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonItem, IonLabel, IonList, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-pers-computing',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IonicModule],
+  imports: [CommonModule, ReactiveFormsModule, IonList, IonItem, IonLabel, IonSelect, IonSelectOption],
   templateUrl: './pers-computing.component.html',
   viewProviders: [{
     provide: ControlContainer,

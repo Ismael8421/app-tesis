@@ -6,7 +6,7 @@ import { AuthService } from '../../data-access/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { GoogleButtonComponent } from '../../../../UI/google-button/google-button.component';
 import { EyeButtonComponent } from '../../../../UI/eye-button/eye-button.component';
-import { IonicModule } from '@ionic/angular';
+import { IonButton, IonContent, IonInput, IonLabel } from '@ionic/angular/standalone';
 
 interface FormSignUp {
   email: FormControl<string | null>;
@@ -17,7 +17,7 @@ interface FormSignUp {
 @Component({
   selector: 'app-sign-up',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonicModule],
+  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonContent, IonLabel, IonInput, IonButton],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
 })

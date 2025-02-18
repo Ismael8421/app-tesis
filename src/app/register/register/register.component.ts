@@ -6,7 +6,7 @@ import { AuthService } from '../../account/auth/data-access/auth.service';
 import { Router } from '@angular/router';
 
 import { PersonalDataComponent } from '../personal-data/personal-data.component';
-import { IonicModule } from '@ionic/angular';
+import { IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +19,7 @@ import { IonicModule } from '@ionic/angular';
     NgSwitchDefault, 
     FormsModule, 
     PersonalDataComponent, 
-    IonicModule
+    IonContent
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'

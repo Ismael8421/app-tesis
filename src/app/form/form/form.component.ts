@@ -14,9 +14,9 @@ import { IEMEComponent } from '../form-questions/wanted-skills/ieme/ieme.compone
 import { MCMComponent } from '../form-questions/wanted-skills/mcm/mcm.component';
 import { MechatronicsComponent } from '../form-questions/wanted-skills/mechatronics/mechatronics.component';
 import { SciencesComponent } from '../form-questions/offer-skills/sciences/sciences.component';
-import { IonicModule } from '@ionic/angular';
 import { FormStateService } from '../data-access/form-state.service';
 import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
+import { IonButton, IonList, IonText } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-form',
@@ -32,7 +32,9 @@ import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firesto
     IEMEComponent,
     MCMComponent,
     MechatronicsComponent,
-    IonicModule
+    IonText,
+    IonList,
+    IonButton 
   ],
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.scss'],

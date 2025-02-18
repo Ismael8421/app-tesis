@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../account/auth/data-access/auth.service';
-import { AlertController, IonicModule } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import {
   updateEmail,
@@ -12,11 +12,12 @@ import {
 } from '@angular/fire/auth';
 import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 import { Router } from '@angular/router';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonSpinner, IonText } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-change-pws-email',
   standalone: true,
-  imports: [ReactiveFormsModule, IonicModule, CommonModule, BackIconComponent],
+  imports: [ReactiveFormsModule, CommonModule, BackIconComponent, IonContent, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonText, IonSpinner ],
   templateUrl: './change-pws-email.component.html',
   styleUrls: ['./change-pws-email.component.scss']
 })

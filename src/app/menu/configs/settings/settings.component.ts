@@ -1,15 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthStateService } from '../../../account/shared/data-access/auth-state.service';
-import { IonicModule } from '@ionic/angular';
 import { ThemeService, ThemeType } from './data-access/theme.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IonAvatar, IonContent, IonIcon, IonImg, IonItem, IonLabel, IonList, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [RouterLink, RouterOutlet, IonicModule, CommonModule, FormsModule],
+  imports: [RouterLink, RouterOutlet, CommonModule, FormsModule, IonContent, IonList, IonItem, IonAvatar, IonImg, IonLabel, IonIcon, IonSelect, IonSelectOption ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })

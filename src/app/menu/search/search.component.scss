@@ -14,20 +14,37 @@
       background: var(--ion-background-color);
       border-radius: 20px;
       overflow: hidden;
-
-      @media (min-width: 768px) {
-        max-width: 500px;
+      
+      // Responsive breakpoints
+      @media (max-width: 767px) {
+        height: auto;
+        min-height: calc(100vh - 70px);
       }
-
+      
+      @media (min-width: 768px) and (max-width: 1024px) {
+        max-width: 500px;
+        width: 90%;
+      }
+      
+      @media (min-width: 1025px) {
+        max-width: 550px;
+        width: 80%;
+      }
+      
       ion-card-content.profile-section {
         height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-between; // Distribuye el espacio entre elementos
+        justify-content: space-between;
         padding: 2rem 1.5rem;
         background-color: var(--ion-background-color);
-
+        
+        // Responsive adjustments for smaller screens
+        @media (max-width: 375px) {
+          padding: 1rem;
+        }
+        
         // Contenedor superior para avatar y nombre
         .profile-header {
           display: flex;
@@ -37,28 +54,44 @@
           justify-content: center;
           width: 100%;
           margin-bottom: 1rem;
-
+          
           ion-avatar.profile-img {
-            width: clamp(120px, 25vw, 150px);
-            height: clamp(120px, 25vw, 150px);
-            margin-bottom: 2rem;
+            width: clamp(100px, 25vw, 150px);
+            height: clamp(100px, 25vw, 150px);
+            margin-bottom: 1.5rem;
             border: 3px solid var(--ion-color-primary);
+            
+            @media (max-width: 375px) {
+              width: clamp(80px, 20vw, 120px);
+              height: clamp(80px, 20vw, 120px);
+              margin-bottom: 1rem;
+            }
           }
-
+          
           ion-text h3 {
-            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-size: clamp(1.3rem, 5vw, 2rem);
             font-weight: 600;
             margin-bottom: 0.5rem;
             color: var(--ion-text-color);
+            text-align: center;
+            
+            @media (max-width: 375px) {
+              font-size: clamp(1.2rem, 4.5vw, 1.8rem);
+            }
           }
-
+          
           ion-text small {
-            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
             color: var(--ion-color-medium);
             margin-bottom: 0.5rem;
+            text-align: center;
+            
+            @media (max-width: 375px) {
+              font-size: clamp(0.8rem, 2.8vw, 1.1rem);
+            }
           }
         }
-
+        
         // Contenedor central para información
         .info-section {
           flex: 1;
@@ -68,24 +101,37 @@
           width: 100%;
           text-align: center;
           margin: 1.5rem 0;
-
+          
+          @media (max-width: 375px) {
+            margin: 1rem 0;
+          }
+          
           ion-text p {
-            font-size: clamp(1.2rem, 4vw, 1.4rem);
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
             color: var(--ion-text-color);
             margin-bottom: 1rem;
+            
+            @media (max-width: 375px) {
+              font-size: clamp(1rem, 3.5vw, 1.3rem);
+            }
             
             &:last-child {
               margin-bottom: 0;
             }
           }
         }
-
+        
         // Contenedor de botones
         .buttons-container {
           display: flex;
           gap: 2rem;
           margin-top: 2rem;
-
+          
+          @media (max-width: 375px) {
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+          }
+          
           ion-button {
             --padding-start: 0;
             --padding-end: 0;
@@ -94,13 +140,22 @@
             --border-radius: 50%;
             --background: var(--ion-color-primary);
             --background-hover: var(--ion-color-primary-shade);
-
+            
+            @media (max-width: 375px) {
+              width: clamp(45px, 13vw, 55px);
+              height: clamp(45px, 13vw, 55px);
+            }
+            
             app-messages-icon,
             app-check-icon {
               font-size: clamp(24px, 7vw, 30px);
               color: var(--ion-color-primary-contrast);
+              
+              @media (max-width: 375px) {
+                font-size: clamp(20px, 6vw, 26px);
+              }
             }
-
+            
             &:hover {
               transform: scale(1.05);
               transition: transform 0.2s ease;

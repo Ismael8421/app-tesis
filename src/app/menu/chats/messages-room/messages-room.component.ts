@@ -4,15 +4,15 @@ import { Auth } from '@angular/fire/auth';
 import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
 import { RecomendatioIconComponent } from '../../../UI/recomendatio-icon/recomendatio-icon.component';
+import { IonAvatar, IonContent, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-messages-room',
   templateUrl: './messages-room.component.html',
   styleUrls: ['./messages-room.component.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, RecomendatioIconComponent]
+  imports: [CommonModule, RecomendatioIconComponent, IonContent, IonList, IonItem, IonAvatar, IonLabel ]
 })
 export class MessagesRoomComponent implements OnInit {
   private chatService = inject(ChatService);

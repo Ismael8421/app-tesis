@@ -4,12 +4,12 @@ import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, ControlContainer, FormGroupDirective, FormGroup, Validators } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonItem, IonLabel, IonList, IonSelect, IonSelectOption, IonText } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-computing',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, IonicModule ],
+  imports: [ CommonModule, ReactiveFormsModule, IonText, IonList, IonItem, IonLabel, IonSelect, IonSelectOption ],
   templateUrl: './computing.component.html',
   styleUrls: ['./computing.component.scss'],
   viewProviders: [

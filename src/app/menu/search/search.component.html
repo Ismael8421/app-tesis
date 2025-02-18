@@ -17,6 +17,7 @@
     
   </div> -->
   <swiper-container>
+
     <swiper-slide>
       <ion-card class="content-container ion-no-margin">
         <ion-card-content class="profile-section">
@@ -46,10 +47,56 @@
             </ion-text>
           </div>
 
+          <!-- Sección información del usuario -->
+          <div>
+            <!-- Informática -->
+          <div *ngIf="userData?.carrera === 'Informatica'">
+            <!-- Para segundos -->
+            <div *ngIf="userData?.anioLectivo === 'Segundo' && formData">
+              <p>Programación de aplicaciones: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.programacion }}</p>
+              <p>Construcción y programación de circuitos electrónicos: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.soporte }}</p>
+              <p>Diseño y desarrollo de páginas web: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.web }}</p>
+              <p>Configuración de sistemas operativos y redes de computadoras: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.redes }}</p>
+            </div>
+
+            <!-- Para terceros -->
+            <div *ngIf="userData?.anioLectivo === 'Tercero' && formData">
+              <div>
+                <p>Desarrollo de programas o aplicaciones: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.programacion }}</p>
+                <p>Manejo de herramientas de diseño como Illutrator, Photoshop, etc: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.diseno }}</p>
+                <p>Construcción y modelado de piezas en 3D: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.cad }}</p>
+              </div>
+              <div *ngIf="userData?.mencion === 'Programacion movil'">
+                <p>Construcción y programación de circuitos electrónicos: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.soporte }}</p>
+                <p>Programación de aplicaciones móviles: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.movil }}</p>
+              </div>
+              <div *ngIf="userData?.mencion === 'Aplicaciones web'">
+                <p>Diseño y desarrollo de páginas web: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.web }}</p>
+                <p>Configuración de sistemas operativos y redes de computadoras: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.redes }}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Ciencias -->
+          <div></div>
+          <!-- EMA -->
+          <div></div>
+          <!-- IEME -->
+          <div></div>
+          <!-- MCM -->
+          <div></div>
+          <!-- Mecatrónica -->
+          <div></div>
+          </div>
+          
+
           <!-- Sección inferior: Botones -->
           <div class="buttons-container">
             <ion-button fill="solid" shape="round" mode="ios">
               <app-messages-icon></app-messages-icon>
+            </ion-button>
+
+            <ion-button>
+              <app-heart-icon></app-heart-icon>
             </ion-button>
 
             <ion-button fill="solid" shape="round" mode="ios">
@@ -68,33 +115,79 @@
             <ion-avatar class="profile-img">
               <ion-img src="icons/logo_tesis.png" alt="Profile"></ion-img>
             </ion-avatar>
-            
+
             <ion-text>
               <h3>NombreUsuario</h3>
             </ion-text>
-            
+
             <ion-text color="medium">
               <small>Nombre Apellido</small>
             </ion-text>
           </div>
-    
+
           <!-- Sección central: Información -->
           <div class="info-section">
             <ion-text>
               <p>Carrera</p>
             </ion-text>
-            
+
             <ion-text>
               <p>Curso</p>
             </ion-text>
           </div>
-    
+
+          <!-- Sección información del usuario -->
+          <div>
+            <!-- Informática -->
+          <div *ngIf="userData?.carrera === 'Informatica'">
+            <!-- Para segundos -->
+            <div *ngIf="userData?.anioLectivo === 'Segundo' && formData">
+              <p>Programación de aplicaciones: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.programacion }}</p>
+              <p>Construcción y programación de circuitos electrónicos: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.soporte }}</p>
+              <p>Diseño y desarrollo de páginas web: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.web }}</p>
+              <p>Configuración de sistemas operativos y redes de computadoras: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.redes }}</p>
+            </div>
+
+            <!-- Para terceros -->
+            <div *ngIf="userData?.anioLectivo === 'Tercero' && formData">
+              <div>
+                <p>Desarrollo de programas o aplicaciones: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.programacion }}</p>
+                <p>Manejo de herramientas de diseño como Illutrator, Photoshop, etc: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.diseno }}</p>
+                <p>Construcción y modelado de piezas en 3D: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.cad }}</p>
+              </div>
+              <div *ngIf="userData?.mencion === 'Programacion movil'">
+                <p>Construcción y programación de circuitos electrónicos: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.soporte }}</p>
+                <p>Programación de aplicaciones móviles: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.movil }}</p>
+              </div>
+              <div *ngIf="userData?.mencion === 'Aplicaciones web'">
+                <p>Diseño y desarrollo de páginas web: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.web }}</p>
+                <p>Configuración de sistemas operativos y redes de computadoras: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.redes }}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Ciencias -->
+          <div></div>
+          <!-- EMA -->
+          <div></div>
+          <!-- IEME -->
+          <div></div>
+          <!-- MCM -->
+          <div></div>
+          <!-- Mecatrónica -->
+          <div></div>
+          </div>
+          
+
           <!-- Sección inferior: Botones -->
           <div class="buttons-container">
             <ion-button fill="solid" shape="round" mode="ios">
               <app-messages-icon></app-messages-icon>
             </ion-button>
-            
+
+            <ion-button>
+              <app-heart-icon></app-heart-icon>
+            </ion-button>
+
             <ion-button fill="solid" shape="round" mode="ios">
               <app-check-icon></app-check-icon>
             </ion-button>
@@ -111,33 +204,79 @@
             <ion-avatar class="profile-img">
               <ion-img src="icons/logo_tesis.png" alt="Profile"></ion-img>
             </ion-avatar>
-            
+
             <ion-text>
               <h3>NombreUsuario</h3>
             </ion-text>
-            
+
             <ion-text color="medium">
               <small>Nombre Apellido</small>
             </ion-text>
           </div>
-    
+
           <!-- Sección central: Información -->
           <div class="info-section">
             <ion-text>
               <p>Carrera</p>
             </ion-text>
-            
+
             <ion-text>
               <p>Curso</p>
             </ion-text>
           </div>
-    
+
+          <!-- Sección información del usuario -->
+          <div>
+            <!-- Informática -->
+          <div *ngIf="userData?.carrera === 'Informatica'">
+            <!-- Para segundos -->
+            <div *ngIf="userData?.anioLectivo === 'Segundo' && formData">
+              <p>Programación de aplicaciones: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.programacion }}</p>
+              <p>Construcción y programación de circuitos electrónicos: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.soporte }}</p>
+              <p>Diseño y desarrollo de páginas web: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.web }}</p>
+              <p>Configuración de sistemas operativos y redes de computadoras: {{ formData.habilidad_ofrecida_seg?.informatica_seg_of?.redes }}</p>
+            </div>
+
+            <!-- Para terceros -->
+            <div *ngIf="userData?.anioLectivo === 'Tercero' && formData">
+              <div>
+                <p>Desarrollo de programas o aplicaciones: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.programacion }}</p>
+                <p>Manejo de herramientas de diseño como Illutrator, Photoshop, etc: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.diseno }}</p>
+                <p>Construcción y modelado de piezas en 3D: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.cad }}</p>
+              </div>
+              <div *ngIf="userData?.mencion === 'Programacion movil'">
+                <p>Construcción y programación de circuitos electrónicos: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.soporte }}</p>
+                <p>Programación de aplicaciones móviles: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.movil }}</p>
+              </div>
+              <div *ngIf="userData?.mencion === 'Aplicaciones web'">
+                <p>Diseño y desarrollo de páginas web: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.web }}</p>
+                <p>Configuración de sistemas operativos y redes de computadoras: {{ formData.habilidad_ofrecida_ter?.informatica_ter_of?.redes }}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Ciencias -->
+          <div></div>
+          <!-- EMA -->
+          <div></div>
+          <!-- IEME -->
+          <div></div>
+          <!-- MCM -->
+          <div></div>
+          <!-- Mecatrónica -->
+          <div></div>
+          </div>
+          
+
           <!-- Sección inferior: Botones -->
           <div class="buttons-container">
             <ion-button fill="solid" shape="round" mode="ios">
               <app-messages-icon></app-messages-icon>
             </ion-button>
-            
+
+            <ion-button>
+              <app-heart-icon></app-heart-icon>
+            </ion-button>
+
             <ion-button fill="solid" shape="round" mode="ios">
               <app-check-icon></app-check-icon>
             </ion-button>
@@ -145,6 +284,7 @@
         </ion-card-content>
       </ion-card>
     </swiper-slide>
+
   </swiper-container>
 
   <ion-alert [isOpen]="!isFormComplete"

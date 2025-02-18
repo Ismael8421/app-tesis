@@ -10,6 +10,9 @@ import { IonicModule, AlertController } from '@ionic/angular';
 import { FormStateService } from '../../form/data-access/form-state.service';
 import { CheckIconComponent } from '../../UI/check-icon/check-icon.component';
 import { MessagesIconComponent } from '../../UI/messages-icon/messages-icon.component';
+import { HeartIconComponent } from '../../UI/heart-icon/heart-icon.component';
+import { RegisterService, userCreate } from '../../register/data-access/register.service';
+import { FormService, formCreate } from '../../form/data-access/form.service';
 
 register();
 
@@ -23,7 +26,8 @@ register();
     CommonModule,
     IonicModule,
     CheckIconComponent,
-    MessagesIconComponent 
+    MessagesIconComponent,
+    HeartIconComponent 
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',
@@ -34,10 +38,14 @@ export class SearchComponent {
   private router = inject(Router);
   private chatService = inject(ChatService);
   private formStateService = inject(FormStateService);
+  private registerService = inject(RegisterService);
+  private formService = inject(FormService);
 
+  userData: userCreate | null = null;
+  formData: formCreate | null = null;
   isFormComplete: boolean = true;
   showAlert: boolean = false;
-
+  
   alertButtons = [{
     text: 'Ir',
     handler: () => {
@@ -58,12 +66,21 @@ export class SearchComponent {
       try {
         const user = this.auth.currentUser;
         if (user) {
-          const formCompleted = await this.formStateService.checkFormCompletion(user.uid);
+          // Cargar datos de ambos servicios en paralelo junto con la verificación del formulario
+          const [registerData, formData, formCompleted] = await Promise.all([
+            this.registerService.getUserData(user.uid),
+            this.formService.getFormData(user.uid),
+            this.formStateService.checkFormCompletion(user.uid)
+          ]);
+  
+          this.userData = registerData;
+          this.formData = formData;
           this.isFormComplete = formCompleted;
           this.showAlert = !formCompleted;
         }
+        
       } catch (error) {
-        console.error('Error al verificar el estado del formulario:', error);
+        console.error('Error al cargar datos:', error);
         this.isFormComplete = false;
         this.showAlert = true;
       }

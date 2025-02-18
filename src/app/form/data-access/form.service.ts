@@ -10,10 +10,10 @@ export interface habilid_inf_seg {
 }
 export interface habilid_inf_ter {
   programacion?: string;
-  diseño?: string;
+  diseno?: string;
   cad?: string;
   soporte?: string;
-  mobile?: string;
+  movil?: string;
   web?: string;
   redes?: string;
 }
@@ -27,10 +27,10 @@ export interface habilid_inf_seg_of {
 }
 export interface habilid_inf_ter_of {
   programacion?: string;
-  diseño?: string;
+  diseno?: string;
   cad?: string;
   soporte?: string;
-  mobile?: string;
+  movil?: string;
   web?: string;
   redes?: string;
 }
@@ -63,7 +63,7 @@ export class FormService {
   async saveFormData(uid: string, formData: formCreate): Promise<void> {
     try {
       console.log('Iniciando guardado de datos para uid:', uid);
-      
+
       // 1. Actualizar documento del usuario
       const generalUserDoc = doc(this._firestore, 'usuarios', uid);
       await updateDoc(generalUserDoc, {
@@ -93,6 +93,39 @@ export class FormService {
       return;
     } catch (error) {
       console.error('Error detallado en saveFormData:', error);
+      throw error;
+    }
+  }
+
+  async getFormData(uid: string): Promise<formCreate | null> {
+    try {
+      // 1. Primero obtener el documento del usuario para saber su carrera
+      const generalUserDoc = doc(this._firestore, 'usuarios', uid);
+      const userSnap = await getDoc(generalUserDoc);
+
+      if (!userSnap.exists()) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      const { carrera } = userSnap.data();
+
+      // 2. Normalizar el nombre de la colección (igual que en saveFormData)
+      const collectionName = carrera.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "");
+
+      // 3. Obtener los datos del formulario de la colección específica
+      const carreraDoc = doc(this._firestore, collectionName, uid);
+      const formSnap = await getDoc(carreraDoc);
+
+      if (!formSnap.exists()) {
+        return null;
+      }
+
+      return formSnap.data() as formCreate;
+
+    } catch (error) {
+      console.error('Error al obtener datos del formulario:', error);
       throw error;
     }
   }

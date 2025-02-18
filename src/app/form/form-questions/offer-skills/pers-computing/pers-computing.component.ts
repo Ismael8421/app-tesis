@@ -43,9 +43,7 @@ export class PersComputingComponent implements OnInit {
           console.log('Second year offer skills values:', values);
         });
       } else if (this.userData?.anioLectivo === 'Tercero') {
-        this.form.get('offer_skills_third_inf')?.valueChanges.subscribe((values: any) => {
-          console.log('Third year offer skills values:', values);
-        });
+        this.form.get('offer_skills_third_inf')?.valueChanges.subscribe((values: any) => {});
       }
     } catch (error) {
       console.error('Error al cargar datos del perfil:', error);

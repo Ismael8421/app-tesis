@@ -167,16 +167,42 @@ export class FormComponent {
         horas: this.form.get('hours')?.value || '',
         carrera_buscada: this.getSelectedCarreras(),
         habilidad_buscada_seg: {
-          informatica_seg: this.form.get('wanted_skills_sec_inf')?.value || {}
+          informatica_seg: {
+            programacion: this.form.get('wanted_skills_sec_inf')?.get('programing')?.value || '',
+            soporte: this.form.get('wanted_skills_sec_inf')?.get('support')?.value || '',
+            web: this.form.get('wanted_skills_sec_inf')?.get('web')?.value || '',
+            redes: this.form.get('wanted_skills_sec_inf')?.get('networks')?.value || ''
+          }
         },
         habilidad_buscada_ter: {
-          informatica_ter: this.form.get('wanted_skills_third_inf')?.value || {}
+          informatica_ter: {
+            programacion: this.form.get('wanted_skills_third_inf')?.get('programming1')?.value || '',
+            diseno: this.form.get('wanted_skills_third_inf')?.get('desing')?.value || '',
+            cad: this.form.get('wanted_skills_third_inf')?.get('cad')?.value || '',
+            soporte: this.form.get('wanted_skills_third_inf')?.get('support1')?.value || '',
+            movil: this.form.get('wanted_skills_third_inf')?.get('mobile')?.value || '',
+            web: this.form.get('wanted_skills_third_inf')?.get('web1')?.value || '',
+            redes: this.form.get('wanted_skills_third_inf')?.get('networks1')?.value || ''
+          }
         },
         habilidad_ofrecida_seg: {
-          informatica_seg_of: this.form.get('offer_skills_sec_inf')?.value || {}
+          informatica_seg_of: {
+            programacion: this.form.get('offer_skills_sec_inf')?.get('programing')?.value || '',
+            soporte: this.form.get('offer_skills_sec_inf')?.get('support')?.value || '',
+            web: this.form.get('offer_skills_sec_inf')?.get('web')?.value || '',
+            redes: this.form.get('offer_skills_sec_inf')?.get('networks')?.value || ''
+          }
         },
         habilidad_ofrecida_ter: {
-          informatica_ter_of: this.form.get('offer_skills_third_inf')?.value || {}
+          informatica_ter_of: {
+            programacion: this.form.get('offer_skills_third_inf')?.get('programming1')?.value || '',
+            diseno: this.form.get('offer_skills_third_inf')?.get('desing')?.value || '',
+            cad: this.form.get('offer_skills_third_inf')?.get('cad')?.value || '',
+            soporte: this.form.get('offer_skills_third_inf')?.get('support1')?.value || '',
+            movil: this.form.get('offer_skills_third_inf')?.get('mobile')?.value || '',
+            web: this.form.get('offer_skills_third_inf')?.get('web1')?.value || '',
+            redes: this.form.get('offer_skills_third_inf')?.get('networks1')?.value || ''
+          }
         }
       };
       

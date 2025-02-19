@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Database, ref, push, set, onValue, get, update } from '@angular/fire/database';
+import { Database, ref, push, set, onValue, get, update, query, orderByChild } from '@angular/fire/database';
 import { Observable } from 'rxjs';
 
 interface Message {
@@ -135,42 +135,41 @@ export class ChatService {
   async sendMessage(chatId: string, senderId: string, senderName: string, content: string): Promise<void> {
     try {
       const timestamp = Date.now();
-      // Crear el objeto mensaje
-      const message: Message = {
+      const message = {
         content,
         senderId,
         senderName,
         timestamp,
         readBy: {
-          [senderId]: true // Sender has read the message by default
+          [senderId]: true
         }
       };
 
-      // Obtener la referencia del chat para los participantes
+      // Obtener referencia del chat
       const chatRef = ref(this.db, `chats/${chatId}`);
       const chatSnapshot = await get(chatRef);
       const chatData = chatSnapshot.val();
 
       // Preparar el estado de lectura para otros participantes
-      const unreadStatus: { [key: string]: boolean } = {};
+      const unreadMessages: Record<string, boolean> = {};
       chatData.participants.forEach((participantId: string) => {
         if (participantId !== senderId) {
-          unreadStatus[participantId] = true;
+          unreadMessages[participantId] = true;
         }
       });
 
-      // Crear actualizaciones atómicas
-      const newMessageKey = push(ref(this.db, 'messages')).key;
-      const updates = {
-        [`messages/${chatId}/${newMessageKey}`]: message,
-        [`chats/${chatId}/lastMessage`]: content,
-        [`chats/${chatId}/lastMessageTimestamp`]: timestamp,
-        [`chats/${chatId}/unreadMessages`]: unreadStatus
-      };
+      // Crear el nuevo mensaje
+      const newMessageRef = push(ref(this.db, `messages/${chatId}`));
+      
+      // Actualizaciones atómicas
+      const updates: any = {};
+      updates[`messages/${chatId}/${newMessageRef.key}`] = message;
+      updates[`chats/${chatId}/lastMessage`] = content;
+      updates[`chats/${chatId}/lastMessageTimestamp`] = timestamp;
+      updates[`chats/${chatId}/unreadMessages`] = unreadMessages;
 
       // Realizar todas las actualizaciones en una sola operación
       await update(ref(this.db), updates);
-
     } catch (error) {
       console.error('Error sending message:', error);
       throw new Error('Failed to send message');
@@ -180,33 +179,19 @@ export class ChatService {
   // Add new method to mark messages as read
   async markMessagesAsRead(chatId: string, userId: string): Promise<void> {
     try {
+      const updates: any = {};
+      updates[`chats/${chatId}/unreadMessages/${userId}`] = false;
+
       const messagesRef = ref(this.db, `messages/${chatId}`);
       const snapshot = await get(messagesRef);
-
-      if (!snapshot.exists()) return;
-
-      const updates: { [key: string]: any } = {};
-      snapshot.forEach((childSnapshot) => {
-        const message = childSnapshot.val();
-        if (!message.readBy?.[userId]) {
-          updates[`${childSnapshot.key}/readBy/${userId}`] = true;
-        }
-      });
-
-      if (Object.keys(updates).length > 0) {
-        await update(ref(this.db, `messages/${chatId}`), updates);
-
-        // Clear unread status for this user in chat
-        const chatRef = ref(this.db, `chats/${chatId}`);
-        const chatSnapshot = await get(chatRef);
-        const chatData = chatSnapshot.val();
-
-        if (chatData.unreadMessages?.[userId]) {
-          await update(chatRef, {
-            [`unreadMessages/${userId}`]: false
-          });
-        }
+      
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          updates[`messages/${chatId}/${childSnapshot.key}/readBy/${userId}`] = true;
+        });
       }
+
+      await update(ref(this.db), updates);
     } catch (error) {
       console.error('Error marking messages as read:', error);
       throw new Error('Failed to mark messages as read');
@@ -274,6 +259,93 @@ export class ChatService {
         }
       });
       
+      return () => unsubscribe();
+    });
+  }
+
+  getUserChatsRealtime(userId: string): Observable<any[]> {
+    return new Observable(subscriber => {
+      if (!userId) {
+        subscriber.next([]);
+        return;
+      }
+
+      const userChatsRef = ref(this.db, `userChats/${userId}`);
+      
+      const unsubscribe = onValue(userChatsRef, async (snapshot) => {
+        try {
+          if (!snapshot.exists()) {
+            subscriber.next([]);
+            return;
+          }
+
+          // Obtener todos los chats del usuario
+          const userChatsData = snapshot.val();
+          const chatsPromises = Object.keys(userChatsData).map(async (chatId) => {
+            const chatRef = ref(this.db, `chats/${chatId}`);
+            const chatSnapshot = await get(chatRef);
+            
+            if (chatSnapshot.exists()) {
+              const chatData = chatSnapshot.val();
+              return {
+                ...chatData,
+                id: chatId,
+                unreadMessages: chatData.unreadMessages || {}
+              };
+            }
+            return null;
+          });
+
+          // Esperar a que se resuelvan todas las promesas
+          const chats = (await Promise.all(chatsPromises))
+            .filter(chat => chat !== null)
+            .sort((a, b) => (b.lastMessageTimestamp || 0) - (a.lastMessageTimestamp || 0));
+
+          subscriber.next(chats);
+        } catch (error) {
+          console.error('Error getting user chats:', error);
+          subscriber.error(error);
+        }
+      }, error => {
+        console.error('Error in chat subscription:', error);
+        subscriber.error(error);
+      });
+
+      // Cleanup function
+      return () => unsubscribe();
+    });
+  }
+  
+  getMessagesRealtime(chatId: string): Observable<any[]> {
+    return new Observable(subscriber => {
+      const messagesRef = ref(this.db, `messages/${chatId}`);
+      const orderedRef = query(messagesRef, orderByChild('timestamp'));
+
+      const unsubscribe = onValue(orderedRef, (snapshot) => {
+        try {
+          if (!snapshot.exists()) {
+            subscriber.next([]);
+            return;
+          }
+
+          const messages: any[] = [];
+          snapshot.forEach((childSnapshot) => {
+            messages.push({
+              id: childSnapshot.key,
+              ...childSnapshot.val()
+            });
+          });
+
+          subscriber.next(messages);
+        } catch (error) {
+          console.error('Error getting messages:', error);
+          subscriber.error(error);
+        }
+      }, error => {
+        console.error('Error in messages subscription:', error);
+        subscriber.error(error);
+      });
+
       return () => unsubscribe();
     });
   }

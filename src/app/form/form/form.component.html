@@ -47,14 +47,10 @@
       </ion-button>
 
       <!-- Botón Registrar (solo en la última página) -->
-      <ion-button 
-  *ngIf="isLastPage"
-  expand="block" 
-  type="submit" 
-  (click)="submit()"
-  [disabled]="!isPageComplete(page) || loading()">
-  {{loading() ? 'Guardando...' : 'Registrar'}}
-</ion-button>
+      <ion-button *ngIf="isLastPage" expand="block" type="submit" (click)="submit()"
+        [disabled]="!isPageComplete(page) || loading()">
+        {{loading() ? 'Guardando...' : 'Registrar'}}
+      </ion-button>
     </div>
 
   </ion-list>

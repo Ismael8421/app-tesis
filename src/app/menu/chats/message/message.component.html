@@ -8,10 +8,8 @@
           </ion-back-button>
         </ion-buttons>
 
-        <ion-title class="title-container">
-          <h1>{{ 
-            currentUser?.uid === 'yeRfZnKOkoYBUbCYtpRJMPwHs7v1' ? 'fabianB94' : 'IsmaelP2007'
-          }}</h1>
+        <ion-title class="title-container" *ngIf="chatData$ | async as chatData">
+          <h1>{{ chatData.otherUserName }}</h1>
           <h2>En línea</h2>
         </ion-title>
 

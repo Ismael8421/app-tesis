@@ -1,4 +1,9 @@
 <div class="page-container">
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+    <p>Cargando recomendaciones...</p>
+  </div>
+
   <swiper-container>
     <swiper-slide *ngFor="let user of recommendedUsers">
       <ion-card class="content-container ion-no-margin">

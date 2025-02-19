@@ -1,7 +1,41 @@
+$accent-yellow: #F2DA5E;
+$dark-accent: #FCFF8B;
+$blue-accent: #5A7F94;
+$dark-secondary: #A3A9B0;
+
 :host {
   .page-container {
     height: calc(100vh - 56px);
     overflow: hidden;
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  
+    ion-spinner {
+      --color: #{$accent-yellow};
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+  
+      @media (prefers-color-scheme: dark) {
+        --color: #{$dark-accent};
+      }
+    }
+  
+    p {
+      color: $blue-accent;
+      font-size: 16px;
+      margin: 0;
+  
+      @media (prefers-color-scheme: dark) {
+        color: $dark-secondary;
+      }
+    }
   }
 
   swiper-container {

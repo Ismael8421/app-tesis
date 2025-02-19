@@ -13,7 +13,7 @@ import { MessagesIconComponent } from '../../UI/messages-icon/messages-icon.comp
 import { HeartIconComponent } from '../../UI/heart-icon/heart-icon.component';
 import { RegisterService, userCreate } from '../../register/data-access/register.service';
 import { FormService, formCreate } from '../../form/data-access/form.service';
-import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonImg, IonText } from '@ionic/angular/standalone';
+import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonImg, IonSpinner, IonText } from '@ionic/angular/standalone';
 import { Firestore, collection, doc, getDoc, getDocs, query, where } from '@angular/fire/firestore';
 
 register();
@@ -29,7 +29,7 @@ register();
     CheckIconComponent,
     MessagesIconComponent,
     HeartIconComponent,
-    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert
+    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert, IonSpinner 
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',
@@ -45,6 +45,8 @@ export class SearchComponent {
   private firestore = inject(Firestore);
 
   recommendedUsers: any[] = [];
+
+  loading = true;
 
   userData: userCreate | null = null;
   formData: formCreate | null = null;
@@ -88,11 +90,12 @@ export class SearchComponent {
             await this.loadRecommendations();
           }
         }
-        
+        this.loading = false;
       } catch (error) {
         console.error('Error al cargar datos:', error);
         this.isFormComplete = false;
         this.showAlert = true;
+        this.loading = false;
       }
     }, 1000);
   }

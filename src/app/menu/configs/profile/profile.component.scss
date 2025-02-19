@@ -1,105 +1,111 @@
-// Variables principales
-:root {
-  // Paleta de colores
-  --color-blue-darkest: #032B44;
-  --color-blue-dark: #4C626F;
-  --color-blue-medium: #73889B;
-  --color-blue-light: #84A3B5;
-  --color-blue-accent: #5A7F94;
-  --color-yellow-light: #F2DA5E;
-  --color-yellow-dark: #F3DD6C;
-  --color-gray-light: #D3E3E6;
+// Variables de color
+$primary-color: #032B44;
+$secondary-color: #4C626F;
+$accent-yellow: #F2DA5E;
+$accent-yellow-dark: #F3DD6C;
+$blue-light: #84A3B5;
+$blue-medium: #73889B;
+$blue-accent: #5A7F94;
+$background-light: #D3E3E6;
 
-  // Variables del tema claro
-  --ion-color-primary: var(--color-blue-accent);
-  --ion-color-secondary: var(--color-blue-light);
-  --ion-background-color: var(--color-gray-light);
-  --ion-text-color: var(--color-blue-darkest);
-  --ion-item-background: #ffffff;
-  --ion-card-background: #ffffff;
-  --profile-header-bg: #ffffff;
-  --ion-color-medium: var(--color-blue-medium);
-  --avatar-border: var(--color-yellow-light);
-  --card-shadow: rgba(3, 43, 68, 0.1);
-}
+// Nuevos colores para modo oscuro
+$dark-primary: #4F5F73;
+$dark-secondary: #A3A9B0;
+$dark-accent: #FCFF8B;
+$dark-surface: #4F5F73;
 
-// Tema oscuro
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ion-color-primary: var(--color-blue-light);
-    --ion-color-secondary: var(--color-blue-medium);
-    --ion-background-color: var(--color-blue-darkest);
-    --ion-text-color: var(--color-gray-light);
-    --ion-item-background: var(--color-blue-dark);
-    --ion-card-background: var(--color-blue-dark);
-    --profile-header-bg: var(--color-blue-dark);
-    --ion-color-medium: var(--color-blue-light);
-    --avatar-border: var(--color-yellow-dark);
-    --card-shadow: rgba(0, 0, 0, 0.3);
+// Estilos base
+ion-content {
+  --background: #{$background-light};
+
+  @media (prefers-color-scheme: dark) {
+    --background: #{$dark-primary};
   }
 }
 
-ion-content {
-  --background: var(--ion-background-color);
-}
-
+// Header
 ion-header {
   ion-toolbar {
-    --background: transparent;
+    --background: #{$background-light};
+    --color: #{$primary-color};
     --border-color: transparent;
     
-    ion-title {
-      color: var(--ion-text-color);
-      font-weight: 600;
+    @media (prefers-color-scheme: dark) {
+      --background: #{$dark-surface};
+      --color: #{$dark-accent};
+    }
+
+    ion-button {
+      --color: #{$primary-color};
+      
+      @media (prefers-color-scheme: dark) {
+        --color: #{$dark-accent};
+      }
     }
   }
-
-  ion-button {
-    --color: var(--ion-text-color);
-  }
 }
 
-.profile-menu {
-  padding: 16px;
-}
-
+// Profile header
 .profile-header {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
-  padding: 20px;
-  background: var(--profile-header-bg);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px var(--card-shadow);
+  box-shadow: 0 4px 12px rgba($primary-color, 0.1);
+
+  @media (prefers-color-scheme: dark) {
+    background: $dark-surface;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
 
   ion-avatar {
     width: 80px;
     height: 80px;
     margin-right: 16px;
-    border: 3px solid var(--avatar-border);
+    border: 3px solid $accent-yellow;
+
+    @media (prefers-color-scheme: dark) {
+      border-color: $dark-accent;
+    }
   }
 
   .profile-info {
     h2 {
+      color: $primary-color;
       font-size: 24px;
       font-weight: 600;
       margin: 0 0 4px 0;
-      color: var(--ion-text-color);
+
+      @media (prefers-color-scheme: dark) {
+        color: $dark-accent;
+      }
     }
 
     p {
+      color: $blue-accent;
       font-size: 16px;
-      color: var(--ion-color-medium);
       margin: 0;
+
+      @media (prefers-color-scheme: dark) {
+        color: $dark-secondary;
+      }
     }
   }
 }
 
+// Card styles
 ion-card {
-  margin: 0 0 16px 0;
+  background: white;
   border-radius: 16px;
-  background: var(--ion-card-background);
-  box-shadow: 0 4px 12px var(--card-shadow);
+  margin: 0;
+  box-shadow: 0 4px 12px rgba($primary-color, 0.1);
+
+  @media (prefers-color-scheme: dark) {
+    background: $dark-surface;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
 
   ion-card-content {
     padding: 20px;
@@ -112,19 +118,33 @@ ion-card {
   ion-item {
     --background: transparent;
     --padding-start: 0;
-    --inner-padding-end: 0;
-    margin-bottom: 12px;
+    --padding-end: 0;
+    --border-color: #{rgba($blue-light, 0.3)};
+    margin-bottom: 16px;
+
+    @media (prefers-color-scheme: dark) {
+      --border-color: #{rgba($dark-secondary, 0.3)};
+    }
 
     ion-label {
-      color: var(--ion-color-medium);
+      color: $blue-accent;
       font-size: 16px;
       font-weight: 500;
+
+      @media (prefers-color-scheme: dark) {
+        color: $dark-accent;
+      }
     }
 
     ion-note {
+      color: $primary-color;
       font-size: 16px;
-      color: var(--ion-text-color);
+      padding-left: 8px;
       font-weight: 500;
+
+      @media (prefers-color-scheme: dark) {
+        color: $dark-secondary;
+      }
     }
 
     &:last-child {
@@ -133,51 +153,70 @@ ion-card {
   }
 }
 
+// Button styles
 ion-button {
-  margin-top: 20px;
-  --background: var(--color-yellow-light);
-  --background-hover: var(--color-yellow-dark);
-  --color: var(--color-blue-darkest);
+  --background: #{$accent-yellow};
+  --background-hover: #{$accent-yellow-dark};
+  --color: #{$primary-color};
   --border-radius: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
+  margin-top: 20px;
   height: 48px;
+  font-weight: 600;
   font-size: 16px;
 
-  &:hover {
-    --opacity: 0.9;
+  @media (prefers-color-scheme: dark) {
+    --background: #{$dark-accent};
+    --background-hover: #{darken($dark-accent, 5%)};
+    --color: #{$dark-primary};
   }
 }
 
-.loading-container, .error-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+// Loading container
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--ion-background-color);
-  z-index: 9999;
+  padding: 40px;
 
   ion-spinner {
-    width: 50px;
-    height: 50px;
+    --color: #{$accent-yellow};
+    width: 48px;
+    height: 48px;
     margin-bottom: 16px;
-    --color: var(--color-yellow-light);
+
+    @media (prefers-color-scheme: dark) {
+      --color: #{$dark-accent};
+    }
   }
 
   p {
+    color: $blue-accent;
     font-size: 16px;
-    color: var(--ion-color-medium);
-    text-align: center;
+    margin: 0;
+
+    @media (prefers-color-scheme: dark) {
+      color: $dark-secondary;
+    }
   }
 }
 
+// Error container
 .error-container {
+  padding: 20px;
+  text-align: center;
+
   p {
     color: var(--ion-color-danger);
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+// Responsive
+@media (min-width: 768px) {
+  .profile-menu {
+    max-width: 600px;
+    margin: 0 auto;
   }
 }

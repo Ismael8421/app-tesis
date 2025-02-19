@@ -2,100 +2,116 @@
     <ion-button (click)="navigateTo()">
         <app-back-icon />
     </ion-button>
-    <!-- Sección Email -->
-    <ion-card>
+
+    <!-- Mensaje para usuarios de Google -->
+    <ion-card *ngIf="!isEmailProvider">
         <ion-card-header>
             <ion-card-title>
-                <h3>Cambiar Correo Electrónico</h3>
+                <h3>Acceso No Disponible</h3>
             </ion-card-title>
         </ion-card-header>
-
         <ion-card-content>
-            <form [formGroup]="emailForm" (ngSubmit)="onEmailChange()">
-                <ion-item>
-                    <ion-label position="floating">Nuevo correo electrónico</ion-label>
-                    <ion-input type="email" formControlName="newEmail"
-                        [class.ion-invalid]="emailForm.get('newEmail')?.invalid && emailForm.get('newEmail')?.touched"></ion-input>
-                </ion-item>
-
-                <div class="validation-error"
-                    *ngIf="emailForm.get('newEmail')?.invalid && emailForm.get('newEmail')?.touched">
-                    <ion-text color="danger" *ngIf="emailForm.get('newEmail')?.errors?.['required']">
-                        El correo es requerido
-                    </ion-text>
-                    <ion-text color="danger" *ngIf="emailForm.get('newEmail')?.errors?.['email']">
-                        Ingrese un correo válido
-                    </ion-text>
-                </div>
-
-                <ion-item>
-                    <ion-label position="floating">Contraseña actual</ion-label>
-                    <ion-input type="password" formControlName="currentPassword"
-                        [class.ion-invalid]="emailForm.get('currentPassword')?.invalid && emailForm.get('currentPassword')?.touched"></ion-input>
-                </ion-item>
-
-                <div class="validation-error"
-                    *ngIf="emailForm.get('currentPassword')?.invalid && emailForm.get('currentPassword')?.touched">
-                    <ion-text color="danger" *ngIf="emailForm.get('currentPassword')?.errors?.['required']">
-                        La contraseña es requerida
-                    </ion-text>
-                </div>
-
-                <div class="ion-text-center ion-margin-top">
-                    <ion-button expand="block" type="submit" [disabled]="emailForm.invalid || emailLoading">
-                        <ion-spinner *ngIf="emailLoading"></ion-spinner>
-                        <span *ngIf="!emailLoading">Cambiar Correo</span>
-                    </ion-button>
-                </div>
-            </form>
+            <p>Esta funcionalidad solo está disponible para usuarios registrados con correo electrónico y contraseña. Como te has registrado con Google, debes gestionar tus credenciales desde tu cuenta de Google.</p>
         </ion-card-content>
     </ion-card>
 
-    <!-- Sección Contraseña -->
-    <ion-card>
-        <ion-card-header>
-            <ion-card-title>
-                <h3>Cambiar Contraseña</h3>
-            </ion-card-title>
-        </ion-card-header>
+    <!-- Formularios solo para usuarios con email/password -->
+    <ng-container *ngIf="isEmailProvider">
+        <!-- Sección Email -->
+        <ion-card>
+            <ion-card-header>
+                <ion-card-title>
+                    <h3>Cambiar Correo Electrónico</h3>
+                </ion-card-title>
+            </ion-card-header>
 
-        <ion-card-content>
-            <form [formGroup]="passwordForm" (ngSubmit)="onPasswordChange()">
-                <ion-item>
-                    <ion-label position="floating">Contraseña actual</ion-label>
-                    <ion-input type="password" formControlName="currentPassword"
-                        [class.ion-invalid]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched"></ion-input>
-                </ion-item>
+            <ion-card-content>
+                <form [formGroup]="emailForm" (ngSubmit)="onEmailChange()">
+                    <ion-item>
+                        <ion-label position="floating">Nuevo correo electrónico</ion-label>
+                        <ion-input type="email" formControlName="newEmail"
+                            [class.ion-invalid]="emailForm.get('newEmail')?.invalid && emailForm.get('newEmail')?.touched"></ion-input>
+                    </ion-item>
 
-                <ion-item>
-                    <ion-label position="floating">Nueva contraseña</ion-label>
-                    <ion-input type="password" formControlName="newPassword"
-                        [class.ion-invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched"></ion-input>
-                </ion-item>
+                    <div class="validation-error"
+                        *ngIf="emailForm.get('newEmail')?.invalid && emailForm.get('newEmail')?.touched">
+                        <ion-text color="danger" *ngIf="emailForm.get('newEmail')?.errors?.['required']">
+                            El correo es requerido
+                        </ion-text>
+                        <ion-text color="danger" *ngIf="emailForm.get('newEmail')?.errors?.['email']">
+                            Ingrese un correo válido
+                        </ion-text>
+                    </div>
 
-                <div class="validation-error"
-                    *ngIf="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
-                    <ion-text color="danger" *ngIf="passwordForm.get('newPassword')?.errors?.['required']">
-                        La contraseña es requerida
-                    </ion-text>
-                    <ion-text color="danger" *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">
-                        La contraseña debe tener al menos 6 caracteres
-                    </ion-text>
-                </div>
+                    <ion-item>
+                        <ion-label position="floating">Contraseña actual</ion-label>
+                        <ion-input type="password" formControlName="currentPassword"
+                            [class.ion-invalid]="emailForm.get('currentPassword')?.invalid && emailForm.get('currentPassword')?.touched"></ion-input>
+                    </ion-item>
+
+                    <div class="validation-error"
+                        *ngIf="emailForm.get('currentPassword')?.invalid && emailForm.get('currentPassword')?.touched">
+                        <ion-text color="danger" *ngIf="emailForm.get('currentPassword')?.errors?.['required']">
+                            La contraseña es requerida
+                        </ion-text>
+                    </div>
+
+                    <div class="ion-text-center ion-margin-top">
+                        <ion-button expand="block" type="submit" [disabled]="emailForm.invalid || emailLoading">
+                            <ion-spinner *ngIf="emailLoading"></ion-spinner>
+                            <span *ngIf="!emailLoading">Cambiar Correo</span>
+                        </ion-button>
+                    </div>
+                </form>
+            </ion-card-content>
+        </ion-card>
+
+        <!-- Sección Contraseña -->
+        <ion-card>
+            <ion-card-header>
+                <ion-card-title>
+                    <h3>Cambiar Contraseña</h3>
+                </ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content>
+                <form [formGroup]="passwordForm" (ngSubmit)="onPasswordChange()">
+                    <ion-item>
+                        <ion-label position="floating">Contraseña actual</ion-label>
+                        <ion-input type="password" formControlName="currentPassword"
+                            [class.ion-invalid]="passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched"></ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-label position="floating">Nueva contraseña</ion-label>
+                        <ion-input type="password" formControlName="newPassword"
+                            [class.ion-invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched"></ion-input>
+                    </ion-item>
+
+                    <div class="validation-error"
+                        *ngIf="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+                        <ion-text color="danger" *ngIf="passwordForm.get('newPassword')?.errors?.['required']">
+                            La contraseña es requerida
+                        </ion-text>
+                        <ion-text color="danger" *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">
+                            La contraseña debe tener al menos 6 caracteres
+                        </ion-text>
+                    </div>
+
+                    <div class="ion-text-center ion-margin-top">
+                        <ion-button expand="block" type="submit" [disabled]="passwordForm.invalid || passwordLoading">
+                            <ion-spinner *ngIf="passwordLoading"></ion-spinner>
+                            <span *ngIf="!passwordLoading">Cambiar Contraseña</span>
+                        </ion-button>
+                    </div>
+                </form>
 
                 <div class="ion-text-center ion-margin-top">
-                    <ion-button expand="block" type="submit" [disabled]="passwordForm.invalid || passwordLoading">
-                        <ion-spinner *ngIf="passwordLoading"></ion-spinner>
-                        <span *ngIf="!passwordLoading">Cambiar Contraseña</span>
+                    <ion-button expand="block" fill="clear" (click)="onForgotPassword()">
+                        ¿Olvidaste tu contraseña?
                     </ion-button>
                 </div>
-            </form>
-
-            <div class="ion-text-center ion-margin-top">
-                <ion-button expand="block" fill="clear" (click)="onForgotPassword()">
-                    ¿Olvidaste tu contraseña?
-                </ion-button>
-            </div>
-        </ion-card-content>
-    </ion-card>
+            </ion-card-content>
+        </ion-card>
+    </ng-container>
 </ion-content>

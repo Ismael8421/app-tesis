@@ -1,0 +1,266 @@
+// Variables de color
+$primary-color: #032B44;
+$secondary-color: #4C626F;
+$accent-yellow: #F2DA5E;
+$accent-yellow-dark: #F3DD6C;
+$accent-blue: #5A7F94;
+$background-light: #D3E3E6;
+$input-border: #84A3B5;
+$medium-blue: #73889B;
+
+// Variables para modo oscuro
+$dark-background: #032B44;
+$dark-surface: #4C626F;
+$dark-accent: #F3DD6C;
+
+// Breakpoints
+$breakpoints: (
+  'xs': 320px,
+  'sm': 576px,
+  'md': 768px,
+  'lg': 992px,
+  'xl': 1200px
+);
+
+// Mixin para breakpoints
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+}
+
+// Mixins
+@mixin card-shadow {
+  box-shadow: 0 2px 8px rgba($primary-color, 0.08);
+  
+  @include respond-to('md') {
+    box-shadow: 0 4px 12px rgba($primary-color, 0.08);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    box-shadow: 0 4px 12px rgba(black, 0.2);
+  }
+}
+
+@mixin hover-effect {
+  @include respond-to('md') {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba($primary-color, 0.12);
+    }
+  }
+}
+
+// Estilos principales
+div[formGroup] {
+  background: $background-light;
+  min-height: 100vh;
+  padding: 12px;
+  
+  @include respond-to('sm') {
+    padding: 16px;
+  }
+  
+  @include respond-to('md') {
+    padding: 20px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background: $dark-background;
+  }
+}
+
+// Título
+ion-text {
+  h1 {
+    color: $primary-color;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    margin: 16px 0;
+    padding: 0 10px;
+    
+    @include respond-to('sm') {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+    
+    @include respond-to('md') {
+      font-size: 28px;
+      margin: 24px 0;
+      padding: 0 15px;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      color: $accent-yellow;
+    }
+  }
+
+  p {
+    color: $secondary-color;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 16px 0 10px;
+    padding: 0 10px;
+    
+    @include respond-to('md') {
+      font-size: 18px;
+      margin: 20px 0 12px;
+      padding: 0 15px;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      color: $accent-yellow-dark;
+    }
+  }
+}
+
+// Lista principal
+ion-list {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px;
+  width: calc(100% - 24px);
+  max-width: 600px;
+  @include card-shadow;
+  
+  @include respond-to('sm') {
+    margin: 16px auto;
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background: $dark-surface;
+  }
+}
+
+// Items
+ion-item {
+  --background: transparent;
+  --background-hover: #{rgba($accent-yellow, 0.1)};
+  --background-activated: #{rgba($accent-yellow, 0.2)};
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --border-radius: 6px;
+  margin-bottom: 6px;
+  
+  @include respond-to('sm') {
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  
+  @include hover-effect;
+
+  &::part(native) {
+    border-radius: 6px;
+    
+    @include respond-to('sm') {
+      border-radius: 8px;
+    }
+  }
+
+  ion-label {
+    color: $secondary-color;
+    font-size: 14px;
+    margin: 10px 0;
+    
+    @include respond-to('sm') {
+      font-size: 16px;
+      margin: 12px 0;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      color: $background-light;
+    }
+  }
+}
+
+// Checkbox personalizado
+ion-checkbox {
+  --size: 20px;
+  --checkbox-background-checked: #{$accent-yellow};
+  --checkbox-background: white;
+  --border-color: #{$input-border};
+  --border-color-checked: #{$accent-yellow};
+  --checkmark-color: #{$primary-color};
+  margin-right: 10px;
+  
+  @include respond-to('sm') {
+    --size: 22px;
+    margin-right: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    --checkbox-background-checked: #{$accent-yellow-dark};
+    --border-color: #{$medium-blue};
+    --checkmark-color: #{$dark-background};
+  }
+}
+
+// Radio personalizado
+ion-radio {
+  --color: #{$input-border};
+  --color-checked: #{$accent-yellow};
+  margin-right: 10px;
+  
+  @include respond-to('sm') {
+    margin-right: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    --color: #{$medium-blue};
+    --color-checked: #{$accent-yellow-dark};
+  }
+}
+
+// Grupos de radio
+ion-radio-group {
+  margin: 6px 0;
+  
+  @include respond-to('sm') {
+    margin: 8px 0;
+  }
+}
+
+// Efectos de selección
+ion-item.item-radio-checked, ion-item.item-checkbox-checked {
+  --background: #{rgba($accent-yellow, 0.1)};
+  
+  @media (prefers-color-scheme: dark) {
+    --background: #{rgba($accent-yellow-dark, 0.1)};
+  }
+
+  ion-label {
+    color: $primary-color;
+    font-weight: 500;
+    
+    @media (prefers-color-scheme: dark) {
+      color: $accent-yellow;
+    }
+  }
+}
+
+// Animaciones
+@include respond-to('md') {
+  ion-item, ion-checkbox, ion-radio {
+    transition: all 0.2s ease;
+  }
+}
+
+// Touch target improvements for mobile
+@media (max-width: map-get($breakpoints, 'sm')) {
+  ion-item {
+    min-height: 48px; // Ensure minimum touch target size
+    
+    ion-checkbox, ion-radio {
+      margin: 8px; // Increase touch area
+    }
+  }
+}

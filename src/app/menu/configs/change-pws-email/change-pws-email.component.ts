@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../account/auth/data-access/auth.service';
 import { AlertController } from '@ionic/angular';
@@ -21,14 +21,27 @@ import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCon
   templateUrl: './change-pws-email.component.html',
   styleUrls: ['./change-pws-email.component.scss']
 })
-export default class ChangePwsEmailComponent {
+export default class ChangePwsEmailComponent implements OnInit {
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private alertController = inject(AlertController);
   private _router = inject(Router);
 
+  isEmailProvider = false;
+
   emailLoading = false;
   passwordLoading = false;
+
+  ngOnInit() {
+    // Verificar el método de autenticación
+    const user = this.authService.currentUser;
+    if (user) {
+      // Verificamos si el usuario tiene proveedor de email/password
+      this.isEmailProvider = user.providerData.some(
+        provider => provider.providerId === 'password'
+      );
+    }
+  }
 
   navigateTo() {
     this._router.navigateByUrl('/menu/configuraciones');

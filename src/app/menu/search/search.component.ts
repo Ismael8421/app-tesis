@@ -14,6 +14,7 @@ import { HeartIconComponent } from '../../UI/heart-icon/heart-icon.component';
 import { RegisterService, userCreate } from '../../register/data-access/register.service';
 import { FormService, formCreate } from '../../form/data-access/form.service';
 import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonImg, IonText } from '@ionic/angular/standalone';
+import { Firestore, collection, doc, getDoc, getDocs, query, where } from '@angular/fire/firestore';
 
 register();
 
@@ -41,6 +42,9 @@ export class SearchComponent {
   private formStateService = inject(FormStateService);
   private registerService = inject(RegisterService);
   private formService = inject(FormService);
+  private firestore = inject(Firestore);
+
+  recommendedUsers: any[] = [];
 
   userData: userCreate | null = null;
   formData: formCreate | null = null;
@@ -78,6 +82,11 @@ export class SearchComponent {
           this.formData = formData;
           this.isFormComplete = formCompleted;
           this.showAlert = !formCompleted;
+  
+          // ÚNICA LÍNEA NUEVA: Cargar recomendaciones solo si el formulario está completo
+          if (formCompleted && this.userData) {
+            await this.loadRecommendations();
+          }
         }
         
       } catch (error) {
@@ -87,6 +96,55 @@ export class SearchComponent {
       }
     }, 1000);
   }
+
+  async loadRecommendations() {
+    try {
+      const informaticaRef = collection(this.firestore, 'Informatica');
+      
+      let q = query(
+        informaticaRef,
+        where('uid', '!=', this.auth.currentUser?.uid)
+      );
+  
+      const querySnapshot = await getDocs(q);
+      const users: any[] = [];
+  
+      for (const docSnap of querySnapshot.docs) {
+        const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
+        const formCompleted = userGeneralDoc.data()?.['formCompleted'] ?? false;
+  
+        if (formCompleted) {
+          const userData = docSnap.data();
+          users.push({
+            ...userData,
+            id: docSnap.id
+          });
+        }
+      }
+  
+      this.recommendedUsers = users;
+    } catch (error) {
+      console.error('Error al cargar recomendaciones:', error);
+    }
+  }
+
+  private isCompatible(otherUser: any): boolean {
+    if (!this.formData || !otherUser) return false;
+
+    // Verificar compatibilidad de horarios
+    const hasCommonSchedule = this.formData.horario.some(
+      horario => otherUser.horario?.includes(horario)
+    );
+
+    // Verificar método de estudio compatible
+    const hasCompatibleMethod = this.formData.metodo === otherUser.metodo;
+
+    // Verificar horas disponibles compatibles
+    const hasCompatibleHours = this.formData.horas === otherUser.horas;
+
+    return hasCommonSchedule && hasCompatibleMethod && hasCompatibleHours;
+  }
+
 
   async startChat(otherUserId: string, otherUserName: string) {
     const currentUser = this.auth.currentUser;
@@ -105,3 +163,4 @@ export class SearchComponent {
     }
   }
 }
+

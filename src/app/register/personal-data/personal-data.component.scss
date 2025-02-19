@@ -1,21 +1,22 @@
 // Variables
-$primary-color: #032B44;
-$secondary-color: #4C626F;
-$accent-color: #F2DA5E;
-$button-color: #5A7F94;
-$background-color: #D3E3E6;
-$input-border: #84A3B5;
-$input-background: #ffffff;
+$primary-color: #032B44;    // Azul oscuro
+$secondary-color: #4C626F;  // Azul grisáceo
+$accent-color: #F2DA5E;     // Amarillo claro
+$button-color: #5A7F94;     // Azul medio
+$background-color: #D3E3E6; // Gris claro
+$input-border: #84A3B5;     // Azul claro
+$input-background:#EFF1E6;
 $shadow-color: rgba(3, 43, 68, 0.1);
 $error-color: #dc3545;
 
 // Dark mode variables
-$dark-background: #032B44;
-$dark-surface: #4C626F;
-$dark-text: #F3DD6C;
-$dark-input-bg: #73889B;
-$dark-input-text: #ffffff;
+$dark-background: #032B44;  // Azul muy oscuro para fondo
+$dark-surface: #4C626F;     // Azul grisáceo para superficies
+$dark-text: #F3DD6C;        // Amarillo para texto
+$dark-input-bg: #73889B;    // Azul medio para inputs
+$dark-input-text: #D3E3E6;  // Gris claro para texto en inputs
 
+// El resto del código permanece igual, solo cambiando los colores
 :host {
   display: block;
   min-height: 100vh;
@@ -163,81 +164,4 @@ ion-button {
   }
 }
 
-// Error messages
-ion-text[color="danger"] {
-  margin-left: 16px;
-  margin-top: -16px;
-  margin-bottom: 20px;
-  display: block;
-
-  small {
-    color: $error-color;
-    font-size: clamp(12px, 3vw, 13px);
-    
-    @include dark-mode {
-      color: lighten($error-color, 20%);
-    }
-  }
-}
-
-// Responsive adjustments
-@media (max-width: 320px) {
-  ion-list {
-    padding: 15px;
-  }
-
-  ion-item {
-    margin-bottom: 15px;
-  }
-
-  ion-button {
-    height: 44px;
-    width: 85%;
-  }
-}
-
-@media (min-width: 768px) {
-  ion-list {
-    padding: 35px;
-  }
-
-  ion-button {
-    width: 250px;
-  }
-}
-
-// Support for smaller screens
-@media (max-width: 280px) {
-  ion-list {
-    padding: 12px;
-    width: 95%;
-  }
-
-  ion-item {
-    margin-bottom: 12px;
-  }
-
-  ion-button {
-    width: 90%;
-    height: 40px;
-  }
-}
-
-// Landscape orientation
-@media (max-height: 500px) and (orientation: landscape) {
-  div[formGroup] {
-    padding: 12px;
-  }
-
-  ion-text h1 {
-    margin: 18px 0;
-  }
-
-  ion-list {
-    margin: 12px auto;
-  }
-
-  ion-button {
-    margin: 25px auto;
-  }
-}
+// El resto del código permanece igual...

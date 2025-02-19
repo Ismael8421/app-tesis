@@ -11,6 +11,7 @@ import { IonItem, IonLabel, IonList, IonSelect, IonSelectOption } from '@ionic/a
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, IonList, IonItem, IonLabel, IonSelect, IonSelectOption],
   templateUrl: './pers-computing.component.html',
+  styleUrl: './pers-computing.component.scss',
   viewProviders: [{
     provide: ControlContainer,
     useExisting: FormGroupDirective

@@ -57,7 +57,6 @@ export class ThemeService {
     return this.theme.value;
   }
 
-  // Obtener el estado actual del tema (si está oscuro o no)
   isDarkMode(): boolean {
     const currentTheme = this.getCurrentTheme();
     if (currentTheme === 'system') {

@@ -1,42 +1,42 @@
 :root {
-  /* Variables modo claro */
-  --background-color: #D3E3E6;
-  --chat-background: linear-gradient(135deg, #84A3B5 0%, #D3E3E6 100%);
-  --text-color: #032B44;
-  --secondary-text-color: #5A7F94;
-  --input-background: #ffffff;
-  --input-text-color: #4C626F;
-  --input-placeholder-color: #73889B;
-  --border-color: #84A3B5;
-  --messages-background: #ffffff;
-  --button-background: #F2DA5E;
-  --button-text-color: #032B44;
-  --shadow-color: rgba(3, 43, 68, 0.1);
-  --message-sent: #F2DA5E;
-  --message-received: #ffffff;
+  /* Light mode variables */
+  --background-color: #f0f4f8;
+  --chat-background: linear-gradient(135deg, #e6f0ff 0%, #f0f4f8 100%);
+  --text-color: #333;
+  --secondary-text-color: #666;
+  --input-background: #e8f0fe;
+  --input-text-color: #2c3e50;
+  --input-placeholder-color: #7f8c8d;
+  --border-color: #bdc3c7;
+  --messages-background: #fff;
+  --button-background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  --button-text-color: #fff;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --message-sent: #dcf8c6;
+  --message-received: #fff;
 }
 
-/* Variables modo oscuro */
+/* Dark mode variables */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color: #032B44;
-    --chat-background: linear-gradient(135deg, #4C626F 0%, #032B44 100%);
-    --text-color: #D3E3E6;
-    --secondary-text-color: #84A3B5;
-    --input-background: #4C626F;
-    --input-text-color: #D3E3E6;
-    --input-placeholder-color: #73889B;
-    --border-color: #5A7F94;
-    --messages-background: #4C626F;
-    --button-background: #F3DD6C;
-    --button-text-color: #032B44;
+    --background-color: #1a1a2e;
+    --chat-background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    --text-color: #f0f0f0;
+    --secondary-text-color: #b0b0b0;
+    --input-background: #2c3e50;
+    --input-text-color: #ecf0f1;
+    --input-placeholder-color: #bdc3c7;
+    --border-color: #34495e;
+    --messages-background: #2c2c3e;
+    --button-background: linear-gradient(135deg, #0056b3 0%, #003366 100%);
+    --button-text-color: #fff;
     --shadow-color: rgba(0, 0, 0, 0.2);
-    --message-sent: #F3DD6C;
-    --message-received: #5A7F94;
+    --message-sent: #0d7377;
+    --message-received: #2c2c3e;
   }
 }
 
-/* El resto del código permanece igual */
+/* Chat container */
 .chat {
   display: flex;
   flex-direction: column;
@@ -46,53 +46,175 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Chat header */
 .chat-title {
   --background: transparent;
   --color: var(--text-color);
   box-shadow: 0 2px 10px var(--shadow-color);
 }
 
-// ... resto del código sin cambios ...
+.back-icon {
+  font-size: 24px;
+  color: var(--text-color);
+  transition: transform 0.3s ease;
+}
 
-/* Personalizaciones adicionales */
+.back-icon:hover {
+  transform: translateX(-3px);
+}
+
+.title-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-container h1 {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.title-container h2 {
+  font-size: 14px;
+  color: var(--secondary-text-color);
+  margin: 0;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--button-background);
+  box-shadow: 0 2px 5px var(--shadow-color);
+  transition: transform 0.3s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.1);
+}
+
+/* Messages area */
+.messages {
+  height: 100%;  // Nuevo
+  overflow: hidden;  // Nuevo
+  display: flex;  // Nuevo
+  flex-direction: column;  // Nuevo
+  background-color: var(--messages-background);
+}
+
+.messages-content {
+  flex: 1;  // Nuevo
+  overflow-y: auto;  // Movido de .messages
+  padding: 20px;  // Movido de .messages
+  display: flex;
+  flex-direction: column;
+}
+
+/* Message bubbles */
+.message {
+  max-width: 80%;
+  margin-bottom: 10px;
+  padding: 10px 15px;
+  border-radius: 18px;
+  box-shadow: 0 1px 3px var(--shadow-color);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .message-sent {
-  .message-text {
-    color: var(--button-text-color);
-  }
-  .message-time {
-    color: rgba(3, 43, 68, 0.7);
-  }
+  align-self: flex-end;
+  background-color: var(--message-sent);
+  border-bottom-right-radius: 4px;
 }
 
 .message-received {
-  .message-text {
-    color: var(--text-color);
-  }
-  .message-time {
-    color: var(--secondary-text-color);
-  }
+  align-self: flex-start;
+  background-color: var(--message-received);
+  border-bottom-left-radius: 4px;
 }
 
-.no-messages {
-  text-align: center;
-  color: var(--secondary-text-color);
-  padding: 20px;
-  font-style: italic;
+/* Message input area */
+.message-box {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--input-background);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -2px 10px var(--shadow-color);
 }
 
 .message-input {
-  &::placeholder {
-    color: var(--input-placeholder-color);
-  }
+  flex: 1;
+  --background: var(--input-background);
+  --color: var(--input-text-color);
+  --placeholder-color: var(--input-placeholder-color);
+  --padding-start: 15px;
+  --padding-end: 15px;
+  --border-radius: 20px;
+  margin-right: 10px;
+  box-shadow: inset 0 1px 3px var(--shadow-color);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.message-input:focus {
+  --background: var(--input-background);
+  box-shadow: inset 0 1px 3px var(--shadow-color), 0 0 0 2px var(--button-background);
 }
 
 .message-submit {
   --background: var(--button-background);
   --color: var(--button-text-color);
-  font-weight: 600;
-  
-  &:hover {
-    --background: var(--message-sent);
-    opacity: 0.9;
+  --border-radius: 20px;
+  --padding-start: 15px;
+  --padding-end: 15px;
+  --box-shadow: 0 2px 5px var(--shadow-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.message-submit:active {
+  --background: var(--button-background);
+  transform: scale(0.95);
+  --box-shadow: 0 1px 2px var(--shadow-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .title-container h1 {
+    font-size: 16px;
   }
+
+  .title-container h2 {
+    font-size: 12px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Scrollbar styling */
+.messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-text-color);
+  border-radius: 3px;
 }

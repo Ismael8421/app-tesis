@@ -13,11 +13,28 @@ import {
 import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 import { Router } from '@angular/router';
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonSpinner, IonText } from '@ionic/angular/standalone';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ThemeService } from '../settings/data-access/theme.service';
 
 @Component({
   selector: 'app-change-pws-email',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, BackIconComponent, IonContent, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonText, IonSpinner ],
+  imports: [
+    ReactiveFormsModule, 
+    CommonModule, 
+    BackIconComponent, 
+    IonContent, 
+    IonButton, 
+    IonCard, 
+    IonCardHeader, 
+    IonCardTitle, 
+    IonCardContent, 
+    IonItem, 
+    IonLabel, 
+    IonInput, 
+    IonText, 
+    IonSpinner
+  ],
   templateUrl: './change-pws-email.component.html',
   styleUrls: ['./change-pws-email.component.scss']
 })
@@ -26,34 +43,27 @@ export default class ChangePwsEmailComponent implements OnInit {
   private fb = inject(FormBuilder);
   private alertController = inject(AlertController);
   private _router = inject(Router);
+  private _themeService = inject(ThemeService);
 
   isEmailProvider = false;
-
   emailLoading = false;
   passwordLoading = false;
 
+  constructor() {
+    this._themeService.theme$
+      .pipe(takeUntilDestroyed())
+      .subscribe(theme => {
+        // El ThemeService ya maneja la aplicación de la clase .dark al body
+      });
+  }
+
   ngOnInit() {
-    // Verificar el método de autenticación
     const user = this.authService.currentUser;
     if (user) {
-      // Verificamos si el usuario tiene proveedor de email/password
       this.isEmailProvider = user.providerData.some(
         provider => provider.providerId === 'password'
       );
     }
-  }
-
-  navigateTo() {
-    this._router.navigateByUrl('/menu/configuraciones');
-  }
-
-  async showAlert(message: string) {
-    const alert = await this.alertController.create({
-      message,
-      buttons: ['OK']
-    });
-
-    await alert.present();
   }
 
   emailForm = this.fb.group({
@@ -66,7 +76,18 @@ export default class ChangePwsEmailComponent implements OnInit {
     newPassword: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-  // change-pws-email.component.ts
+  navigateTo() {
+    this._router.navigateByUrl('/menu/configuraciones');
+  }
+
+  async showAlert(message: string) {
+    const alert = await this.alertController.create({
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+
   async onEmailChange() {
     if (this.emailLoading || this.emailForm.invalid) return;
 
@@ -79,10 +100,7 @@ export default class ChangePwsEmailComponent implements OnInit {
         throw new Error('Por favor, completa todos los campos');
       }
 
-      // Primero reautenticamos al usuario
       await this.authService.reauthenticateUser(currentPassword);
-
-      // Iniciamos el proceso de verificación del nuevo email
       await this.authService.initiateEmailUpdate(newEmail);
       await this.showAlert('Se ha enviado un correo de verificación a la nueva dirección. Por favor, verifica tu nuevo correo para completar el cambio.');
       this.emailForm.reset();
@@ -106,16 +124,15 @@ export default class ChangePwsEmailComponent implements OnInit {
         case 'auth/operation-not-allowed':
           await this.showAlert('Esta operación no está permitida en este momento');
           break;
+        default:
+          await this.showAlert(errorMessage);
       }
-
-      alert(errorMessage);
     } finally {
       this.emailLoading = false;
     }
   }
 
   async onPasswordChange() {
-
     if (this.passwordLoading || this.passwordForm.invalid) return;
 
     this.passwordLoading = true;
@@ -125,11 +142,8 @@ export default class ChangePwsEmailComponent implements OnInit {
       const user = this.authService.currentUser;
 
       if (currentPassword && newPassword && user?.email && user) {
-        // Reautenticar usuario
         const credential = EmailAuthProvider.credential(user.email, currentPassword);
         await reauthenticateWithCredential(user, credential);
-
-        // Actualizar contraseña
         await updatePassword(user, newPassword);
         await this.showAlert('Contraseña actualizada exitosamente');
         this.passwordForm.reset();

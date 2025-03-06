@@ -24,6 +24,58 @@ interface Chat {
 export class ChatService {
   constructor(private db: Database) { }
 
+  private async sendNotificationForNewMessage(chatId: string, senderId: string, message: string): Promise<void> {
+    try {
+      // Obtener información del chat
+      const chatRef = ref(this.db, `chats/${chatId}`);
+      const chatSnapshot = await get(chatRef);
+      
+      if (!chatSnapshot.exists()) return;
+      
+      const chat = chatSnapshot.val();
+      
+      // Obtener los IDs de los otros participantes (que no son el remitente)
+      const recipients = chat.participants.filter((participantId: string) => participantId !== senderId);
+      
+      // Para cada destinatario, enviar una notificación
+      for (const recipientId of recipients) {
+        // Obtener el token del dispositivo del destinatario
+        const tokenRef = ref(this.db, `deviceTokens/${recipientId}`);
+        const tokenSnapshot = await get(tokenRef);
+        
+        if (!tokenSnapshot.exists()) continue;
+        
+        const token = tokenSnapshot.val();
+        
+        // Obtener el nombre del remitente
+        const senderDataRef = ref(this.db, `usuarios/${senderId}`);
+        const senderSnapshot = await get(senderDataRef);
+        let senderName = "Usuario";
+        
+        if (senderSnapshot.exists()) {
+          const userData = senderSnapshot.val();
+          senderName = `${userData.nombre} ${userData.apellido}`;
+        }
+        
+        // Guardar la información de la notificación para que la procese Cloud Functions
+        const notificationData = {
+          recipientToken: token,
+          title: senderName,
+          body: message,
+          chatId: chatId,
+          timestamp: Date.now()
+        };
+        
+        // Guardar en Firebase para que Cloud Functions lo procese
+        const notificationsRef = ref(this.db, 'notifications');
+        const newNotificationRef = push(notificationsRef);
+        await set(newNotificationRef, notificationData);
+      }
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  }
+
   async startChat(user1Id: string, user2Id: string): Promise<string> {
     try {
       // Verificar si ya existe un chat
@@ -144,12 +196,12 @@ export class ChatService {
           [senderId]: true
         }
       };
-
+      
       // Obtener referencia del chat
       const chatRef = ref(this.db, `chats/${chatId}`);
       const chatSnapshot = await get(chatRef);
       const chatData = chatSnapshot.val();
-
+      
       // Preparar el estado de lectura para otros participantes
       const unreadMessages: Record<string, boolean> = {};
       chatData.participants.forEach((participantId: string) => {
@@ -157,7 +209,7 @@ export class ChatService {
           unreadMessages[participantId] = true;
         }
       });
-
+      
       // Crear el nuevo mensaje
       const newMessageRef = push(ref(this.db, `messages/${chatId}`));
       
@@ -167,9 +219,12 @@ export class ChatService {
       updates[`chats/${chatId}/lastMessage`] = content;
       updates[`chats/${chatId}/lastMessageTimestamp`] = timestamp;
       updates[`chats/${chatId}/unreadMessages`] = unreadMessages;
-
+      
       // Realizar todas las actualizaciones en una sola operación
       await update(ref(this.db), updates);
+      
+      // Enviar notificación por el nuevo mensaje
+      await this.sendNotificationForNewMessage(chatId, senderId, content);
     } catch (error) {
       console.error('Error sending message:', error);
       throw new Error('Failed to send message');

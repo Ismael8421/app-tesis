@@ -6,13 +6,15 @@ const config: CapacitorConfig = {
   webDir: 'dist/app-tesis/browser',
   server: {
     androidScheme: 'https',
-    allowNavigation: ['*'],
-    cleartext: true // Permite conexiones sin HTTPS durante desarrollo
+    allowNavigation: [
+      'accounts.google.com',
+      'apis.google.com',
+      '*.firebaseapp.com',
+      '*.googleapis.com'
+    ],
+    cleartext: true
   },
-  plugins: {
-    // Aquí puedes añadir configuraciones de plugins específicos si los necesitas
-  },
-  // Esta configuración es clave para que las redirecciones de autenticación funcionen correctamente
+  plugins: {},
   ios: {
     contentInset: 'always'
   },

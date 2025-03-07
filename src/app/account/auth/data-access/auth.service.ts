@@ -6,7 +6,8 @@ import {
   reauthenticateWithCredential, EmailAuthProvider,
   sendEmailVerification,
   verifyBeforeUpdateEmail,
-  updatePassword
+  updatePassword,
+  getRedirectResult
 } from '@angular/fire/auth';
 import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 import { Platform } from '@ionic/angular';
@@ -68,16 +69,28 @@ export class AuthService {
     );
   }
 
-  signInWithGoogle() {
+  async signInWithGoogle() {
     const provider = new GoogleAuthProvider();
     
-    // Verificar si estamos en un dispositivo móvil
-    if (this.platform.is('cordova') || this.platform.is('capacitor') || this.platform.is('ios') || this.platform.is('android')) {
-      // En dispositivos móviles, usar signInWithRedirect
+    // En dispositivos móviles, es mejor usar redirección
+    if (this.isMobile()) {
       return signInWithRedirect(this.auth, provider);
     } else {
-      // En ambiente web, usar el tradicional signInWithPopup
+      // En web, puedes usar popup
       return signInWithPopup(this.auth, provider);
+    }
+  }
+
+  isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
+  async getRedirectResult() {
+    try {
+      return await getRedirectResult(this.auth);
+    } catch (error) {
+      console.error('Error al obtener resultado de redirección:', error);
+      return null;
     }
   }
 

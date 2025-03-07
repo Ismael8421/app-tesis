@@ -5,6 +5,7 @@ import { ThemeService } from './menu/configs/settings/data-access/theme.service'
 import { NotificationService } from './menu/chats/data-access/notification.service';
 import { Auth, getRedirectResult } from '@angular/fire/auth';
 import { Platform } from '@ionic/angular';
+import { AuthService } from './account/auth/data-access/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,8 @@ export class AppComponent implements OnInit {
   constructor(
     private themeService: ThemeService,
     private notificationService: NotificationService,
-    private auth: Auth
+    private auth: Auth,
+    private authService: AuthService
   ) {
     // Asegurarnos de que el tema se inicialice
     const savedTheme = localStorage.getItem('theme');
@@ -29,19 +31,14 @@ export class AppComponent implements OnInit {
     }
   }
 
-  ngOnInit() {
-    // Comprobar si hay redirecciones pendientes al iniciar la app
-    this.platform.ready().then(() => {
-      this.checkRedirectResult();
-    });
-
-    // Inicializar notificaciones push cuando el usuario inicia sesión
-    this.auth.onAuthStateChanged(user => {
-      if (user) {
-        this.notificationService.initPushNotifications();
-        this.notificationService.subscribeToChats();
-      }
-    });
+  async ngOnInit() {
+    // Verificar si hay un resultado de redirección al iniciar la app
+    const result = await this.authService.getRedirectResult();
+    if (result?.user) {
+      // El usuario ha iniciado sesión exitosamente después de una redirección
+      console.log('Usuario autenticado:', result.user);
+      // Aquí puedes navegar a la página principal o hacer lo que necesites
+    }
   }
 
   /**

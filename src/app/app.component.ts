@@ -23,6 +23,10 @@ export class AppComponent implements OnInit {
     private notificationService: NotificationService,
     private auth: Auth,
     private authService: AuthService
+
+    FirebaseAuthentication.addListener('authStateChange', (change) => {
+      console.log('Auth state changed', change);
+    });
   ) {
     // Asegurarnos de que el tema se inicialice
     const savedTheme = localStorage.getItem('theme');

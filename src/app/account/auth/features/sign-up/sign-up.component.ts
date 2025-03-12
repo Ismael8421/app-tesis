@@ -91,11 +91,16 @@ export default class SignUpComponent {
 
   async submitWithGoogle() {
     try {
-      await this._authServices.signInWithGoogle();
-      // En el caso de redirección, el control pasará al AppComponent
-      // después de que el usuario inicie sesión
+      const result = await this._authServices.signInWithGoogle();
+      if (result) {
+        // El usuario ha iniciado sesión correctamente
+        this._router.navigateByUrl('/menu');
+        await this.showToast('Inicio de sesión con Google correcto');
+      }
     } catch (error) {
       console.error('Error al iniciar sesión con Google:', error);
+      // Mostrar un mensaje de error al usuario
+      await this.showToast('Error al iniciar sesión con Google');
     }
   }
 }

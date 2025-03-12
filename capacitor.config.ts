@@ -14,7 +14,13 @@ const config: CapacitorConfig = {
     ],
     cleartext: true
   },
-  plugins: {},
+  bundledWebRuntime: false,
+  plugins: {
+    FirebaseAuthentication: {
+      skipNativeAuth: false,
+      providers: ['google.com']
+    }
+  },
   ios: {
     contentInset: 'always'
   },

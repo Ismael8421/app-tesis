@@ -70,14 +70,22 @@ export class AuthService {
   }
 
   async signInWithGoogle() {
-    const provider = new GoogleAuthProvider();
-    
-    // En dispositivos móviles, es mejor usar redirección
-    if (this.isMobile()) {
-      return signInWithRedirect(this.auth, provider);
-    } else {
-      // En web, puedes usar popup
-      return signInWithPopup(this.auth, provider);
+    try {
+      if (this.platform.is('capacitor')) {
+        // Usar el plugin de Firebase Authentication
+        const result = await AuthService.signInWithGoogle();
+        
+        // El plugin ya integra con Firebase, por lo que no necesitas crear las credenciales manualmente
+        // La sesión de Firebase ya estará establecida
+        return result;
+      } else {
+        // Tu código actual para web
+        const provider = new GoogleAuthProvider();
+        return signInWithPopup(this.auth, provider);
+      }
+    } catch (error) {
+      console.error('Error en signInWithGoogle:', error);
+      throw error;
     }
   }
 

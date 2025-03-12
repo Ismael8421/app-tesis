@@ -14,7 +14,6 @@ const config: CapacitorConfig = {
     ],
     cleartext: true
   },
-  bundledWebRuntime: false,
   plugins: {
     FirebaseAuthentication: {
       skipNativeAuth: false,

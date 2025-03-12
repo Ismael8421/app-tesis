@@ -6,6 +6,7 @@ import { NotificationService } from './menu/chats/data-access/notification.servi
 import { Auth, getRedirectResult } from '@angular/fire/auth';
 import { Platform } from '@ionic/angular';
 import { AuthService } from './account/auth/data-access/auth.service';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 @Component({
   selector: 'app-root',
@@ -23,16 +24,17 @@ export class AppComponent implements OnInit {
     private notificationService: NotificationService,
     private auth: Auth,
     private authService: AuthService
-
-    FirebaseAuthentication.addListener('authStateChange', (change) => {
-      console.log('Auth state changed', change);
-    });
   ) {
     // Asegurarnos de que el tema se inicialice
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       this.themeService.setTheme(savedTheme as 'system' | 'dark' | 'light');
     }
+    
+    // Añadir listener para cambios de estado de autenticación
+    FirebaseAuthentication.addListener('authStateChange', (change) => {
+      console.log('Auth state changed', change);
+    });
   }
 
   async ngOnInit() {

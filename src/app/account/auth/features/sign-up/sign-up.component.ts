@@ -95,12 +95,9 @@ export default class SignUpComponent {
       if (result) {
         // El usuario ha iniciado sesión correctamente
         this._router.navigateByUrl('/menu');
-        await this.showToast('Inicio de sesión con Google correcto');
       }
     } catch (error) {
       console.error('Error al iniciar sesión con Google:', error);
-      // Mostrar un mensaje de error al usuario
-      await this.showToast('Error al iniciar sesión con Google');
     }
   }
 }

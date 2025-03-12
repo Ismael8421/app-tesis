@@ -10,6 +10,7 @@ import {
   getRedirectResult
 } from '@angular/fire/auth';
 import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { Platform } from '@ionic/angular';
 
 export interface User {
@@ -72,11 +73,8 @@ export class AuthService {
   async signInWithGoogle() {
     try {
       if (this.platform.is('capacitor')) {
-        // Usar el plugin de Firebase Authentication
-        const result = await AuthService.signInWithGoogle();
-        
-        // El plugin ya integra con Firebase, por lo que no necesitas crear las credenciales manualmente
-        // La sesión de Firebase ya estará establecida
+        // Usar el plugin de Capacitor Firebase Authentication
+        const result = await FirebaseAuthentication.signInWithGoogle();
         return result;
       } else {
         // Tu código actual para web

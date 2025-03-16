@@ -12,7 +12,7 @@
   
   // Nuevos colores para modo oscuro
   --dark-background: #1A1A2E;  // Azul muy oscuro
-  --dark-surface:#606B73;     // Azul oscuro para elementos
+  --dark-surface: #292941;     // Azul oscuro para elementos
   --dark-yellow-soft: #F2DA5E; // Amarillo suave
   --dark-text: #E9E9F0;        // Texto claro
   --dark-text-secondary: #B4B4C7; // Texto secundario
@@ -42,7 +42,8 @@ ion-content[data-theme='dark'] {
 
   // Ajustes específicos para modo oscuro
   .section-group {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    background-color: var(--dark-surface);
   }
 
   ion-select::part(placeholder),
@@ -53,9 +54,24 @@ ion-content[data-theme='dark'] {
   .custom-icon:not(.danger) {
     color: var(--dark-yellow-soft);
   }
+  
+  ion-item {
+    --background: var(--dark-surface);
+    --color: var(--dark-text);
+  }
 }
 
-// El resto del SCSS permanece igual...
+// Grupos de secciones
+.section-group {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  ion-item:not(:last-child) {
+    --border-width: 0 0 1px 0;
+  }
+}
 
 // Estilos de items
 ion-item {
@@ -77,6 +93,8 @@ ion-item {
   --padding-top: 12px;
   --padding-bottom: 12px;
   margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   ion-label {
     h2 {

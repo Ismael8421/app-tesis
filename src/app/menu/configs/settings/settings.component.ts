@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, HostBinding } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthStateService } from '../../../account/shared/data-access/auth-state.service';
 import { ThemeService, ThemeType } from './data-access/theme.service';
@@ -44,6 +44,8 @@ export class SettingsComponent implements OnInit {
   private _themeService = inject(ThemeService);
 
   currentTheme!: ThemeType;
+  isDarkMode: boolean = false;
+  
   themeOptions: { value: ThemeType; label: string }[] = [
     { value: 'system', label: 'Igual que el sistema' },
     { value: 'light', label: 'Claro' },
@@ -56,12 +58,20 @@ export class SettingsComponent implements OnInit {
       .pipe(takeUntilDestroyed())
       .subscribe(theme => {
         this.currentTheme = theme;
+        this.updateDarkModeStatus();
       });
   }
 
   ngOnInit() {
     // Inicializar el tema actual
     this.currentTheme = this._themeService.getCurrentTheme();
+    // Determinar si estamos en modo oscuro
+    this.updateDarkModeStatus();
+  }
+
+  // Actualizar el estado del modo oscuro
+  updateDarkModeStatus() {
+    this.isDarkMode = this._themeService.isDarkMode();
   }
 
   navigateTo() {

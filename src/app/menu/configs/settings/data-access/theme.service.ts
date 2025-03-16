@@ -17,6 +17,7 @@ export class ThemeService {
     if (savedTheme) {
       this.setTheme(savedTheme);
     } else {
+      // Si no hay tema guardado, usar el del sistema y aplicarlo inmediatamente
       this.setTheme('system');
     }
 
@@ -29,10 +30,13 @@ export class ThemeService {
   }
 
   private applyTheme(isDark: boolean) {
+    // Aplicar la clase 'dark' al document.body para el modo oscuro
     if (isDark) {
       document.body.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.body.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   }
 

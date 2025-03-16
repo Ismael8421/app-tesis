@@ -4,4 +4,8 @@
     <string name="title_activity_main">app-tesis</string>
     <string name="package_name">com.example.app</string>
     <string name="custom_url_scheme">com.example.app</string>
+    
+    <string name="default_notification_channel_id">chat_messages</string>
+    <string name="notification_channel_name">Mensajes de Chat</string>
+    <string name="notification_channel_description">Notificaciones para nuevos mensajes de chat</string>
 </resources>

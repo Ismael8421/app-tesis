@@ -3,6 +3,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { AuthStateService } from './account/shared/data-access/auth-state.service';
 import { ThemeService } from './menu/configs/settings/data-access/theme.service';
 import { NotificationService } from './menu/chats/data-access/notification.service';
+import { UserStatusService } from './menu/chats/data-access/userstatus.service';
 import { Auth, getRedirectResult } from '@angular/fire/auth';
 import { Platform } from '@ionic/angular';
 import { AuthService } from './account/auth/data-access/auth.service';
@@ -18,6 +19,7 @@ import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 export class AppComponent implements OnInit {
   private router = inject(Router);
   private platform = inject(Platform);
+  private userStatusService = inject(UserStatusService);
 
   constructor(
     private themeService: ThemeService,
@@ -34,6 +36,10 @@ export class AppComponent implements OnInit {
     // Añadir listener para cambios de estado de autenticación
     FirebaseAuthentication.addListener('authStateChange', (change) => {
       console.log('Auth state changed', change);
+      if (change.user) {
+        // El usuario ha iniciado sesión, inicializar servicios de notificaciones
+        this.initNotifications();
+      }
     });
   }
 
@@ -43,8 +49,40 @@ export class AppComponent implements OnInit {
     if (result?.user) {
       // El usuario ha iniciado sesión exitosamente después de una redirección
       console.log('Usuario autenticado:', result.user);
-      // Aquí puedes navegar a la página principal o hacer lo que necesites
+      // Inicializar servicios después de la autenticación
+      this.initNotifications();
+    } else if (this.auth.currentUser) {
+      // El usuario ya estaba autenticado
+      this.initNotifications();
     }
+
+    // Inicializar canales de notificación (Android)
+    await this.notificationService.setupNotificationChannels();
+    
+    // Verificar resultados de redirección de autenticación
+    await this.checkRedirectResult();
+
+    // Cuando la plataforma está lista, inicializar todo lo relacionado
+    this.platform.ready().then(() => {
+      // Esto asegura que las operaciones nativas se ejecuten una vez que la plataforma esté lista
+      this.initNotifications();
+    });
+  }
+
+  /**
+   * Inicializa todos los servicios relacionados con notificaciones
+   */
+  private initNotifications() {
+    if (!this.auth.currentUser) return;
+    
+    // Inicializar notificaciones push
+    this.notificationService.initPushNotifications();
+    
+    // Suscribirse a los chats para recibir notificaciones
+    this.notificationService.subscribeToChats();
+    
+    // Inicializar el estado del usuario
+    this.userStatusService.refreshStatus();
   }
 
   /**

@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, OnDestroy, ViewChild, inject } from '@an
 import { Observable, from, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { ChatService } from '../data-access/chat.service';
+import { UserStatusService } from '../data-access/userstatus.service';
 import { Auth } from '@angular/fire/auth';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -24,6 +25,7 @@ export class MessageComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private registerService = inject(RegisterService);
+  private userStatusService = inject(UserStatusService);
   private messagesSubscription?: Subscription;
   private markAsReadInterval: any;
 
@@ -64,6 +66,9 @@ export class MessageComponent implements OnInit, OnDestroy {
 
     const chatId = this.getChatId();
     
+    // Actualizar el estado del usuario para indicar que está activo en este chat
+    this.userStatusService.refreshStatus();
+    
     // Suscripción a los mensajes en tiempo real
     this.messagesSubscription = this.messages$.subscribe(() => {
       setTimeout(() => {
@@ -92,6 +97,9 @@ export class MessageComponent implements OnInit, OnDestroy {
     }
     // Asegurarse de marcar los mensajes como leídos al salir
     this.markMessagesAsRead();
+    
+    // Actualizar estado al salir de la conversación
+    this.userStatusService.refreshStatus();
   }
 
   private scrollToBottom(): void {

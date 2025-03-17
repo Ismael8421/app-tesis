@@ -41,6 +41,16 @@ ion-content {
       padding: 24px;
       border-radius: 16px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      
+      .general-error {
+        background-color: rgba(var(--ion-color-danger-rgb), 0.1);
+        color: var(--ion-color-danger);
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        text-align: center;
+      }
 
       div {
         margin-bottom: 16px;
@@ -107,6 +117,14 @@ ion-content {
           display: block;
           margin-top: 4px;
           color: var(--ion-color-danger);
+          
+          &.validation-error {
+            color: var(--ion-color-danger);
+          }
+          
+          &.validation-success {
+            color: var(--ion-color-success);
+          }
         }
       }
 
@@ -168,6 +186,11 @@ ion-content {
 
       form {
         background-color: #073957;
+        
+        .general-error {
+          background-color: rgba(var(--ion-color-danger-rgb), 0.2);
+          color: var(--ion-color-danger-tint);
+        }
 
         div {
           ion-label {
@@ -184,6 +207,12 @@ ion-content {
 
             .toggle-password {
               color: #D3E3E6;
+            }
+          }
+          
+          small {
+            &.validation-success {
+              color: #4CAF50;
             }
           }
         }

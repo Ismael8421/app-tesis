@@ -11,17 +11,23 @@
     </div> -->
 
     <form [formGroup]="form" (ngSubmit)="submit()">
+      <!-- Mensaje de error general -->
+      <div *ngIf="generalError" class="general-error">
+        {{ generalError }}
+      </div>
+
       <div>
         <ion-label>Correo</ion-label>
         <div class="input-with-icon">
           <ion-input 
             type="email" 
             formControlName="email"
-            [class.invalid]="isRequired('email') || hasEmailError()"
+            [class.invalid]="isRequired('email') || hasEmailError() || emailError"
           ></ion-input>
         </div>
         <small *ngIf="isRequired('email')">Este campo es requerido</small>
-        <small *ngIf="hasEmailError()">Correo invalido</small>
+        <small *ngIf="hasEmailError() && !isRequired('email')">Correo inválido</small>
+        <small *ngIf="emailError && !isRequired('email') && !hasEmailError()" class="validation-error">{{emailError}}</small>
       </div>
 
       <div>
@@ -30,13 +36,14 @@
           <ion-input 
             [type]="passwordInputType"
             formControlName="password"
-            [class.invalid]="isRequired('password')"
+            [class.invalid]="isRequired('password') || passwordError"
           ></ion-input>
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
             <app-eye-button></app-eye-button>
           </button>
         </div>
         <small *ngIf="isRequired('password')">Este campo es requerido</small>
+        <small *ngIf="passwordError && !isRequired('password')" class="validation-error">{{passwordError}}</small>
       </div>
 
       <div class="forgot-password">
@@ -45,8 +52,8 @@
         </ion-button>
       </div>
 
-      <ion-button type="submit" expand="block">
-        Iniciar
+      <ion-button type="submit" expand="block" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Iniciando...' : 'Iniciar' }}
       </ion-button>
 
       <p>

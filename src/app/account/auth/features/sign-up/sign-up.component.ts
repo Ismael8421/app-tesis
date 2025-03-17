@@ -6,7 +6,7 @@ import { AuthService } from '../../data-access/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { GoogleButtonComponent } from '../../../../UI/google-button/google-button.component';
 import { EyeButtonComponent } from '../../../../UI/eye-button/eye-button.component';
-import { IonButton, IonContent, IonInput, IonLabel } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonInput, IonLabel, ToastController } from '@ionic/angular/standalone';
 import { passwordStrengthValidator, getPasswordStrengthMessage, PasswordStrength } from '../utils/password-validator';
 
 interface FormSignUp {
@@ -26,6 +26,14 @@ export default class SignUpComponent {
   private _formBuilder = inject(FormBuilder);
   private _authServices = inject(AuthService);
   private _router = inject(Router);
+  private toastController = inject(ToastController);
+
+  // Estados de error
+  emailError = '';
+  passwordError = '';
+  confirmPasswordError = '';
+  generalError = '';
+  isSubmitting = false;
 
   // Para campos email y password usamos la función importada
   isRequired(field: 'email' | 'password') {
@@ -127,6 +135,33 @@ export default class SignUpComponent {
     confirmPassword: this._formBuilder.control('', Validators.required)
   });
 
+  constructor() {
+    // Escuchar cambios en campos para limpiar errores
+    this.form.get('email')?.valueChanges.subscribe(() => {
+      this.emailError = '';
+      this.generalError = '';
+    });
+    
+    this.form.get('password')?.valueChanges.subscribe(() => {
+      this.passwordError = '';
+      this.generalError = '';
+    });
+    
+    this.form.get('confirmPassword')?.valueChanges.subscribe(() => {
+      this.confirmPasswordError = '';
+    });
+  }
+
+  async showToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: 'bottom',
+    });
+  
+    await toast.present();
+  }
+
   // Propiedades para controlar la visibilidad de las contraseñas
   passwordVisible = false;
   confirmPasswordVisible = false;
@@ -148,6 +183,12 @@ export default class SignUpComponent {
   }
 
   async submit() {
+    // Limpiar errores
+    this.emailError = '';
+    this.passwordError = '';
+    this.confirmPasswordError = '';
+    this.generalError = '';
+    
     if (this.form.invalid) {
       // Marcar todos los controles como tocados para mostrar errores
       Object.keys(this.form.controls).forEach(key => {
@@ -158,28 +199,55 @@ export default class SignUpComponent {
     }
     
     if (!this.passwordsMatch()) {
+      this.confirmPasswordError = 'Las contraseñas no coinciden';
       return;
     }
 
     try {
+      this.isSubmitting = true;
       const { email, password } = this.form.value;
-      if (!email || !password) return;
+      if (!email || !password) {
+        this.isSubmitting = false;
+        return;
+      }
+      
       await this._authServices.signUp({ email, password });
+      this.isSubmitting = false;
+      await this.showToast('Registro exitoso');
       this._router.navigateByUrl('/register');
-    } catch (error) {
+    } catch (error: any) {
+      this.isSubmitting = false;
       console.error('Error al registrar usuario:', error);
+      
+      // Utilizar el método del servicio para obtener mensajes de error específicos
+      const errorInfo = this._authServices.getSignUpErrorMessage(error);
+      
+      if (errorInfo.type === 'email') {
+        this.emailError = errorInfo.message;
+      } else if (errorInfo.type === 'password') {
+        this.passwordError = errorInfo.message;
+      } else {
+        this.generalError = errorInfo.message;
+      }
+      
+      await this.showToast(errorInfo.message);
     }
   }
 
   async submitWithGoogle() {
     try {
+      this.isSubmitting = true;
       const result = await this._authServices.signInWithGoogle();
+      this.isSubmitting = false;
+      
       if (result) {
-        // El usuario ha iniciado sesión correctamente
+        await this.showToast('Inicio con Google exitoso');
         this._router.navigateByUrl('/menu');
       }
     } catch (error) {
+      this.isSubmitting = false;
       console.error('Error al iniciar sesión con Google:', error);
+      await this.showToast('Error al iniciar con Google');
     }
   }
 }

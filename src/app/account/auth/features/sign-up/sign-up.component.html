@@ -11,6 +11,11 @@
     </div> -->
 
     <form [formGroup]="form" (ngSubmit)="submit()">
+      <!-- Mensaje de error general -->
+      <div *ngIf="generalError" class="general-error">
+        {{ generalError }}
+      </div>
+      
       <div>
         <ion-label>Correo</ion-label>
         <div class="input-with-icon">
@@ -18,11 +23,12 @@
             type="email" 
             formControlName="email"
             placeholder="name@company.com"
-            [class.invalid]="isRequired('email') || hasEmailError()"
+            [class.invalid]="isRequired('email') || hasEmailError() || emailError"
           ></ion-input>
         </div>
         <small *ngIf="isRequired('email')">Este campo es requerido</small>
-        <small *ngIf="hasEmailError()">Correo invalido</small>
+        <small *ngIf="hasEmailError() && !isRequired('email')">Correo inválido</small>
+        <small *ngIf="emailError && !isRequired('email') && !hasEmailError()" class="validation-error">{{emailError}}</small>
       </div>
 
       <div>
@@ -32,14 +38,15 @@
             [type]="getPasswordInputType('password')"
             formControlName="password"
             placeholder="••••••••"
-            [class.invalid]="isRequired('password') || hasPasswordStrengthError()"
+            [class.invalid]="isRequired('password') || hasPasswordStrengthError() || passwordError"
           ></ion-input>
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
             <app-eye-button></app-eye-button>
           </button>
         </div>
         <small *ngIf="isRequired('password')">Este campo es requerido</small>
-        <small *ngIf="hasPasswordStrengthError()">{{getPasswordErrorMessage()}}</small>
+        <small *ngIf="hasPasswordStrengthError() && !isRequired('password')" class="validation-error">{{getPasswordErrorMessage()}}</small>
+        <small *ngIf="passwordError && !isRequired('password') && !hasPasswordStrengthError()" class="validation-error">{{passwordError}}</small>
         
         <!-- Indicadores de fortaleza de contraseña -->
         <div class="password-strength-indicators" *ngIf="form.get('password')?.value">
@@ -105,20 +112,23 @@
             [type]="getPasswordInputType('confirm')"
             formControlName="confirmPassword"
             placeholder="••••••••"
-            [class.invalid]="isConfirmPasswordRequired() || (!passwordsMatch() && form.get('confirmPassword')?.touched)"
+            [class.invalid]="isConfirmPasswordRequired() || confirmPasswordError || (!passwordsMatch() && form.get('confirmPassword')?.touched)"
           ></ion-input>
           <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
             <app-eye-button></app-eye-button>
           </button>
         </div>
         <small *ngIf="isConfirmPasswordRequired()">Este campo es requerido</small>
-        <small *ngIf="!passwordsMatch() && form.get('confirmPassword')?.touched && form.get('confirmPassword')?.value">
+        <small *ngIf="!passwordsMatch() && form.get('confirmPassword')?.touched && form.get('confirmPassword')?.value && !isConfirmPasswordRequired()" class="validation-error">
           Las contraseñas no coinciden
+        </small>
+        <small *ngIf="confirmPasswordError && !isConfirmPasswordRequired()" class="validation-error">
+          {{confirmPasswordError}}
         </small>
       </div>
 
-      <ion-button type="submit" expand="block">
-        Crear
+      <ion-button type="submit" expand="block" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Creando...' : 'Crear' }}
       </ion-button>
 
       <p>

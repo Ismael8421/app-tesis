@@ -7,7 +7,8 @@ import {
   sendEmailVerification,
   verifyBeforeUpdateEmail,
   updatePassword,
-  getRedirectResult
+  getRedirectResult,
+  fetchSignInMethodsForEmail
 } from '@angular/fire/auth';
 import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
@@ -16,6 +17,11 @@ import { Platform } from '@ionic/angular';
 export interface User {
   email: string;
   password: string;
+}
+
+export interface AuthError {
+  code: string;
+  message: string;
 }
 
 @Injectable({
@@ -36,6 +42,35 @@ export class AuthService {
     } catch (error) {
       console.log(error);
       throw error;
+    }
+  }
+
+  // Método para obtener mensajes de error durante el registro
+  getSignUpErrorMessage(error: any): { type: 'email' | 'password' | 'general'; message: string } {
+    // Error predeterminado
+    let result = { type: 'general', message: 'Error al registrar usuario' } as const;
+    
+    if (!error || !error.code) {
+      return result;
+    }
+    
+    console.log('Código de error en registro:', error.code);
+    
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        return { type: 'email', message: 'Este correo ya está registrado' };
+      
+      case 'auth/invalid-email':
+        return { type: 'email', message: 'Formato de correo inválido' };
+      
+      case 'auth/weak-password':
+        return { type: 'password', message: 'La contraseña es demasiado débil' };
+      
+      case 'auth/network-request-failed':
+        return { type: 'general', message: 'Error de conexión. Verifica tu internet' };
+      
+      default:
+        return { type: 'general', message: `Error: ${error.message || 'Desconocido'}` };
     }
   }
 
@@ -62,12 +97,56 @@ export class AuthService {
     }
   }
 
-  signIn(user: User) {
-    return signInWithEmailAndPassword(
-      this.auth,
-      user.email,
-      user.password
-    );
+  // Método para interpretar errores de autenticación
+  getAuthErrorMessage(error: any): { type: 'email' | 'password' | 'general'; message: string } {
+    // Error predeterminado
+    let result = { type: 'general', message: 'Error al iniciar sesión' } as const;
+    
+    if (!error || !error.code) {
+      return result;
+    }
+    
+    console.log('Código de error Firebase:', error.code);
+    
+    switch (error.code) {
+      case 'auth/user-not-found':
+        return { type: 'email', message: 'Este correo no está registrado' };
+      
+      case 'auth/wrong-password':
+        return { type: 'password', message: 'Contraseña incorrecta' };
+      
+      case 'auth/invalid-email':
+        return { type: 'email', message: 'Formato de correo inválido' };
+      
+      case 'auth/invalid-credential':
+        // Este error puede significar correo no existente o contraseña incorrecta
+        // Para mantener la seguridad, indicamos que las credenciales son incorrectas
+        return { type: 'general', message: 'Credenciales incorrectas' };
+      
+      case 'auth/too-many-requests':
+        return { type: 'general', message: 'Demasiados intentos. Intenta más tarde o restablece tu contraseña' };
+      
+      case 'auth/network-request-failed':
+        return { type: 'general', message: 'Error de conexión. Verifica tu internet' };
+      
+      default:
+        return { type: 'general', message: `Error: ${error.message || 'Desconocido'}` };
+    }
+  }
+
+  // Método mejorado para iniciar sesión con mejor manejo de errores
+  async signIn(user: User) {
+    try {
+      return await signInWithEmailAndPassword(
+        this.auth,
+        user.email,
+        user.password
+      );
+    } catch (error: any) {
+      const firebaseError = error as AuthError;
+      console.error('Error de autenticación:', firebaseError);
+      throw firebaseError;
+    }
   }
 
   async signInWithGoogle() {

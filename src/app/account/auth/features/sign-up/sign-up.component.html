@@ -6,9 +6,9 @@
 
     <h1>Crea una cuenta</h1>
 
-    <div class="google-button-container">
+    <!-- <div class="google-button-container">
       <app-google-button (click)="submitWithGoogle()"></app-google-button>
-    </div>
+    </div> -->
 
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div>
@@ -32,13 +32,70 @@
             [type]="getPasswordInputType('password')"
             formControlName="password"
             placeholder="••••••••"
-            [class.invalid]="isRequired('password')"
+            [class.invalid]="isRequired('password') || hasPasswordStrengthError()"
           ></ion-input>
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
             <app-eye-button></app-eye-button>
           </button>
         </div>
         <small *ngIf="isRequired('password')">Este campo es requerido</small>
+        <small *ngIf="hasPasswordStrengthError()">{{getPasswordErrorMessage()}}</small>
+        
+        <!-- Indicadores de fortaleza de contraseña -->
+        <div class="password-strength-indicators" *ngIf="form.get('password')?.value">
+          <div class="strength-indicator-container">
+            <div class="strength-label">Fortaleza de contraseña:</div>
+            
+            <!-- Barra de progreso visual -->
+            <div class="password-strength-bar">
+              <div 
+                class="strength-meter" 
+                [style.width]="calculateStrengthPercentage() + '%'"
+                [ngClass]="getStrengthClass()"
+              ></div>
+            </div>
+            
+            <div class="strength-indicators">
+              <div 
+                *ngIf="getPasswordStrength()" 
+                class="indicator" 
+                [class.valid]="getPasswordStrength()?.hasMinLength"
+              >
+                8+ caracteres
+              </div>
+              <div 
+                *ngIf="getPasswordStrength()" 
+                class="indicator" 
+                [class.valid]="getPasswordStrength()?.hasUpperCase"
+              >
+                Mayúscula
+              </div>
+              <div 
+                *ngIf="getPasswordStrength()" 
+                class="indicator" 
+                [class.valid]="getPasswordStrength()?.hasLowerCase"
+              >
+                Minúscula
+              </div>
+            </div>
+            <div class="strength-indicators" style="margin-top: 4px;">
+              <div 
+                *ngIf="getPasswordStrength()" 
+                class="indicator" 
+                [class.valid]="getPasswordStrength()?.hasNumber"
+              >
+                Número
+              </div>
+              <div 
+                *ngIf="getPasswordStrength()" 
+                class="indicator" 
+                [class.valid]="getPasswordStrength()?.hasSpecialChar"
+              >
+                Carácter especial
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div>

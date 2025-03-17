@@ -108,6 +108,70 @@ ion-content {
           margin-top: 4px;
           color: var(--ion-color-danger);
         }
+
+        /* Estilos para los indicadores de fortaleza de contraseña */
+        .password-strength-indicators {
+          margin-top: 8px;
+          
+          .strength-indicator-container {
+            .strength-label {
+              font-size: 11px;
+              color: #4C626F;
+              margin-bottom: 2px; /* Reducido desde 4px */
+            }
+            
+            /* Estilos para la barra de progreso */
+            .password-strength-bar {
+              height: 4px; /* Más delgada */
+              background-color: #E0E0E0;
+              border-radius: 2px;
+              margin-bottom: 6px; /* Menos espacio */
+              overflow: hidden;
+              
+              .strength-meter {
+                height: 100%;
+                transition: width 0.3s ease;
+                
+                &.strength-weak {
+                  background-color: #F44336; /* Rojo */
+                }
+                
+                &.strength-medium {
+                  background-color: #FFC107; /* Amarillo */
+                }
+                
+                &.strength-strong {
+                  background-color: #4CAF50; /* Verde */
+                }
+                
+                &.strength-very-strong {
+                  background-color: #2E7D32; /* Verde oscuro */
+                }
+              }
+            }
+            
+            .strength-indicators {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 2px; /* Reducido aún más */
+              margin-bottom: 2px; /* Reducir espacio entre filas */
+              
+              .indicator {
+                font-size: 10px;
+                padding: 1px 4px; /* Más compacto */
+                border-radius: 2px;
+                background-color: #E0E0E0;
+                color: #5A7F94;
+                margin: 0; /* Eliminar cualquier margen */
+                
+                &.valid {
+                  background-color: #4CAF50;
+                  color: white;
+                }
+              }
+            }
+          }
+        }
       }
 
       ion-button[type="submit"] {
@@ -166,6 +230,27 @@ ion-content {
 
             .toggle-password {
               color: #D3E3E6;
+            }
+          }
+          
+          /* Estilos para los indicadores de fortaleza en modo oscuro */
+          .password-strength-indicators {
+            .strength-indicator-container {
+              .strength-label {
+                color: #D3E3E6;
+              }
+              
+              .strength-indicators {
+                .indicator {
+                  background-color: #444444;
+                  color: #D3E3E6;
+                  
+                  &.valid {
+                    background-color: #2E7D32;
+                    color: white;
+                  }
+                }
+              }
             }
           }
         }

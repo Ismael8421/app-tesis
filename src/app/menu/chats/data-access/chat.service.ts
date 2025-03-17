@@ -352,19 +352,24 @@ export class ChatService {
   getUserChatsRealtime(userId: string): Observable<any[]> {
     return new Observable(subscriber => {
       if (!userId) {
+        console.log('No userId provided to getUserChatsRealtime');
         subscriber.next([]);
         return;
       }
-
+  
+      console.log('Starting realtime chat subscription for user:', userId);
       const userChatsRef = ref(this.db, `userChats/${userId}`);
       
       const unsubscribe = onValue(userChatsRef, async (snapshot) => {
         try {
+          console.log('UserChats snapshot received');
+          
           if (!snapshot.exists()) {
+            console.log('No chats found for user');
             subscriber.next([]);
             return;
           }
-
+  
           // Obtener todos los chats del usuario
           const userChatsData = snapshot.val();
           const chatsPromises = Object.keys(userChatsData).map(async (chatId) => {
@@ -381,12 +386,13 @@ export class ChatService {
             }
             return null;
           });
-
+  
           // Esperar a que se resuelvan todas las promesas
           const chats = (await Promise.all(chatsPromises))
             .filter(chat => chat !== null)
             .sort((a, b) => (b.lastMessageTimestamp || 0) - (a.lastMessageTimestamp || 0));
-
+  
+          console.log('Emitting updated chats:', chats.length);
           subscriber.next(chats);
         } catch (error) {
           console.error('Error getting user chats:', error);
@@ -396,9 +402,12 @@ export class ChatService {
         console.error('Error in chat subscription:', error);
         subscriber.error(error);
       });
-
+  
       // Cleanup function
-      return () => unsubscribe();
+      return () => {
+        console.log('Cleaning up chat subscription');
+        unsubscribe();
+      };
     });
   }
   

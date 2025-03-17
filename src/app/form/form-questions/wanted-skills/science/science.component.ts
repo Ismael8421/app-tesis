@@ -7,11 +7,11 @@ import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-mechatronics',
+  selector: 'app-science',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, IonText, IonList, IonItem, IonLabel, IonSelect, IonSelectOption ], 
-  templateUrl: './mechatronics.component.html',
-  styleUrls: ['./mechatronics.component.scss'],
+  imports: [ CommonModule, ReactiveFormsModule, IonText, IonList, IonItem, IonLabel, IonSelect, IonSelectOption ],
+  templateUrl: './science.component.html',
+  styleUrls: ['./science.component.scss'],
   viewProviders: [
     {
       provide: ControlContainer,
@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
     }
   ]
 })
-export class MechatronicsComponent  implements OnInit {
+export class ScienceComponent  implements OnInit {
   private _registerService = inject(RegisterService);
   private _auth = inject(Auth);
   private _router = inject(Router);

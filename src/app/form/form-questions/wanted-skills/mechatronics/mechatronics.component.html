@@ -1,3 +1,119 @@
-<p>
-  mechatronics works!
-</p>
+<div>
+  <ion-text>
+    <p>En el área de informática, califica las habilidades que buscas para informática</p>
+  </ion-text>
+
+  <ion-list *ngIf="userData?.anioLectivo === 'Segundo'" formGroupName="wanted_skills_sec_inf">
+    <ion-item>
+      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
+      <ion-select id="programming" formControlName="programing">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
+      <ion-select id="support" formControlName="support">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
+      <ion-select id="web" formControlName="web">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
+      <ion-select id="networks" formControlName="networks">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="userData?.anioLectivo === 'Tercero'" formGroupName="wanted_skills_third_inf">
+    <ion-item>
+      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
+      <ion-select id="programming1" formControlName="programming1" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Manejo de herramientas de diseño como Illutrator, Photoshop, etc</ion-label>
+      <ion-select id="desing" formControlName="desing" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Construcción y modelado de piezas en 3D</ion-label>
+      <ion-select id="cad" formControlName="cad" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
+      <ion-select id="support1" formControlName="support1" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Programación de aplicaciones móviles</ion-label>
+      <ion-select id="mobile" formControlName="mobile" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
+      <ion-select id="web1" formControlName="web1" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
+      <ion-select id="networks1" formControlName="networks1" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+</div>

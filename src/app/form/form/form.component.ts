@@ -13,10 +13,15 @@ import { EMAComponent } from '../form-questions/wanted-skills/ema/ema.component'
 import { IEMEComponent } from '../form-questions/wanted-skills/ieme/ieme.component';
 import { MCMComponent } from '../form-questions/wanted-skills/mcm/mcm.component';
 import { MechatronicsComponent } from '../form-questions/wanted-skills/mechatronics/mechatronics.component';
-import { SciencesComponent } from '../form-questions/offer-skills/sciences/sciences.component';
 import { FormStateService } from '../data-access/form-state.service';
 import { Firestore, doc, getDoc, setDoc, updateDoc } from '@angular/fire/firestore';
 import { IonButton, IonList, IonText } from '@ionic/angular/standalone';
+import { ScienceComponent } from '../form-questions/wanted-skills/science/science.component';
+import { PersIEMEComponent } from '../form-questions/offer-skills/pers-ieme/pers-ieme.component';
+import { PersMCMComponent } from '../form-questions/offer-skills/pers-mcm/pers-mcm.component';
+import { PersEMAComponent } from '../form-questions/offer-skills/pers-ema/pers-ema.component';
+import { PersMechatronicsComponent } from '../form-questions/offer-skills/pers-mechatronics/pers-mechatronics.component';
+import { SciencesComponent } from '../form-questions/offer-skills/sciences/sciences.component';
 
 @Component({
   selector: 'app-form',
@@ -26,18 +31,24 @@ import { IonButton, IonList, IonText } from '@ionic/angular/standalone';
     ReactiveFormsModule,
     PreferencesComponent,
     WantedProfessionComponent,
-    PersComputingComponent,
-    ComputingComponent,
-    EMAComponent,
     IEMEComponent,
     MCMComponent,
+    EMAComponent,
     MechatronicsComponent,
+    ComputingComponent,
+    ScienceComponent,
+    PersIEMEComponent,
+    PersMCMComponent,
+    PersEMAComponent,
+    PersMechatronicsComponent,
+    SciencesComponent,
+    PersComputingComponent,
     IonText,
     IonList,
     IonButton 
   ],
   templateUrl: './form.component.html',
-  styleUrls: ['./form.component.scss'],
+  styleUrl: './form.component.scss',
 })
 export class FormComponent {
   private _registerService = inject(RegisterService);

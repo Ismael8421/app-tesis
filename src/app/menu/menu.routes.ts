@@ -40,6 +40,6 @@ export default [
     },
     {
         path: 'form',
-        loadComponent: () => import('../form/form/form.component').then(m => m.FormComponent)
+        loadComponent: () => import('../form/form/form.component').then(m => m.FormComponent) // No FormComponent2
     }
 ] as Routes;

@@ -1,0 +1,132 @@
+:root {
+    --form-background: #121212;
+    --form-text: #ffffff;
+    --form-text-secondary: rgba(255, 255, 255, 0.7);
+    --item-background: #2a2a2a;
+    --item-hover: #323232;
+    --primary-color: #bb86fc;
+    --border-color: #3a3a3a;
+    --select-background: #1e1e1e;
+}
+
+div {
+    padding: 16px;
+    padding-bottom: 80px; // Reducido significativamente
+    background-color: var(--form-background);
+    color: var(--form-text);
+
+    // Estilos del texto introductorio
+    ion-text {
+        text-align: center;
+        margin-bottom: 32px;
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ion-color-primary);
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        p {
+            font-size: 16px;
+            color: var(--form-text-secondary);
+            line-height: 1.5;
+            margin: 0;
+            padding-left: 16px;
+            border-left: 3px solid var(--primary-color);
+        }
+    }
+
+    // Estilos de la lista
+    ion-list {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        margin-bottom: 16px;
+    }
+
+    &:last-of-type {
+        margin-bottom: 80px;
+    }
+
+    // Estilos de los items
+    ion-item {
+        --background: var(--item-background);
+        --border-color: var(--border-color);
+        --padding-start: 16px;
+        --padding-end: 16px;
+        --inner-padding-end: 16px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        --highlight-height: 0;
+
+        &:last-child {
+            margin-bottom: 16px;
+        }
+
+        &:hover {
+            --background: var(--item-hover);
+        }
+
+        // Estilos para el label
+        ion-label {
+            --color: var(--form-text);
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.9;
+
+            &[position="floating"] {
+                transform: translateY(8px);
+            }
+        }
+
+        // Estilos para el select
+        ion-select {
+            --placeholder-color: var(--form-text-secondary);
+            --placeholder-opacity: 0.7;
+            background: var(--select-background);
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+
+            &::part(placeholder),
+            &::part(text) {
+                color: var(--form-text);
+            }
+
+            &::part(icon) {
+                color: var(--primary-color);
+                opacity: 0.8;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    div {
+        padding: 12px;
+        padding-bottom: 70px;
+
+        ion-text p {
+            font-size: 14px;
+        }
+
+        ion-item {
+            --padding-start: 12px;
+            --padding-end: 12px;
+            margin-bottom: 8px;
+
+            ion-label {
+                font-size: 13px;
+            }
+
+            ion-select {
+                font-size: 13px;
+                padding: 6px;
+            }
+        }
+    }
+}

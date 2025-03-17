@@ -20,9 +20,7 @@
       <app-ema *ngIf="shouldShowComponent('ema')"></app-ema>
       <app-mechatronics *ngIf="shouldShowComponent('mechatronics')"></app-mechatronics>
       <app-computing *ngIf="shouldShowComponent('computing')"></app-computing>
-      <ion-text *ngIf="shouldShowComponent('sciences')">
-        <p>Ciencias basicas</p>
-      </ion-text>
+      <app-science *ngIf="shouldShowComponent('sciences')"></app-science>
     </div>
 
     <!-- Preguntas de sus habilidades -->
@@ -32,6 +30,11 @@
         <p>Califica tus habilidades en las materias de tu área</p>
       </ion-text>
       <app-pers-computing *ngIf="userData?.carrera === 'Informatica'"></app-pers-computing>
+      <app-pers-ieme *ngIf="userData?.carrera === 'IEME'"></app-pers-ieme>
+      <app-pers-mcm *ngIf="userData?.carrera === 'MCM'"></app-pers-mcm>
+      <app-pers-ema *ngIf="userData?.carrera === 'EMA'"></app-pers-ema>
+      <app-pers-mechatronics *ngIf="userData?.carrera === 'Mecatronica'"></app-pers-mechatronics>
+      <app-sciences *ngIf="userData?.carrera === 'Ciencias'"></app-sciences>
     </div>
 
     <!-- Botones de navegación -->

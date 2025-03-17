@@ -13,9 +13,10 @@ import {
   IonLabel, 
   IonList, 
   IonSelect, 
-  IonSelectOption 
+  IonSelectOption
 } from '@ionic/angular/standalone';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SciencesComponent } from '../../../form/form-questions/offer-skills/sciences/sciences.component';
 
 @Component({
   selector: 'app-settings',

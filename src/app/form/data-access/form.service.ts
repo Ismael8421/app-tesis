@@ -2,6 +2,68 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
 
 //habilidades buscadas
+export interface habilidad_ieme_ter {
+  electrotecnia?: string;
+  instalaciones?: string;
+  automatismosEle?: string;
+  electronica?: string;
+  potencia?: string;
+  maquinas?: string;
+  industrial?: string;
+  microcontroladores?: string;
+  electronicaAplicada?: string;
+  comunicaciones?: string;
+  redesComputadoras?: string;
+}
+
+export interface habilidad_mec_ter {
+  metrologia?: string;
+  metalurgia?: string;
+  soldaduraMcm?: string;
+  fresado?: string;
+  torno?: string;
+  neumatica?: string;
+  fabricacion?: string;
+  dibujoMcm?: string;
+  automatizacionMcm?: string;
+  maquinasMcm?: string;
+  moldes?: string;
+}
+
+export interface habilidad_ema_ter {
+  motores?: string;
+  seguridad?: string;
+  sistemasElectronicos?: string;
+  sistemasElectricos?: string;
+  dibujoEma?: string;
+  mantenimiento?: string;
+  automotriz?: string;
+}
+
+export interface habilidad_ciencias_ter {
+  redaccionCreativa?: string;
+  dibujoCiencias?: string;
+  investigacion?: string;
+  biologia?: string;
+  morfologia?: string;
+  sociologia?: string;
+  politica?: string;
+  matematica?: string;
+  fisica?: string;
+}
+
+export interface habilidad_mec_ter {
+  microcontroladores?: string;
+  servomecanismos?: string;
+  automatizacion?: string;
+  dibujoMec?: string;
+  simulacion?: string;
+  programacionMec?: string;
+  soldadura?: string;
+  manufactura?: string;
+  cnc?: string;
+}
+
 export interface habilid_inf_seg {
   programacion?: string;
   soporte?: string;
@@ -44,7 +106,12 @@ export interface formCreate {
     informatica_seg?: habilid_inf_seg
   };
   habilidad_buscada_ter?: {
-    informatica_ter?: habilid_inf_ter
+    ieme_ter?: habilidad_ieme_ter,
+    mcm_ter?: habilidad_mec_ter,
+    ema_ter?: habilidad_ema_ter,
+    mecatronica_ter?: habilidad_mec_ter,
+    informatica_ter?: habilid_inf_ter,
+    ciecias_ter?: habilidad_ciencias_ter
   };
   habilidad_ofrecida_seg?: {
     informatica_seg_of?: habilid_inf_seg_of

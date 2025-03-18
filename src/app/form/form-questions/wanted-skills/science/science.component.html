@@ -1,9 +1,9 @@
 <div>
   <ion-text>
-    <p>En el área de informática, califica las habilidades que buscas para informática</p>
+    <p>En el área de ciencias, califica las habilidades que buscas en las siguientes categorías:</p>
   </ion-text>
 
-  <ion-list *ngIf="userData?.anioLectivo === 'Segundo'" formGroupName="wanted_skills_sec_inf">
+  <ion-list *ngIf="userData?.anioLectivo === 'Segundo'" formGroupName="wanted_skills_sec_science">
     <ion-item>
       <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
       <ion-select id="programming" formControlName="programing">
@@ -45,10 +45,10 @@
     </ion-item>
   </ion-list>
 
-  <ion-list *ngIf="userData?.anioLectivo === 'Tercero'" formGroupName="wanted_skills_third_inf">
+  <ion-list *ngIf="userData?.anioLectivo === 'Tercero'" formGroupName="wanted_skills_third_science">
     <ion-item>
-      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
-      <ion-select id="programming1" formControlName="programming1" placeholder="Elige una opción">
+      <ion-label position="floating">Creación de textos interesantes y bien estructurados</ion-label>
+      <ion-select id="creativeWriting" formControlName="creativeWriting" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -57,8 +57,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Manejo de herramientas de diseño como Illutrator, Photoshop, etc</ion-label>
-      <ion-select id="desing" formControlName="desing" placeholder="Elige una opción">
+      <ion-label position="floating">Lectura e interpretación de planos técnicos</ion-label>
+      <ion-select id="drawingScience" formControlName="drawingScience" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -67,8 +67,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Construcción y modelado de piezas en 3D</ion-label>
-      <ion-select id="cad" formControlName="cad" placeholder="Elige una opción">
+      <ion-label position="floating">Realización de experimentos y proyectos científicos en laboratorio</ion-label>
+      <ion-select id="research" formControlName="research" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -77,8 +77,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
-      <ion-select id="support1" formControlName="support1" placeholder="Elige una opción">
+      <ion-label position="floating">Estudio avanzado de los seres vivos y sus procesos</ion-label>
+      <ion-select id="biology" formControlName="biology" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -87,8 +87,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Programación de aplicaciones móviles</ion-label>
-      <ion-select id="mobile" formControlName="mobile" placeholder="Elige una opción">
+      <ion-label position="floating">Análisis de la forma y estructura de organismos vivos </ion-label>
+      <ion-select id="morphology" formControlName="morphology" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -97,8 +97,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
-      <ion-select id="web1" formControlName="web1" placeholder="Elige una opción">
+      <ion-label position="floating">Comprensión de los comportamientos y dinámicas sociales</ion-label>
+      <ion-select id="sociology" formControlName="sociology" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -107,8 +107,28 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
-      <ion-select id="networks1" formControlName="networks1" placeholder="Elige una opción">
+      <ion-label position="floating">Entendimiento de sistemas políticos y toma de decisiones públicas</ion-label>
+      <ion-select id="politics" formControlName="politics" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Cálculo de intereses, inversiones y análisis financiero básico</ion-label>
+      <ion-select id="mathematics" formControlName="mathematics" placeholder="Elige una opción">
+        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Aplicación avanzada de leyes y principios físicos</ion-label>
+      <ion-select id="physics" formControlName="physics" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>

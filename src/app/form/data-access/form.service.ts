@@ -1,7 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
 
-//habilidades buscadas
+//habilidades buscadas segundos
+export interface habilid_inf_seg {
+  programacion?: string;
+  soporte?: string;
+  web?: string;
+  redes?: string;
+}
+
+//habilidades buscadas terceros
 export interface habilidad_ieme_ter {
   electrotecnia?: string;
   instalaciones?: string;
@@ -64,12 +72,6 @@ export interface habilidad_mec_ter {
   cnc?: string;
 }
 
-export interface habilid_inf_seg {
-  programacion?: string;
-  soporte?: string;
-  web?: string;
-  redes?: string;
-}
 export interface habilid_inf_ter {
   programacion?: string;
   diseno?: string;
@@ -80,13 +82,65 @@ export interface habilid_inf_ter {
   redes?: string;
 }
 
-//habilidades ofrecidas
+//habilidades ofrecidas segundos
 export interface habilid_inf_seg_of {
   programacion?: string;
   soporte?: string;
   web?: string;
   redes?: string;
 }
+
+//habilidades ofrecidas terceros
+export interface habilidad_ieme_ter_of {
+  electrotecnia?: string;
+  instalaciones?: string;
+  automatismosEle?: string;
+  electronica?: string;
+  potencia?: string;
+  maquinas?: string;
+  industrial?: string;
+  microcontroladores?: string;
+  electronicaAplicada?: string;
+  comunicaciones?: string;
+  redesComputadoras?: string;
+}
+
+export interface habilidad_mcm_ter_of {
+  metrologia?: string;
+  metalurgia?: string;
+  soldaduraMcm?: string;
+  fresado?: string;
+  torno?: string;
+  neumatica?: string;
+  fabricacion?: string;
+  dibujoMcm?: string;
+  automatizacionMcm?: string;
+  maquinasMcm?: string;
+  moldes?: string;
+}
+
+export interface habilidad_ema_ter_of {
+  motores?: string;
+  seguridad?: string;
+  sistemasElectronicos?: string;
+  sistemasElectricos?: string;
+  dibujoEma?: string;
+  mantenimiento?: string;
+  automotriz?: string;
+}
+
+export interface habilidad_mec_ter_of{
+  microcontroladores?: string;
+  servomecanismos?: string;
+  automatizacion?: string;
+  dibujoMec?: string;
+  simulacion?: string;
+  programacionMec?: string;
+  soldadura?: string;
+  manufactura?: string;
+  cnc?: string;
+}
+
 export interface habilid_inf_ter_of {
   programacion?: string;
   diseno?: string;
@@ -95,6 +149,18 @@ export interface habilid_inf_ter_of {
   movil?: string;
   web?: string;
   redes?: string;
+}
+
+export interface ciencias_ter_of {
+  redaccionCreativa?: string;
+  dibujoCiencias?: string;
+  investigacion?: string;
+  biologia?: string;
+  morfologia?: string;
+  sociologia?: string;
+  politica?: string;
+  matematica?: string;
+  fisica?: string;
 }
 
 export interface formCreate {
@@ -117,7 +183,12 @@ export interface formCreate {
     informatica_seg_of?: habilid_inf_seg_of
   };
   habilidad_ofrecida_ter?: {
-    informatica_ter_of?: habilid_inf_ter_of
+    ieme_ter_of?: habilidad_ieme_ter_of,
+    mcm_ter_of?: habilidad_mcm_ter_of,
+    ema_ter_of?: habilidad_ema_ter_of,
+    mec_ter_of?: habilidad_mec_ter_of,
+    informatica_ter_of?: habilid_inf_ter_of,
+    ciencias_ter_of?: ciencias_ter_of
   };
 }
 

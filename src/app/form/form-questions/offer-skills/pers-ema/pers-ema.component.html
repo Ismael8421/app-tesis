@@ -1,3 +1,119 @@
-<p>
-  pers-ema works!
-</p>
+<div>
+  <ion-list *ngIf="userData?.anioLectivo === 'Segundo'" formGroupName="offer_skills_sec_ema">
+    <ion-item>
+      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
+      <ion-select id="programming" formControlName="programing" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
+      <ion-select id="support" formControlName="support" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
+      <ion-select id="web" formControlName="web" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
+      <ion-select id="networks" formControlName="networks" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+ 
+  <ion-list *ngIf="userData?.anioLectivo === 'Tercero'" formGroupName="offer_skills_third_ema">
+    <ion-item>
+      <ion-label position="floating">Reparación y mantenimiento de motores de autos y camiones</ion-label>
+      <ion-select id="engines" formControlName="engines" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Instalación y arreglo de sistemas de seguridad y comodidad en vehículos</ion-label>
+      <ion-select id="safety" formControlName="safety" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Diagnóstico y reparación de componentes electrónicos del automóvil</ion-label>
+      <ion-select id="electronicSystems" formControlName="electronicSystems" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Arreglo de sistemas eléctricos en vehículos</ion-label>
+      <ion-select id="electricalSystems" formControlName="electricalSystems" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Lectura e interpretación de planos técnicos de automóviles</ion-label>
+      <ion-select id="drawingEma" formControlName="drawingEma" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <div *ngIf="userData?.mencion === 'Mantenimiento automotriz'">
+      <ion-item>
+        <ion-label position="floating">Realización de mantenimientos preventivos y correctivos en vehículos</ion-label>
+        <ion-select id="maintenance" formControlName="maintenance" placeholder="Elige una opción">
+          <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+          <ion-select-option value="Alto">Alto</ion-select-option>
+          <ion-select-option value="Medio">Medio</ion-select-option>
+          <ion-select-option value="Bajo">Bajo</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+ 
+    <div *ngIf="userData?.mencion === 'Electrotecnia automotriz'">
+      <ion-item>
+        <ion-label position="floating">Reparación de sistemas electrónicos modernos en automóviles</ion-label>
+        <ion-select id="automotive" formControlName="automotive" placeholder="Elige una opción">
+          <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+          <ion-select-option value="Alto">Alto</ion-select-option>
+          <ion-select-option value="Medio">Medio</ion-select-option>
+          <ion-select-option value="Bajo">Bajo</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+  </ion-list>
+ </div>

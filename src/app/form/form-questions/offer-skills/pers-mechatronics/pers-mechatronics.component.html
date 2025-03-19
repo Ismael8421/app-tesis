@@ -1,3 +1,135 @@
-<p>
-  pers-mechatronics works!
-</p>
+<div>
+  <ion-list *ngIf="userData?.anioLectivo === 'Segundo'" formGroupName="offer_skills_sec_mec">
+    <ion-item>
+      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
+      <ion-select id="programming" formControlName="programing" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
+      <ion-select id="support" formControlName="support" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
+      <ion-select id="web" formControlName="web" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
+      <ion-select id="networks" formControlName="networks" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+ 
+  <ion-list *ngIf="userData?.anioLectivo === 'Tercero'" formGroupName="offer_skills_third_mec">
+    <ion-item>
+      <ion-label position="floating">Programación de pequeños controladores electrónicos</ion-label>
+      <ion-select id="microcontrollers" formControlName="microcontrollers" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Manejo de sistemas de control de movimiento preciso</ion-label>
+      <ion-select id="servomechanisms" formControlName="servomechanisms" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Configuración de sistemas automáticos con aire, líquidos y controladores programables</ion-label>
+      <ion-select id="automation" formControlName="automation" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Lectura e interpretación de planos técnicos</ion-label>
+      <ion-select id="drawingMec" formControlName="drawingMec" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Creación de modelos virtuales para comprobar diseños</ion-label>
+      <ion-select id="simulation" formControlName="simulation" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+ 
+    <ion-item>
+      <ion-label position="floating">Desarrollo de programas informáticos básicos</ion-label>
+      <ion-select id="programmingMec" formControlName="programmingMec" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Unión de piezas metálicas con distintos tipos de soldadura</ion-label>
+      <ion-select id="weldingMec" formControlName="weldingMec" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Fabricación de piezas usando diferentes técnicas y materiales</ion-label>
+      <ion-select id="manufacture" formControlName="manufacture" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Manejo de máquinas controladas por computadora para fabricar piezas</ion-label>
+      <ion-select id="cnc" formControlName="cnc" placeholder="Elige una opción">
+        <ion-select-option value="" disabled>Elige una opción</ion-select-option>
+        <ion-select-option value="Alto">Alto</ion-select-option>
+        <ion-select-option value="Medio">Medio</ion-select-option>
+        <ion-select-option value="Bajo">Bajo</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+ </div>

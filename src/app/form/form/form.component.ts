@@ -45,7 +45,7 @@ import { SciencesComponent } from '../form-questions/offer-skills/sciences/scien
     PersComputingComponent,
     IonText,
     IonList,
-    IonButton 
+    IonButton
   ],
   templateUrl: './form.component.html',
   styleUrl: './form.component.scss',
@@ -93,6 +93,16 @@ export class FormComponent {
         O5: new FormControl(false),
         O6: new FormControl(false)
       }),
+      wanted_skills_sec_inf: new FormGroup({
+        programing: new FormControl(''),
+        support: new FormControl(''),
+        web: new FormControl(''),
+        networks: new FormControl('')
+      }),
+
+      //busca segundos
+
+      //busca terceros
       wanted_skills_third_ieme: new FormGroup({
         electricalEng: new FormControl(''),
         installations: new FormControl(''),
@@ -139,8 +149,6 @@ export class FormComponent {
         mathematics: new FormControl(''),
         physics: new FormControl('')
       }),
-
-      //wanted_skills_sec_mec
       wanted_skills_third_mec: new FormGroup({
         microcontrollers: new FormControl(''),
         servomechanisms: new FormControl(''),
@@ -152,12 +160,6 @@ export class FormComponent {
         manufacture: new FormControl(''),
         cnc: new FormControl('')
       }),
-      wanted_skills_sec_inf: new FormGroup({
-        programing: new FormControl(''),
-        support: new FormControl(''),
-        web: new FormControl(''),
-        networks: new FormControl('')
-      }),
       wanted_skills_third_inf: new FormGroup({
         programming1: new FormControl(''),
         desing: new FormControl(''),
@@ -167,11 +169,62 @@ export class FormComponent {
         web1: new FormControl(''),
         networks1: new FormControl('')
       }),
+
+      //ofrecido segundos
       offer_skills_sec_inf: new FormGroup({
         programing: new FormControl(''),
         support: new FormControl(''),
         web: new FormControl(''),
         networks: new FormControl('')
+      }),
+      
+
+      //ofrecido terceros
+      offer_skills_third_ieme: new FormGroup({
+        electricalEng: new FormControl(''),
+        installations: new FormControl(''),
+        automationElec: new FormControl(''),
+        electronics: new FormControl(''),
+        power: new FormControl(''),
+        machines: new FormControl(''),
+        industrial: new FormControl(''),
+        microcontrollersIeme: new FormControl(''),
+        appliedElectronics: new FormControl(''),
+        communications: new FormControl(''),
+        computersNetworks: new FormControl(''),
+      }),
+      offer_skills_third_mcm: new FormGroup({
+        metrology: new FormControl(''),
+        metallurgy: new FormControl(''),
+        weldingMcm: new FormControl(''),
+        milling: new FormControl(''),
+        lathe: new FormControl(''),
+        pneumatics: new FormControl(''),
+        manufacturingMcm: new FormControl(''),
+        drawingMcm: new FormControl(''),
+        automationMcm: new FormControl(''),
+        machinesMcm: new FormControl(''),
+        molds: new FormControl('')
+      }),
+      offer_skills_third_ema: new FormGroup({
+        engines: new FormControl(''),
+        safety: new FormControl(''),
+        electronicSystems: new FormControl(''),
+        electricalSystems: new FormControl(''),
+        drawingEma: new FormControl(''),
+        maintenance: new FormControl(''),
+        automotive: new FormControl('')
+      }),
+      offer_skills_third_mec: new FormGroup({
+        microcontrollers: new FormControl(''),
+        servomechanisms: new FormControl(''),
+        automation: new FormControl(''),
+        drawingMec: new FormControl(''),
+        simulation: new FormControl(''),
+        programmingMec: new FormControl(''),
+        weldingMec: new FormControl(''),
+        manufacture: new FormControl(''),
+        cnc: new FormControl(''),
       }),
       offer_skills_third_inf: new FormGroup({
         programming1: new FormControl(''),
@@ -181,7 +234,18 @@ export class FormComponent {
         mobile: new FormControl(''),
         web1: new FormControl(''),
         networks1: new FormControl('')
-      })
+      }),
+      offer_skills_third_sciences: new FormGroup({
+        creativeWriting: new FormControl(''),
+        drawingScience: new FormControl(''),
+        research: new FormControl(''),
+        biology: new FormControl(''),
+        morphology: new FormControl(''),
+        sociology: new FormControl(''),
+        politics: new FormControl(''),
+        mathematics: new FormControl(''),
+        physics: new FormControl('')
+      }),
     });
   }
 
@@ -211,10 +275,10 @@ export class FormComponent {
       if (!formGroup || !(formGroup instanceof FormGroup)) {
         return null;
       }
-      
+
       const selections = Object.values(formGroup.value);
       const hasSelection = selections.some(value => value === true);
-      
+
       return hasSelection ? null : { requireCheckbox: true };
     };
   }
@@ -223,16 +287,16 @@ export class FormComponent {
     if (this.form.invalid) {
       console.log('Formulario inválido, pero continuaremos para debug');
     }
-  
+
     this.loading.set(true);
-  
+
     try {
       const currentUser = this._auth.currentUser;
       if (!currentUser || !currentUser.uid) {
         console.error('No se encontró un usuario autenticado.');
         return;
       }
-  
+
       const formData: formCreate = {
         horario: this.getSelectedHorario(),
         metodo: this.form.get('method')?.value || '',
@@ -323,6 +387,52 @@ export class FormComponent {
           }
         },
         habilidad_ofrecida_ter: {
+          ieme_ter_of: {
+            electrotecnia: this.form.get('offer_skills_third_ieme')?.get('electricalEng')?.value || '',
+            instalaciones: this.form.get('offer_skills_third_ieme')?.get('installations')?.value || '',
+            automatismosEle: this.form.get('offer_skills_third_ieme')?.get('automationElec')?.value || '',
+            electronica: this.form.get('offer_skills_third_ieme')?.get('electronics')?.value || '',
+  	        potencia: this.form.get('offer_skills_third_ieme')?.get('power')?.value || '',
+ 	          maquinas: this.form.get('offer_skills_third_ieme')?.get('machines')?.value || '',
+ 	          industrial: this.form.get('offer_skills_third_ieme')?.get('industrial')?.value || '',
+ 	          microcontroladores: this.form.get('offer_skills_third_ieme')?.get('microcontrollersIeme')?.value || '',
+ 	          electronicaAplicada: this.form.get('offer_skills_third_ieme')?.get('appliedElectronics')?.value || '',
+	          comunicaciones: this.form.get('offer_skills_third_ieme')?.get('communications')?.value || '',
+	          redesComputadoras: this.form.get('offer_skills_third_ieme')?.get('computersNetworks')?.value || '',
+          },
+          mcm_ter_of: {
+            metrologia: this.form.get('offer_skills_third_mcm')?.get('metrology')?.value || '',
+            metalurgia: this.form.get('offer_skills_third_mcm')?.get('metallurgy')?.value || '',
+            soldaduraMcm: this.form.get('offer_skills_third_mcm')?.get('weldingMcm')?.value || '',
+            fresado: this.form.get('offer_skills_third_mcm')?.get('milling')?.value || '',
+            torno: this.form.get('offer_skills_third_mcm')?.get('lathe')?.value || '',
+            neumatica: this.form.get('offer_skills_third_mcm')?.get('pneumatics')?.value || '',
+            fabricacion: this.form.get('offer_skills_third_mcm')?.get('manufacturingMcm')?.value || '',
+            dibujoMcm: this.form.get('offer_skills_third_mcm')?.get('drawingMcm')?.value || '',
+            automatizacionMcm: this.form.get('offer_skills_third_mcm')?.get('automationMcm')?.value || '',
+            maquinasMcm: this.form.get('offer_skills_third_mcm')?.get('machinesMcm')?.value || '',
+            moldes: this.form.get('offer_skills_third_mcm')?.get('molds')?.value || ''
+          },
+          ema_ter_of: {
+            motores: this.form.get('offer_skills_third_ema')?.get('engines')?.value || '',
+            seguridad: this.form.get('offer_skills_third_ema')?.get('safety')?.value || '',
+            sistemasElectronicos: this.form.get('offer_skills_third_ema')?.get('electronicSystems')?.value || '',
+            sistemasElectricos: this.form.get('offer_skills_third_ema')?.get('electricalSystems')?.value || '',
+            dibujoEma: this.form.get('offer_skills_third_ema')?.get('drawingEma')?.value || '',
+            mantenimiento: this.form.get('offer_skills_third_ema')?.get('maintenance')?.value || '',
+            automotriz: this.form.get('offer_skills_third_ema')?.get('automotive')?.value || '',
+          },
+          mec_ter_of: {
+            microcontroladores: this.form.get('offer_skills_third_mec')?.get('microcontrollers')?.value || '',
+            servomecanismos: this.form.get('offer_skills_third_mec')?.get('servomechanisms')?.value || '',
+            automatizacion: this.form.get('offer_skills_third_mec')?.get('automation')?.value || '',
+            dibujoMec: this.form.get('offer_skills_third_mec')?.get('drawingMec')?.value || '',
+            simulacion: this.form.get('offer_skills_third_mec')?.get('simulation')?.value || '',
+            programacionMec: this.form.get('offer_skills_third_mec')?.get('programmingMec')?.value || '',
+            soldadura: this.form.get('offer_skills_third_mec')?.get('weldingMec')?.value || '',
+            manufactura: this.form.get('offer_skills_third_mec')?.get('manufacture')?.value || '',
+            cnc: this.form.get('offer_skills_third_mec')?.get('cnc')?.value || ''
+          },
           informatica_ter_of: {
             programacion: this.form.get('offer_skills_third_inf')?.get('programming1')?.value || '',
             diseno: this.form.get('offer_skills_third_inf')?.get('desing')?.value || '',
@@ -331,44 +441,56 @@ export class FormComponent {
             movil: this.form.get('offer_skills_third_inf')?.get('mobile')?.value || '',
             web: this.form.get('offer_skills_third_inf')?.get('web1')?.value || '',
             redes: this.form.get('offer_skills_third_inf')?.get('networks1')?.value || ''
+          },
+          ciencias_ter_of: {
+            redaccionCreativa: this.form.get('offer_skills_third_sciences')?.get('creativeWriting')?.value || '',
+            dibujoCiencias: this.form.get('offer_skills_third_sciences')?.get('drawingScience')?.value || '',
+            investigacion: this.form.get('offer_skills_third_sciences')?.get('research')?.value || '',
+            biologia: this.form.get('offer_skills_third_sciences')?.get('biology')?.value || '',
+            morfologia: this.form.get('offer_skills_third_sciences')?.get('morphology')?.value || '',
+            sociologia: this.form.get('offer_skills_third_sciences')?.get('sociology')?.value || '',
+            politica: this.form.get('offer_skills_third_sciences')?.get('politics')?.value || '',
+            matematica: this.form.get('offer_skills_third_sciences')?.get('mathematics')?.value || '',
+            fisica: this.form.get('offer_skills_third_sciences')?.get('physics')?.value || ''
           }
         }
       };
-      
+
       // Intentar crear/actualizar el documento en la colección específica primero
       const generalUserDoc = doc(this._firestore, 'usuarios', currentUser.uid);
       const userSnap = await getDoc(generalUserDoc);
-      
+
       if (!userSnap.exists()) {
         throw new Error('Usuario no encontrado');
       }
-      
+
       const { carrera } = userSnap.data();
       const collectionName = carrera.normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/\s+/g, "");
-      
+
       console.log('Guardando en colección:', collectionName);
-      
+
       // Guardar en la colección específica
       const carreraDoc = doc(this._firestore, collectionName, currentUser.uid);
       await setDoc(carreraDoc, formData, { merge: true });
-      
+
       // Actualizar el estado de completitud
       await updateDoc(generalUserDoc, {
         formCompleted: true
       });
-  
+
       console.log('Datos guardados exitosamente');
+      //console.log(formData);
       this._router.navigateByUrl('/menu/recomendados');
-  
+
     } catch (error) {
       console.error('Error en submit:', error);
     } finally {
       this.loading.set(false);
     }
   }
-  
+
   private getSelectedHorario(): string[] {
     const schedule = this.form.get('schedule')?.value;
     const horario: string[] = [];
@@ -378,7 +500,7 @@ export class FormComponent {
     if (schedule?.Q1O4) horario.push('tarde_fines');
     return horario;
   }
-  
+
   private getSelectedCarreras(): string[] {
     const professions = this.form.get('wanted_profession')?.value;
     const carreras: string[] = [];
@@ -484,34 +606,34 @@ export class FormComponent {
   }
 
   private isOfferSkillsComplete(): boolean {
-  if (this.userData?.carrera !== 'Informatica') return true;
+    if (this.userData?.carrera !== 'Informatica') return true;
 
-  if (this.userData?.anioLectivo === 'Segundo') {
-    const secInfValid = this.form.get('offer_skills_sec_inf')?.valid ?? false;
-    const allFieldsCompleted = Object.values(this.form.get('offer_skills_sec_inf')?.value ?? {})
-      .every(value => value !== null && value !== '' && value !== undefined);
-    return secInfValid && allFieldsCompleted;
-  } 
-  else if (this.userData?.anioLectivo === 'Tercero') {
-    const thirdInfGroup = this.form.get('offer_skills_third_inf');
-    if (!thirdInfGroup) return false;
+    if (this.userData?.anioLectivo === 'Segundo') {
+      const secInfValid = this.form.get('offer_skills_sec_inf')?.valid ?? false;
+      const allFieldsCompleted = Object.values(this.form.get('offer_skills_sec_inf')?.value ?? {})
+        .every(value => value !== null && value !== '' && value !== undefined);
+      return secInfValid && allFieldsCompleted;
+    }
+    else if (this.userData?.anioLectivo === 'Tercero') {
+      const thirdInfGroup = this.form.get('offer_skills_third_inf');
+      if (!thirdInfGroup) return false;
 
-    // Obtener los campos requeridos según la mención
-    const requiredFields = this.userData?.mencion === 'Programacion movil' 
-      ? ['programming1', 'desing', 'cad', 'support1', 'mobile']
-      : ['programming1', 'desing', 'cad', 'web1', 'networks1'];
+      // Obtener los campos requeridos según la mención
+      const requiredFields = this.userData?.mencion === 'Programacion movil'
+        ? ['programming1', 'desing', 'cad', 'support1', 'mobile']
+        : ['programming1', 'desing', 'cad', 'web1', 'networks1'];
 
-    // Verificar que todos los campos requeridos tengan un valor
-    const allRequiredFieldsCompleted = requiredFields.every(field => {
-      const value = thirdInfGroup.get(field)?.value;
-      return value !== null && value !== '' && value !== undefined;
-    });
+      // Verificar que todos los campos requeridos tengan un valor
+      const allRequiredFieldsCompleted = requiredFields.every(field => {
+        const value = thirdInfGroup.get(field)?.value;
+        return value !== null && value !== '' && value !== undefined;
+      });
 
-    return allRequiredFieldsCompleted;
+      return allRequiredFieldsCompleted;
+    }
+
+    return false;
   }
-
-  return false;
-}
 
   get isLastPage(): boolean {
     return this.page === 4;

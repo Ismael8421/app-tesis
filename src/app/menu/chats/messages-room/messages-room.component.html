@@ -3,19 +3,28 @@
     <div class="chat-title">Chats</div>
 
     <div class="search-container">
-      <form>
-        <div class="search-input">
-          <input type="text" placeholder="Buscar" required class="ion-color-light" />
-          <button type="submit" class="ion-color-light">
+      <form (submit)="$event.preventDefault()">
+        <div class="search-input" [class.active]="searchTerm">
+          <input type="text" 
+                 placeholder="Buscar" 
+                 [(ngModel)]="searchTerm" 
+                 name="searchTerm"
+                 (input)="onSearchInput()" 
+                 class="ion-color-light" />
+          <button type="button" class="ion-color-light">
             <app-recomendatio-icon class="icon" />
           </button>
         </div>
       </form>
     </div>
 
+    <div *ngIf="isSearching && filteredChats.length > 0" class="search-results">
+      Mostrando {{filteredChats.length}} resultado(s) para "{{searchTerm}}"
+    </div>
+
     <ion-list lines="full" class="ion-no-padding">
       <ng-container *ngIf="currentUser">
-        <ion-item *ngFor="let chat of chats" button detail
+        <ion-item *ngFor="let chat of filteredChats" button detail
         class="chat-item"
         [class.unread]="chat.unreadMessages?.[currentUser.uid]"
         (click)="navigateTo(chat.id)">
@@ -36,8 +45,12 @@
         </ion-item>
       </ng-container>
       
-      <div *ngIf="chats.length === 0" class="no-chats">
+      <div *ngIf="filteredChats.length === 0 && !isSearching" class="no-chats">
         <p>No hay conversaciones activas</p>
+      </div>
+      
+      <div *ngIf="filteredChats.length === 0 && isSearching" class="no-chats">
+        <p>No se encontraron resultados para "{{searchTerm}}"</p>
       </div>
     </ion-list>
   </div>

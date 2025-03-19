@@ -1,1 +1,76 @@
-<p>report works!</p>
+<ion-content class="ion-padding">
+    <ion-button (click)="navigateBack()">
+      <app-back-icon />
+    </ion-button>
+  
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <h3>Reportar un error</h3>
+        </ion-card-title>
+      </ion-card-header>
+  
+      <ion-card-content>
+        <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+          <!-- Descripción del error (obligatorio) -->
+          <ion-item>
+            <ion-label position="floating">Descripción del error <ion-text color="danger">*</ion-text></ion-label>
+            <ion-textarea formControlName="description" rows="4" placeholder="Detalla lo más posible el error que encontraste"></ion-textarea>
+          </ion-item>
+  
+          <div class="validation-error" *ngIf="reportForm.get('description')?.invalid && reportForm.get('description')?.touched">
+            <ion-text color="danger" *ngIf="reportForm.get('description')?.errors?.['required']">
+              La descripción es obligatoria
+            </ion-text>
+            <ion-text color="danger" *ngIf="reportForm.get('description')?.errors?.['minlength']">
+              La descripción debe tener al menos 10 caracteres
+            </ion-text>
+          </div>
+  
+          <!-- Subir imagen (opcional) -->
+          <ion-item>
+            <ion-label position="floating">Captura de pantalla (opcional)</ion-label>
+            <div class="image-capture-area">
+              <!-- Vista previa de la imagen -->
+              <div *ngIf="imagePreview" class="preview-container">
+                <img [src]="imagePreview" alt="Vista previa" class="image-preview">
+                <ion-button fill="clear" (click)="removeImage()" color="danger" class="remove-btn">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+              </div>
+              
+              <!-- Cuando no hay imagen -->
+              <div *ngIf="!imagePreview" class="no-image">
+                <p>Ninguna imagen seleccionada</p>
+              </div>
+              
+              <!-- Botón para seleccionar imagen -->
+              <ion-button 
+                (click)="captureImage()" 
+                class="take-picture-button"
+                [disabled]="loading"
+                expand="block"
+                fill="outline">
+                <ion-icon name="image-outline" slot="start"></ion-icon>
+                <span *ngIf="!loading">Seleccionar imagen</span>
+                <span *ngIf="loading">Cargando...</span>
+              </ion-button>
+            </div>
+          </ion-item>
+  
+          <!-- Mensaje de error -->
+          <div *ngIf="errorMessage" class="error-message">
+            <ion-text color="danger">{{ errorMessage }}</ion-text>
+          </div>
+  
+          <!-- Botón enviar -->
+          <div class="ion-text-center ion-margin-top">
+            <ion-button expand="block" type="submit" [disabled]="reportForm.invalid || isSubmitting">
+              <ion-spinner *ngIf="isSubmitting"></ion-spinner>
+              <span *ngIf="!isSubmitting">Enviar reporte</span>
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </ion-content>

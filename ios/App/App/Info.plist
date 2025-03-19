@@ -63,5 +63,12 @@
 			</array>
 		</dict>
 	</array>
+	<!-- Permisos para cámara y galería -->
+	<key>NSCameraUsageDescription</key>
+	<string>Necesitamos acceso a tu cámara para que puedas tomar fotos al reportar errores.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Necesitamos acceso a tu galería para que puedas seleccionar imágenes al reportar errores.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Necesitamos permiso para guardar imágenes en tu galería.</string>
 </dict>
 </plist>

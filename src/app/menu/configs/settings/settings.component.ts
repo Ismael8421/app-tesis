@@ -83,6 +83,10 @@ export class SettingsComponent implements OnInit {
     this._router.navigateByUrl('/menu/chagePwsEmail');
   }
 
+  navigateToReport() {
+    this._router.navigateByUrl('/menu/report');
+  }
+
   async logOut() {
     await this._authState.logOut();
     this._router.navigateByUrl('/auth/sign-in');

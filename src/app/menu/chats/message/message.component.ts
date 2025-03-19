@@ -48,7 +48,7 @@ export class MessageComponent implements OnInit, OnDestroy {
 
         try {
           const userData = await this.registerService.getUserData(otherUserId);
-          const otherUserName = userData ? `${userData.nombre} ${userData.apellido}` : 'Usuario';
+          const otherUserName = userData ? userData.nombreUsuario || 'Usuario' : 'Usuario';
           return { chat, otherUserName };
         } catch (error) {
           console.error('Error getting user data:', error);

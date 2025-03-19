@@ -9,6 +9,7 @@ import { getDatabase, provideDatabase } from '@angular/fire/database';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getStorage, provideStorage } from '@angular/fire/storage';
+import { provideHttpClient } from '@angular/common/http';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWICQxQQutJ-7t3hjIZP9QRuhtszoNkM8",
@@ -30,6 +31,7 @@ export const appConfig: ApplicationConfig = {
     provideDatabase(() => getDatabase()), 
     provideIonicAngular({}),
     provideMessaging(() => getMessaging()), 
-    provideStorage(() => getStorage())
+    provideStorage(() => getStorage()),
+    provideHttpClient()
   ]
 };

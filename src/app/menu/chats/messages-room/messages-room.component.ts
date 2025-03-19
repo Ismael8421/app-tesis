@@ -1,19 +1,21 @@
 import { Component, OnInit, OnDestroy, inject, NgZone, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import { ChatService } from '../data-access/chat.service';
 import { Auth } from '@angular/fire/auth';
-import { Observable, Subscription, interval } from 'rxjs';
+import { Observable, Subscription, interval, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RecomendatioIconComponent } from '../../../UI/recomendatio-icon/recomendatio-icon.component';
 import { IonAvatar, IonContent, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { RegisterService } from '../../../register/data-access/register.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-messages-room',
   templateUrl: './messages-room.component.html',
   styleUrls: ['./messages-room.component.scss'],
   standalone: true,
-  imports: [CommonModule, RecomendatioIconComponent, IonContent, IonList, IonItem, IonAvatar, IonLabel]
+  imports: [CommonModule, FormsModule, RecomendatioIconComponent, IonContent, IonList, IonItem, IonAvatar, IonLabel]
 })
 export class MessagesRoomComponent implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
@@ -27,17 +29,27 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   private chatsSubscription?: Subscription;
   private authStateSubscription?: Subscription;
   private refreshSubscription?: Subscription;
+  private searchSubscription?: Subscription;
   
   // Intervalo de refresco en milisegundos (15 segundos)
   private REFRESH_INTERVAL = 15000;
 
   // Lista directa de chats
   chats: any[] = [];
+  filteredChats: any[] = [];
   
   currentUser: any = null;
   userNames: { [key: string]: string } = {};
+  
+  // Variables para búsqueda
+  searchTerm: string = '';
+  isSearching: boolean = false;
+  private searchSubject = new Subject<string>();
 
   ngOnInit() {
+    // Configurar el debounce para la búsqueda
+    this.setupSearchDebounce();
+    
     // Suscribirse a los cambios de autenticación
     this.authStateSubscription = new Observable<any>(observer => {
       return this.auth.onAuthStateChanged(
@@ -53,6 +65,54 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
       
       // Configurar refresco periódico
       this.setupPeriodicRefresh();
+    });
+  }
+
+  // Configura el debounce para la búsqueda
+  private setupSearchDebounce() {
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(300), // Esperar 300ms después de la última entrada
+      distinctUntilChanged() // Solo realizar la búsqueda si el término ha cambiado
+    ).subscribe(term => {
+      this.performSearch(term);
+    });
+  }
+  
+  // Método llamado cuando el usuario escribe en el campo de búsqueda
+  onSearchInput() {
+    this.searchSubject.next(this.searchTerm);
+  }
+
+  // Realizar la búsqueda
+  private performSearch(term: string) {
+    this.zone.run(() => {
+      this.isSearching = term.length > 0;
+      
+      if (!term.trim()) {
+        // Si no hay término de búsqueda, mostrar todos los chats
+        this.filteredChats = [...this.chats];
+      } else {
+        const lowerTerm = term.toLowerCase();
+        
+        // Filtrar los chats según el nombre del usuario
+        this.filteredChats = this.chats.filter(chat => {
+          // Encontrar el ID del otro participante
+          const otherUserId = chat.participants.find((id: string) => id !== this.currentUser.uid);
+          
+          if (!otherUserId) return false;
+          
+          // Obtener el nombre del otro usuario
+          const userName = this.userNames[otherUserId];
+          
+          // Si aún no tenemos el nombre, siempre incluirlo en los resultados
+          if (!userName) return true;
+          
+          // Verificar si el nombre contiene el término de búsqueda
+          return userName.toLowerCase().includes(lowerTerm);
+        });
+      }
+      
+      this.cdr.detectChanges();
     });
   }
 
@@ -80,6 +140,7 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     // Si no hay usuario, no hacemos nada
     if (!this.currentUser) {
       this.chats = [];
+      this.filteredChats = [];
       return;
     }
     
@@ -106,6 +167,14 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
             // Actualizar directamente la propiedad chats
             this.zone.run(() => {
               this.chats = chats;
+              
+              // Inicializar los chats filtrados si es la primera carga
+              if (this.filteredChats.length === 0 && !this.searchTerm) {
+                this.filteredChats = [...this.chats];
+              } else {
+                // Si ya hay una búsqueda activa, actualizar los resultados
+                this.performSearch(this.searchTerm);
+              }
               
               // Forzar la detección de cambios
               this.cdr.detectChanges();
@@ -159,7 +228,7 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
         try {
           const userData = await this.registerService.getUserData(participantId);
           if (userData) {
-            newUserNames[participantId] = `${userData.nombre} ${userData.apellido}`;
+            newUserNames[participantId] = userData.nombreUsuario || 'Usuario';
             namesUpdated = true;
           }
         } catch (error) {
@@ -171,6 +240,12 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     if (namesUpdated) {
       this.zone.run(() => {
         this.userNames = { ...this.userNames, ...newUserNames };
+        
+        // Volver a ejecutar la búsqueda si hay una activa
+        if (this.searchTerm) {
+          this.performSearch(this.searchTerm);
+        }
+        
         this.cdr.detectChanges();
       });
     }
@@ -186,6 +261,9 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     }
     if (this.refreshSubscription) {
       this.refreshSubscription.unsubscribe();
+    }
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
     }
   }
 

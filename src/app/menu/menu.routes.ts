@@ -39,6 +39,10 @@ export default [
         loadComponent: () => import('./configs/change-pws-email/change-pws-email.component').then(m => m.default)
     },
     {
+        path: 'report',
+        loadComponent: () => import('./configs/report/report.component').then(m => m.ReportComponent)
+    },
+    {
         path: 'form',
         loadComponent: () => import('../form/form/form.component').then(m => m.FormComponent) // No FormComponent2
     }

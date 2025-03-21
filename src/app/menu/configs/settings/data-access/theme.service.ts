@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 export type ThemeType = 'system' | 'dark' | 'light';
@@ -10,8 +10,12 @@ export class ThemeService {
   private theme = new BehaviorSubject<ThemeType>('system');
   theme$ = this.theme.asObservable();
   private mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  private renderer: Renderer2;
 
-  constructor() {
+  constructor(rendererFactory: RendererFactory2) {
+    // Inicializar el renderer (necesario para manipulación DOM segura)
+    this.renderer = rendererFactory.createRenderer(null, null);
+    
     // Verificar tema guardado al iniciar
     const savedTheme = localStorage.getItem('theme') as ThemeType;
     if (savedTheme) {
@@ -30,13 +34,41 @@ export class ThemeService {
   }
 
   private applyTheme(isDark: boolean) {
-    // Aplicar la clase 'dark' al document.body para el modo oscuro
+    // 1. Eliminar todas las clases de tema
+    document.body.classList.remove('dark-theme', 'light-theme');
+    
+    // 2. Aplicar la clase correspondiente
     if (isDark) {
-      document.body.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
+      // Modo oscuro
+      this.renderer.addClass(document.body, 'dark-theme');
+      this.renderer.setAttribute(document.documentElement, 'data-theme', 'dark');
+      
+      // Eliminar atributos que puedan causar conflicto
+      document.body.removeAttribute('class-light');
+      document.body.setAttribute('class-dark', 'true');
     } else {
-      document.body.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
+      // Modo claro - aplicamos explícitamente light-theme
+      this.renderer.addClass(document.body, 'light-theme');
+      this.renderer.setAttribute(document.documentElement, 'data-theme', 'light');
+      
+      // Eliminar atributos que puedan causar conflicto
+      document.body.removeAttribute('class-dark');
+      document.body.setAttribute('class-light', 'true');
+    }
+    
+    // 3. Forzar repintado (puede ayudar en ciertos casos)
+    document.body.style.transition = 'background-color 0.3s ease';
+    
+    // 4. Aplicar clase ionic específica (puede ser necesario para ciertos componentes)
+    const ionApp = document.querySelector('ion-app');
+    if (ionApp) {
+      if (isDark) {
+        this.renderer.addClass(ionApp, 'dark-theme');
+        this.renderer.removeClass(ionApp, 'light-theme');
+      } else {
+        this.renderer.addClass(ionApp, 'light-theme');
+        this.renderer.removeClass(ionApp, 'dark-theme');
+      }
     }
   }
 

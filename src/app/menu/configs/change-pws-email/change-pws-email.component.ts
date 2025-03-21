@@ -12,7 +12,19 @@ import {
 } from '@angular/fire/auth';
 import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 import { Router } from '@angular/router';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonContent, IonInput, IonItem, IonLabel, IonSpinner, IonText } from '@ionic/angular/standalone';
+import { 
+  IonButton, 
+  IonCard, 
+  IonCardContent, 
+  IonCardHeader, 
+  IonCardTitle, 
+  IonContent, 
+  IonInput, 
+  IonItem, 
+  IonLabel, 
+  IonSpinner, 
+  IonText 
+} from '@ionic/angular/standalone';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ThemeService } from '../settings/data-access/theme.service';
 
@@ -48,22 +60,33 @@ export default class ChangePwsEmailComponent implements OnInit {
   isEmailProvider = false;
   emailLoading = false;
   passwordLoading = false;
+  isDarkMode = false;
 
   constructor() {
+    // Suscribirse a los cambios del tema
     this._themeService.theme$
       .pipe(takeUntilDestroyed())
-      .subscribe(theme => {
-        // El ThemeService ya maneja la aplicación de la clase .dark al body
+      .subscribe(() => {
+        this.updateDarkModeStatus();
       });
   }
 
   ngOnInit() {
+    // Inicializar el estado del tema
+    this.updateDarkModeStatus();
+    
+    // Verificar el tipo de proveedor de autenticación
     const user = this.authService.currentUser;
     if (user) {
       this.isEmailProvider = user.providerData.some(
         provider => provider.providerId === 'password'
       );
     }
+  }
+
+  // Actualizar el estado del modo oscuro
+  updateDarkModeStatus() {
+    this.isDarkMode = this._themeService.isDarkMode();
   }
 
   emailForm = this.fb.group({
@@ -80,10 +103,12 @@ export default class ChangePwsEmailComponent implements OnInit {
     this._router.navigateByUrl('/menu/configuraciones');
   }
 
-  async showAlert(message: string) {
+  async showAlert(message: string, header?: string) {
     const alert = await this.alertController.create({
+      header: header || 'Información',
       message,
-      buttons: ['OK']
+      buttons: ['OK'],
+      cssClass: this.isDarkMode ? 'dark-alert' : 'light-alert'
     });
     await alert.present();
   }
@@ -102,30 +127,31 @@ export default class ChangePwsEmailComponent implements OnInit {
 
       await this.authService.reauthenticateUser(currentPassword);
       await this.authService.initiateEmailUpdate(newEmail);
-      await this.showAlert('Se ha enviado un correo de verificación a la nueva dirección. Por favor, verifica tu nuevo correo para completar el cambio.');
+      await this.showAlert('Se ha enviado un correo de verificación a la nueva dirección. Por favor, verifica tu nuevo correo para completar el cambio.', 'Verificación enviada');
       this.emailForm.reset();
     } catch (error: any) {
       console.error('Error al cambiar email:', error);
       let errorMessage = 'Error al cambiar el correo';
+      let headerMessage = 'Error';
 
       switch (error.code) {
         case 'auth/requires-recent-login':
-          await this.showAlert('Por favor, vuelve a iniciar sesión e intenta nuevamente');
+          await this.showAlert('Por favor, vuelve a iniciar sesión e intenta nuevamente', 'Autenticación requerida');
           break;
         case 'auth/invalid-credential':
-          await this.showAlert('La contraseña actual es incorrecta');
+          await this.showAlert('La contraseña actual es incorrecta', 'Error de autenticación');
           break;
         case 'auth/email-already-in-use':
-          await this.showAlert('Este correo electrónico ya está en uso');
+          await this.showAlert('Este correo electrónico ya está en uso', 'Correo existente');
           break;
         case 'auth/invalid-email':
-          await this.showAlert('El correo electrónico no es válido');
+          await this.showAlert('El correo electrónico no es válido', 'Error de formato');
           break;
         case 'auth/operation-not-allowed':
-          await this.showAlert('Esta operación no está permitida en este momento');
+          await this.showAlert('Esta operación no está permitida en este momento', 'Operación no permitida');
           break;
         default:
-          await this.showAlert(errorMessage);
+          await this.showAlert(errorMessage, headerMessage);
       }
     } finally {
       this.emailLoading = false;
@@ -142,15 +168,40 @@ export default class ChangePwsEmailComponent implements OnInit {
       const user = this.authService.currentUser;
 
       if (currentPassword && newPassword && user?.email && user) {
+        // Validar que la contraseña nueva sea diferente de la actual
+        if (currentPassword === newPassword) {
+          await this.showAlert('La nueva contraseña no puede ser igual a la actual', 'Contraseña inválida');
+          this.passwordLoading = false;
+          return;
+        }
+        
         const credential = EmailAuthProvider.credential(user.email, currentPassword);
         await reauthenticateWithCredential(user, credential);
         await updatePassword(user, newPassword);
-        await this.showAlert('Contraseña actualizada exitosamente');
+        await this.showAlert('Contraseña actualizada exitosamente', 'Éxito');
         this.passwordForm.reset();
       }
     } catch (error: any) {
       console.error('Error al cambiar contraseña:', error);
-      await this.showAlert('Error al cambiar la contraseña');
+      let headerMessage = 'Error';
+      let errorMessage = 'Error al cambiar la contraseña';
+      
+      switch (error.code) {
+        case 'auth/requires-recent-login':
+          errorMessage = 'Por favor, vuelve a iniciar sesión e intenta nuevamente';
+          headerMessage = 'Autenticación requerida';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'La contraseña actual es incorrecta';
+          headerMessage = 'Error de autenticación';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'La nueva contraseña es demasiado débil. Usa al menos 6 caracteres.';
+          headerMessage = 'Contraseña débil';
+          break;
+      }
+      
+      await this.showAlert(errorMessage, headerMessage);
     } finally {
       this.passwordLoading = false;
     }
@@ -161,11 +212,11 @@ export default class ChangePwsEmailComponent implements OnInit {
       const user = this.authService.currentUser;
       if (user?.email) {
         await this.authService.resetPassword(user.email);
-        await this.showAlert('Se ha enviado un correo para restablecer tu contraseña');
+        await this.showAlert('Se ha enviado un correo para restablecer tu contraseña', 'Correo enviado');
       }
     } catch (error: any) {
       console.error('Error al enviar correo de recuperación:', error);
-      await this.showAlert('Error al enviar el correo de recuperación');
+      await this.showAlert('Error al enviar el correo de recuperación', 'Error');
     }
   }
 }

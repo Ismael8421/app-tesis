@@ -1,64 +1,14 @@
-// Variables principales
-:host {
-  // Colores base
-  --color-yellow-light: #F2DA5E;
-  --color-yellow-dark: #F3DD6C;
-  --color-blue-darkest: #032B44;
-  --color-blue-dark: #4C626F;
-  --color-blue-medium: #73889B;
-  --color-blue-light: #84A3B5;
-  --color-blue-accent: #5A7F94;
-  --color-gray-light: #D3E3E6;
-  
-  // Nuevos colores para modo oscuro
-  --dark-background: #1A1A2E;  // Azul muy oscuro
-  --dark-surface: #292941;     // Azul oscuro para elementos
-  --dark-yellow-soft: #F2DA5E; // Amarillo suave
-  --dark-text: #E9E9F0;        // Texto claro
-  --dark-text-secondary: #B4B4C7; // Texto secundario
-}
+// Eliminar variables específicas del componente que puedan causar conflictos
+// Usamos solo las variables globales de Ionic
 
-// Estilos base para tema claro (default)
 ion-content {
-  --page-background: var(--color-gray-light);
-  --item-background: #ffffff;
-  --text-primary: var(--color-blue-darkest);
-  --text-secondary: var(--color-blue-medium);
-  --border-color: rgba(3, 43, 68, 0.1);
-  --icon-color: var(--color-blue-accent);
-  --ion-color-danger: #ff3b30;
-  --background: var(--page-background);
+  // Asegurar que el fondo use la variable global
+  --background: var(--ion-background-color) !important;
 }
 
-// Estilos para tema oscuro
-ion-content[data-theme='dark'] {
-  --page-background: var(--dark-background);
-  --item-background: var(--dark-surface);
-  --text-primary: var(--dark-text);
-  --text-secondary: var(--dark-text-secondary);
-  --border-color: rgba(242, 218, 94, 0.1); // Borde con tono amarillo suave
-  --icon-color: var(--dark-yellow-soft);
-  --background: var(--page-background);
-
-  // Ajustes específicos para modo oscuro
-  .section-group {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    background-color: var(--dark-surface);
-  }
-
-  ion-select::part(placeholder),
-  ion-select::part(text) {
-    color: var(--dark-yellow-soft);
-  }
-
-  .custom-icon:not(.danger) {
-    color: var(--dark-yellow-soft);
-  }
-  
-  ion-item {
-    --background: var(--dark-surface);
-    --color: var(--dark-text);
-  }
+ion-list {
+  // Fondo transparente para que herede del contenedor
+  background: transparent !important;
 }
 
 // Grupos de secciones
@@ -66,18 +16,20 @@ ion-content[data-theme='dark'] {
   margin-bottom: 16px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--ion-item-background) !important;
+  box-shadow: var(--ion-box-shadow);
   
   ion-item:not(:last-child) {
     --border-width: 0 0 1px 0;
+    --border-color: var(--ion-border-color);
   }
 }
 
-// Estilos de items
+// Estilos de items - usamos !important para asegurar que nuestras variables dominen
 ion-item {
-  --background: var(--item-background);
-  --color: var(--text-primary);
-  --border-color: var(--border-color);
+  --background: var(--ion-item-background) !important;
+  --color: var(--ion-text-color) !important;
+  --border-color: var(--ion-border-color);
   --padding-start: 16px;
   --padding-end: 16px;
   --min-height: 50px;
@@ -85,6 +37,19 @@ ion-item {
 
   &::part(native) {
     padding-right: 16px;
+    background: var(--ion-item-background) !important;
+  }
+  
+  ion-label {
+    color: var(--ion-text-color) !important;
+    
+    h2 {
+      color: var(--ion-text-color) !important;
+    }
+    
+    p {
+      color: var(--ion-color-medium) !important;
+    }
   }
 }
 
@@ -94,18 +59,19 @@ ion-item {
   --padding-bottom: 12px;
   margin-bottom: 24px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--ion-box-shadow);
+  background-color: var(--ion-item-background) !important;
 
   ion-label {
     h2 {
       font-size: 20px;
       margin-bottom: 4px;
       font-weight: 500;
-      color: var(--text-primary);
+      color: var(--ion-text-color) !important;
     }
     p {
       font-size: 15px;
-      color: var(--text-secondary);
+      color: var(--ion-color-medium) !important;
     }
   }
 }
@@ -121,23 +87,28 @@ ion-avatar {
 .custom-icon {
   font-size: 22px;
   margin-right: 12px;
-  color: var(--icon-color);
+  color: var(--ion-color-primary) !important;
 
   &.danger {
-    color: var(--ion-color-danger);
+    color: var(--ion-color-danger) !important;
   }
 }
 
 // Iconos de navegación
 ion-icon[slot="end"] {
-  color: var(--text-secondary);
+  color: var(--ion-color-medium) !important;
   font-size: 20px;
 }
 
 // Select
 ion-select {
-  --placeholder-color: var(--text-secondary);
+  --placeholder-color: var(--ion-color-medium);
   max-width: 120px;
+  
+  &::part(placeholder),
+  &::part(text) {
+    color: var(--ion-color-primary) !important;
+  }
 }
 
 // Item de cierre de sesión
@@ -162,5 +133,25 @@ ion-select {
   ion-content {
     --padding-top: max(16px, env(safe-area-inset-top));
     --padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+// Forzar colores específicos para el modo claro también
+:host-context(.light-theme) {
+  ion-content {
+    --background: var(--ion-background-color) !important;
+  }
+  
+  ion-item {
+    --background: var(--ion-item-background) !important;
+    --color: var(--ion-text-color) !important;
+  }
+  
+  .section-group {
+    background-color: var(--ion-item-background) !important;
+  }
+  
+  .profile-item {
+    background-color: var(--ion-item-background) !important;
   }
 }

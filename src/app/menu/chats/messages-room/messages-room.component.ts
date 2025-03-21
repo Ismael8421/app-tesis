@@ -9,6 +9,8 @@ import { RecomendatioIconComponent } from '../../../UI/recomendatio-icon/recomen
 import { IonAvatar, IonContent, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { RegisterService } from '../../../register/data-access/register.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ThemeService } from '../../configs/settings/data-access/theme.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-messages-room',
@@ -25,6 +27,7 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   private zone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
   private appRef = inject(ApplicationRef);
+  private _themeService = inject(ThemeService);
   
   private chatsSubscription?: Subscription;
   private authStateSubscription?: Subscription;
@@ -45,8 +48,23 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   isSearching: boolean = false;
   private searchSubject = new Subject<string>();
+  
+  // Variable para modo oscuro
+  isDarkMode: boolean = false;
+
+  constructor() {
+    // Suscribirse a cambios de tema
+    this._themeService.theme$
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this.updateDarkModeStatus();
+      });
+  }
 
   ngOnInit() {
+    // Inicializar el estado del tema
+    this.updateDarkModeStatus();
+    
     // Configurar el debounce para la búsqueda
     this.setupSearchDebounce();
     
@@ -66,6 +84,11 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
       // Configurar refresco periódico
       this.setupPeriodicRefresh();
     });
+  }
+
+  // Actualizar el estado del modo oscuro
+  updateDarkModeStatus() {
+    this.isDarkMode = this._themeService.isDarkMode();
   }
 
   // Configura el debounce para la búsqueda

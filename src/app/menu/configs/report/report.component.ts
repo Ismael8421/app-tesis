@@ -8,8 +8,17 @@ import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 import { TelegramService } from './telegram.service';
 import { HttpClientModule } from '@angular/common/http';
 import { 
-  IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-  IonButton, IonItem, IonLabel, IonTextarea, IonText, IonSpinner,
+  IonContent, 
+  IonCard, 
+  IonCardHeader, 
+  IonCardTitle, 
+  IonCardContent,
+  IonButton, 
+  IonItem, 
+  IonLabel, 
+  IonTextarea, 
+  IonText, 
+  IonSpinner,
   IonIcon
 } from '@ionic/angular/standalone';
 import { ThemeService } from '../settings/data-access/theme.service';
@@ -18,9 +27,10 @@ import { addIcons } from 'ionicons';
 import { 
   imageOutline, 
   trashOutline,
-  cameraOutline
+  cameraOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
-import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 
 @Component({
@@ -53,7 +63,7 @@ export class ReportComponent implements OnInit {
   private alertController = inject(AlertController);
   private auth = inject(Auth);
   private telegramService = inject(TelegramService);
-  private themeService = inject(ThemeService);
+  private _themeService = inject(ThemeService);
   
   reportForm!: FormGroup;
   isSubmitting = false;
@@ -61,25 +71,36 @@ export class ReportComponent implements OnInit {
   imagePreview: string | null = null;
   loading = false;
   errorMessage = '';
+  isDarkMode = false;
 
   constructor() {
+    // Registrar iconos
     addIcons({
       'image-outline': imageOutline,
       'trash-outline': trashOutline,
-      'camera-outline': cameraOutline
+      'camera-outline': cameraOutline,
+      'alert-circle-outline': alertCircleOutline
     });
 
     // Suscribirse a cambios de tema
-    this.themeService.theme$
+    this._themeService.theme$
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
-        // El ThemeService ya maneja la aplicación de la clase .dark al body
+        this.updateDarkModeStatus();
       });
   }
 
   ngOnInit() {
+    // Inicializar el estado del tema
+    this.updateDarkModeStatus();
+    
     this.initForm();
     this.checkPermissions();
+  }
+
+  // Actualizar el estado del modo oscuro
+  updateDarkModeStatus() {
+    this.isDarkMode = this._themeService.isDarkMode();
   }
 
   initForm() {
@@ -110,7 +131,7 @@ export class ReportComponent implements OnInit {
     this.loading = true;
     
     try {
-      // Configuración de la cámara similar a tu proyecto funcional
+      // Configuración de la cámara
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: true,
@@ -209,7 +230,8 @@ export class ReportComponent implements OnInit {
     const alert = await this.alertController.create({
       header,
       message,
-      buttons: ['OK']
+      buttons: ['OK'],
+      cssClass: this.isDarkMode ? 'dark-alert' : 'light-alert'
     });
     await alert.present();
   }

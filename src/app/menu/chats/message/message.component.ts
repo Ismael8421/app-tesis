@@ -10,6 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 import { IonAvatar, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonInput, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { RegisterService } from '../../../register/data-access/register.service';
+import { ThemeService } from '../../configs/settings/data-access/theme.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-message',
@@ -26,6 +28,8 @@ export class MessageComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private registerService = inject(RegisterService);
   private userStatusService = inject(UserStatusService);
+  private _themeService = inject(ThemeService);
+  
   private messagesSubscription?: Subscription;
   private markAsReadInterval: any;
 
@@ -34,6 +38,9 @@ export class MessageComponent implements OnInit, OnDestroy {
   currentUser = this.auth.currentUser;
   otherUserName: string = 'Usuario';
   chatData$: Observable<any>;
+  
+  // Variable para modo oscuro
+  isDarkMode: boolean = false;
 
   constructor() {
     const chatId = this.route.snapshot.paramMap.get('id') || '';
@@ -56,9 +63,19 @@ export class MessageComponent implements OnInit, OnDestroy {
         }
       })
     );
+    
+    // Suscribirse a cambios de tema
+    this._themeService.theme$
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this.updateDarkModeStatus();
+      });
   }
 
   ngOnInit() {
+    // Inicializar el estado del tema
+    this.updateDarkModeStatus();
+    
     if (!this.currentUser) {
       this.router.navigate(['/login']);
       return;
@@ -86,6 +103,11 @@ export class MessageComponent implements OnInit, OnDestroy {
 
     // Marcar mensajes como leídos al entrar al chat
     this.markMessagesAsRead();
+  }
+  
+  // Actualizar el estado del modo oscuro
+  updateDarkModeStatus() {
+    this.isDarkMode = this._themeService.isDarkMode();
   }
 
   ngOnDestroy() {

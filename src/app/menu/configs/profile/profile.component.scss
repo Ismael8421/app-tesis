@@ -1,111 +1,63 @@
-// Variables de color
-$primary-color: #032B44;
-$secondary-color: #4C626F;
-$accent-yellow: #F2DA5E;
-$accent-yellow-dark: #F3DD6C;
-$blue-light: #84A3B5;
-$blue-medium: #73889B;
-$blue-accent: #5A7F94;
-$background-light: #D3E3E6;
-
-// Nuevos colores para modo oscuro
-$dark-primary: #4F5F73;
-$dark-secondary: #A3A9B0;
-$dark-accent: #FCFF8B;
-$dark-surface: #4F5F73;
+// Eliminamos las variables de color locales y usamos las variables CSS de Ionic
 
 // Estilos base
 ion-content {
-  --background: #{$background-light};
-
-  @media (prefers-color-scheme: dark) {
-    --background: #{$dark-primary};
-  }
+  --background: var(--ion-background-color);
 }
 
 // Header
 ion-header {
   ion-toolbar {
-    --background: #{$background-light};
-    --color: #{$primary-color};
+    --background: var(--ion-toolbar-background);
+    --color: var(--ion-text-color);
     --border-color: transparent;
-    
-    @media (prefers-color-scheme: dark) {
-      --background: #{$dark-surface};
-      --color: #{$dark-accent};
-    }
 
     ion-button {
-      --color: #{$primary-color};
-      
-      @media (prefers-color-scheme: dark) {
-        --color: #{$dark-accent};
-      }
+      --color: var(--ion-color-primary);
     }
   }
 }
 
 // Profile header
 .profile-header {
-  background: white;
+  background: var(--ion-item-background);
   padding: 24px;
   border-radius: 16px;
+  margin: 16px;
   margin-bottom: 24px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 12px rgba($primary-color, 0.1);
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-surface;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
+  box-shadow: var(--ion-box-shadow);
 
   ion-avatar {
     width: 80px;
     height: 80px;
     margin-right: 16px;
-    border: 3px solid $accent-yellow;
-
-    @media (prefers-color-scheme: dark) {
-      border-color: $dark-accent;
-    }
+    border: 3px solid var(--ion-color-primary);
   }
 
   .profile-info {
     h2 {
-      color: $primary-color;
+      color: var(--ion-text-color);
       font-size: 24px;
       font-weight: 600;
       margin: 0 0 4px 0;
-
-      @media (prefers-color-scheme: dark) {
-        color: $dark-accent;
-      }
     }
 
     p {
-      color: $blue-accent;
+      color: var(--ion-color-medium);
       font-size: 16px;
       margin: 0;
-
-      @media (prefers-color-scheme: dark) {
-        color: $dark-secondary;
-      }
     }
   }
 }
 
 // Card styles
 ion-card {
-  background: white;
+  background: var(--ion-card-background);
   border-radius: 16px;
-  margin: 0;
-  box-shadow: 0 4px 12px rgba($primary-color, 0.1);
-
-  @media (prefers-color-scheme: dark) {
-    background: $dark-surface;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
+  margin: 16px;
+  box-shadow: var(--ion-box-shadow);
 
   ion-card-content {
     padding: 20px;
@@ -119,32 +71,20 @@ ion-card {
     --background: transparent;
     --padding-start: 0;
     --padding-end: 0;
-    --border-color: #{rgba($blue-light, 0.3)};
+    --border-color: var(--ion-border-color);
     margin-bottom: 16px;
 
-    @media (prefers-color-scheme: dark) {
-      --border-color: #{rgba($dark-secondary, 0.3)};
-    }
-
     ion-label {
-      color: $blue-accent;
+      color: var(--ion-color-medium);
       font-size: 16px;
       font-weight: 500;
-
-      @media (prefers-color-scheme: dark) {
-        color: $dark-accent;
-      }
     }
 
     ion-note {
-      color: $primary-color;
+      color: var(--ion-text-color);
       font-size: 16px;
       padding-left: 8px;
       font-weight: 500;
-
-      @media (prefers-color-scheme: dark) {
-        color: $dark-secondary;
-      }
     }
 
     &:last-child {
@@ -155,20 +95,14 @@ ion-card {
 
 // Button styles
 ion-button {
-  --background: #{$accent-yellow};
-  --background-hover: #{$accent-yellow-dark};
-  --color: #{$primary-color};
+  --background: var(--ion-color-primary);
+  --background-hover: var(--ion-color-primary-shade);
+  --color: var(--ion-color-primary-contrast);
   --border-radius: 12px;
   margin-top: 20px;
   height: 48px;
   font-weight: 600;
   font-size: 16px;
-
-  @media (prefers-color-scheme: dark) {
-    --background: #{$dark-accent};
-    --background-hover: #{darken($dark-accent, 5%)};
-    --color: #{$dark-primary};
-  }
 }
 
 // Loading container
@@ -180,24 +114,16 @@ ion-button {
   padding: 40px;
 
   ion-spinner {
-    --color: #{$accent-yellow};
+    --color: var(--ion-color-primary);
     width: 48px;
     height: 48px;
     margin-bottom: 16px;
-
-    @media (prefers-color-scheme: dark) {
-      --color: #{$dark-accent};
-    }
   }
 
   p {
-    color: $blue-accent;
+    color: var(--ion-color-medium);
     font-size: 16px;
     margin: 0;
-
-    @media (prefers-color-scheme: dark) {
-      color: $dark-secondary;
-    }
   }
 }
 
@@ -218,5 +144,6 @@ ion-button {
   .profile-menu {
     max-width: 600px;
     margin: 0 auto;
+    padding: 0 16px;
   }
 }

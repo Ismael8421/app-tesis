@@ -1,3 +1,4 @@
+<!-- profile.component.html -->
 <ion-content>
   <ion-header>
     <ion-toolbar>
@@ -28,12 +29,28 @@
     <ng-container *ngIf="!loading && !error && userData">
       <!-- Cabecera del Perfil -->
       <div class="profile-header">
-        <ion-avatar>
-          <ion-img
-            src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg"
-            alt="Foto de perfil"
-          ></ion-img>
-        </ion-avatar>
+        <div class="profile-avatar-container">
+          <ion-avatar>
+            <div class="circular-image-container">
+              <ion-img
+                [src]="profileImagePreview || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg'"
+                alt="Foto de perfil"
+              ></ion-img>
+            </div>
+          </ion-avatar>
+          <ion-button class="change-photo-btn" fill="clear" (click)="presentPhotoOptions()">
+            <ion-icon name="camera"></ion-icon>
+          </ion-button>
+        </div>
+        
+        <!-- Botón emergencia para abrir el modal de recorte (solo visible cuando hay una imagen temporal) -->
+        <div *ngIf="tempImageUrl && !isCropModalOpen" class="emergency-btn-container">
+          <ion-button color="warning" (click)="openCropModal()">
+            <ion-icon name="crop-outline" slot="start"></ion-icon>
+            Continuar con recorte
+          </ion-button>
+          <p class="emergency-help-text">Si el recorte no apareció automáticamente, presiona este botón</p>
+        </div>
         <div class="profile-info">
           <h2>{{ userData.nombreUsuario }}</h2>
           <p>{{ userData.nombre }} {{ userData.apellido }}</p>
@@ -61,8 +78,52 @@
           </ion-button>
         </ion-card-content>
       </ion-card>
-
-      <!-- Aquí puedes agregar más secciones del menú de perfil si es necesario -->
     </ng-container>
   </div>
 </ion-content>
+
+<!-- Modal para recortar la imagen -->
+<!-- Actualización del modal de recorte en profile.component.html -->
+
+<ion-modal [isOpen]="isCropModalOpen" [backdropDismiss]="false" [animated]="true" class="crop-modal">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-title>Ajustar foto</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cancelCrop()">Cancelar</ion-button>
+          <ion-button (click)="saveCroppedImage()" [disabled]="isProcessingImage" strong>
+            <ion-spinner *ngIf="isProcessingImage" name="crescent" class="save-spinner"></ion-spinner>
+            <span *ngIf="!isProcessingImage">Guardar</span>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="crop-modal-content">
+      <div class="crop-container">
+        <div class="image-container" *ngIf="tempImageUrl">
+          <img 
+            #cropImage
+            [src]="tempImageUrl" 
+            alt="Imagen para recortar"
+            class="crop-image"
+            (load)="handleImageLoad()"
+          >
+          
+          <div class="crop-frame"
+            #cropFrame
+            [style.width]="cropFrameSize + 'px'"
+            [style.height]="cropFrameSize + 'px'"
+            [style.transform]="'translate(' + cropFrameX + 'px, ' + cropFrameY + 'px)'"
+            (touchstart)="onFrameTouchStart($event)"
+            (touchmove)="onFrameTouchMove($event)"
+            (touchend)="onFrameTouchEnd()"
+            (mousedown)="onFrameMouseDown($event)"
+            (mousemove)="onFrameMouseMove($event)"
+            (mouseup)="onFrameMouseUp()">
+          </div>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

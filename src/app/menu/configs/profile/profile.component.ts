@@ -1,52 +1,76 @@
-import { Component, inject, OnInit } from '@angular/core';
+// profile.component.ts
+import { Component, ElementRef, NgZone, OnInit, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BackIconComponent } from '../../../UI/back-icon/back-icon.component';
 import { RegisterService, userCreate } from '../../../register/data-access/register.service';
 import { CommonModule } from '@angular/common';
 import { Auth } from '@angular/fire/auth';
 import { ThemeService } from '../settings/data-access/theme.service';
+import { ProfileImageService } from './profile-image.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { 
-  IonAvatar, 
-  IonButton, 
-  IonButtons, 
-  IonCard, 
-  IonCardContent, 
-  IonContent, 
-  IonHeader, 
-  IonImg, 
-  IonItem, 
-  IonLabel, 
-  IonList, 
-  IonNote, 
-  IonSpinner, 
-  IonText, 
-  IonTitle, 
-  IonToolbar 
+import { FormsModule } from '@angular/forms';
+import { addIcons } from 'ionicons';
+import {
+  cameraOutline,
+  imageOutline,
+  closeOutline,
+  addOutline,
+  removeOutline,
+  camera,
+  chevronDownOutline
+} from 'ionicons/icons';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
+import {
+  ActionSheetController,
+  AlertController,
+  IonAvatar,
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonImg,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonModal,
+  IonNote,
+  IonRange,
+  IonSpinner,
+  IonText,
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [
-    BackIconComponent, 
-    CommonModule, 
-    IonContent, 
-    IonHeader, 
-    IonToolbar, 
-    IonButton, 
-    IonButtons, 
-    IonTitle, 
-    IonSpinner, 
-    IonText, 
-    IonAvatar, 
-    IonImg, 
-    IonCard, 
-    IonCardContent, 
-    IonList, 
-    IonItem, 
-    IonLabel, 
-    IonNote
+    BackIconComponent,
+    CommonModule,
+    FormsModule,
+    IonContent,
+    IonHeader,
+    IonToolbar,
+    IonButton,
+    IonButtons,
+    IonTitle,
+    IonSpinner,
+    IonText,
+    IonAvatar,
+    IonImg,
+    IonCard,
+    IonCardContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonNote,
+    IonIcon,
+    IonModal,
+    IonRange
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
@@ -56,13 +80,54 @@ export class ProfileComponent implements OnInit {
   private _registerService = inject(RegisterService);
   private _auth = inject(Auth);
   private _themeService = inject(ThemeService);
+  private _actionSheetCtrl = inject(ActionSheetController);
+  private _alertController = inject(AlertController);
+  private _profileImageService = inject(ProfileImageService);
+  private _zone = inject(NgZone);
+
+  // Variables para el recuadro de recorte
+  cropFrameSize = 200; // Tamaño inicial del recuadro en px
+  cropFrameX = 0; // Posición X del recuadro
+  cropFrameY = 0; // Posición Y del recuadro
+  isFrameDragging = false; // Para detectar si se está arrastrando
+  lastTouchX = 0; // Última posición X tocada
+  lastTouchY = 0; // Última posición Y tocada
+  imageContainerRect: DOMRect | null = null; // Dimensiones del contenedor de la imagen
+
+  @ViewChild('cropImage') cropImageElement: ElementRef<HTMLImageElement> | undefined;
+  @ViewChild('cropFrame') cropFrameElement: ElementRef<HTMLDivElement> | undefined;
+
+  imageWidth = 0; // Ancho natural de la imagen
+  imageHeight = 0; // Alto natural de la imagen
+  cropSize = 300; // Tamaño del cuadro de recorte en píxeles
 
   userData: userCreate | null = null;
   loading = true;
   error: string | null = null;
   isDarkMode: boolean = false;
 
+  // Imagen de perfil
+  profileImagePreview: string | null = null;
+  tempImageUrl: string | null = null;
+
+  // Modal para recortar
+  isCropModalOpen = false;
+
+  // Variables para manipulación de imagen
+  isProcessingImage = false;
+
   constructor() {
+    // Registrar iconos
+    addIcons({
+      camera,
+      'camera-outline': cameraOutline,
+      'image-outline': imageOutline,
+      'close-outline': closeOutline,
+      'add-outline': addOutline,
+      'remove-outline': removeOutline,
+      'chevron-down-outline': chevronDownOutline
+    });
+
     // Suscribirse a los cambios del tema usando takeUntilDestroyed
     this._themeService.theme$
       .pipe(takeUntilDestroyed())
@@ -74,7 +139,7 @@ export class ProfileComponent implements OnInit {
   async ngOnInit() {
     // Inicializar el estado del modo oscuro
     this.updateDarkModeStatus();
-    
+
     try {
       // Obtener el usuario actual
       const currentUser = this._auth.currentUser;
@@ -85,6 +150,15 @@ export class ProfileComponent implements OnInit {
 
       // Obtener los datos del usuario
       this.userData = await this._registerService.getUserData(currentUser.uid);
+
+      // Cargar la imagen de perfil si existe
+      if (currentUser.uid) {
+        const savedImage = this._profileImageService.getProfileImage(currentUser.uid);
+        if (savedImage) {
+          this.profileImagePreview = savedImage;
+        }
+      }
+
       this.loading = false;
     } catch (error) {
       console.error('Error al cargar datos del perfil:', error);
@@ -100,5 +174,436 @@ export class ProfileComponent implements OnInit {
 
   navigateTo() {
     this._router.navigateByUrl('/menu/configuraciones');
+  }
+
+  // ---- Funciones para manejar la foto de perfil ----
+
+  async presentPhotoOptions() {
+    const actionSheet = await this._actionSheetCtrl.create({
+      header: 'Cambiar foto de perfil',
+      buttons: [
+        {
+          text: 'Tomar foto',
+          icon: 'camera-outline',
+          handler: () => {
+            this.getImage(CameraSource.Camera);
+          }
+        },
+        {
+          text: 'Seleccionar de galería',
+          icon: 'image-outline',
+          handler: () => {
+            this.getImage(CameraSource.Photos);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close-outline',
+          role: 'cancel'
+        }
+      ],
+      cssClass: this.isDarkMode ? 'action-sheet-dark' : 'action-sheet-light'
+    });
+
+    await actionSheet.present();
+  }
+
+  async checkCameraPermissions() {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const permissions = await Camera.checkPermissions();
+        if (permissions.camera !== 'granted' || permissions.photos !== 'granted') {
+          await Camera.requestPermissions();
+        }
+      } catch (error) {
+        console.error('Error al verificar permisos:', error);
+        this.showAlert('Permisos necesarios', 'Se requieren permisos para acceder a la cámara y galería');
+      }
+    }
+  }
+
+  async getImage(source: CameraSource) {
+    try {
+      console.log('Iniciando captura de imagen desde:', source === CameraSource.Camera ? 'Cámara' : 'Galería');
+
+      // Verificar permisos primero
+      await this.checkCameraPermissions();
+
+      // Configuración de la cámara
+      const imageResult = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: source,
+        correctOrientation: true, // Importante para corregir la orientación
+        webUseInput: true, // Para web
+        width: 1200, // Limitar ancho para optimizar
+        height: 1200, // Limitar alto para optimizar
+      });
+
+      if (imageResult && imageResult.dataUrl) {
+        console.log('Imagen obtenida correctamente');
+
+        // Asegurarse de que el modal esté cerrado antes de abrir uno nuevo
+        this.isCropModalOpen = false;
+
+        // Usar NgZone para asegurar que Angular detecte los cambios
+        this._zone.run(() => {
+          // Asignar la URL de la imagen
+          this.tempImageUrl = imageResult.dataUrl ?? null;
+
+          // Abrir el modal con un pequeño retraso para que Angular actualice la vista
+          setTimeout(() => {
+            console.log('Abriendo modal de recorte...');
+            this.isCropModalOpen = true;
+
+            // Inicializar el recuadro después de abrir el modal
+            setTimeout(() => {
+              this.initializeCropFrame();
+            }, 300);
+          }, 300);
+        });
+      } else {
+        console.warn('No se obtuvieron datos de imagen');
+      }
+    } catch (error) {
+      console.error('Error al obtener imagen:', error);
+
+      if (error instanceof Error) {
+        // Manejo específico de errores
+        if (error.message.includes('User cancelled')) {
+          console.log('El usuario canceló la selección');
+        } else {
+          this.showAlert('Error', `No se pudo obtener la imagen: ${error.message}`);
+        }
+      }
+    }
+  }
+
+  // ---- Funciones para el recorte de imagen ----
+
+  cancelCrop() {
+    this.isCropModalOpen = false;
+    this.tempImageUrl = null;
+  }
+
+  // Método para abrir el modal de recorte manualmente (botón de emergencia)
+  openCropModal() {
+    if (this.tempImageUrl) {
+      console.log('Abriendo modal de recorte manualmente');
+      this._zone.run(() => {
+        this.isCropModalOpen = true;
+
+        // cuando la imagen se cargue gracias al evento (load) en el HTML
+      });
+    } else {
+      this.showAlert('Error', 'No hay imagen para recortar');
+    }
+  }
+
+  // Corregir el método saveCroppedImage() en profile.component.ts
+
+  async saveCroppedImage() {
+    this.isProcessingImage = true;
+
+    try {
+      // Verificar usuario
+      const currentUser = this._auth.currentUser;
+      if (!currentUser || !currentUser.uid) {
+        this.showAlert('Error', 'Usuario no identificado');
+        return;
+      }
+
+      // Obtener referencias a elementos
+      const img = this.cropImageElement?.nativeElement;
+      const frame = this.cropFrameElement?.nativeElement;
+
+      if (!img || !frame || !this.imageContainerRect) {
+        this.showAlert('Error', 'No se pudo encontrar los elementos necesarios');
+        return;
+      }
+
+      // Calcular la relación entre la imagen mostrada y su tamaño real
+      const displayedWidth = this.imageContainerRect.width;
+      const displayedHeight = this.imageContainerRect.height;
+      const imgNaturalWidth = img.naturalWidth;
+      const imgNaturalHeight = img.naturalHeight;
+
+      // Calcular la escala
+      const scaleX = imgNaturalWidth / displayedWidth;
+      const scaleY = imgNaturalHeight / displayedHeight;
+
+      // Calcular la posición del centro de la imagen mostrada
+      const displayedCenterX = displayedWidth / 2;
+      const displayedCenterY = displayedHeight / 2;
+
+      // Calcular la posición del recuadro relativa al centro de la imagen
+      const frameLeft = displayedCenterX + this.cropFrameX - (this.cropFrameSize / 2);
+      const frameTop = displayedCenterY + this.cropFrameY - (this.cropFrameSize / 2);
+
+      // Calcular las coordenadas correspondientes en la imagen original
+      const sourceX = frameLeft * scaleX;
+      const sourceY = frameTop * scaleY;
+      const sourceWidth = this.cropFrameSize * scaleX;
+      const sourceHeight = this.cropFrameSize * scaleY;
+
+      // Crear un canvas del tamaño deseado para el resultado final
+      const canvas = document.createElement('canvas');
+      const finalSize = 300; // Tamaño final fijo
+      canvas.width = finalSize;
+      canvas.height = finalSize;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        throw new Error('No se pudo crear el contexto del canvas');
+      }
+
+      // Dibujar la porción recortada de la imagen original en el canvas
+      ctx.drawImage(
+        img,
+        sourceX, sourceY, sourceWidth, sourceHeight, // Área de origen en la imagen original
+        0, 0, finalSize, finalSize // Área de destino en el canvas
+      );
+
+      // Obtener la data URL
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+      // Guardar localmente
+      this._profileImageService.saveProfileImage(currentUser.uid, dataUrl);
+
+      // Actualizar la vista
+      this.profileImagePreview = dataUrl;
+      this.isCropModalOpen = false;
+      this.tempImageUrl = null;
+
+      // Mostrar mensaje de éxito
+      this.showSuccessToast('Foto de perfil actualizada');
+
+    } catch (error) {
+      console.error('Error al recortar la imagen:', error);
+      this.showAlert('Error', 'No se pudo guardar la imagen');
+    } finally {
+      this.isProcessingImage = false;
+    }
+  }
+
+  // Debug para el estado del modal
+  logModalState() {
+    console.log('Estado del modal:', {
+      isCropModalOpen: this.isCropModalOpen,
+      tempImageUrl: this.tempImageUrl ? 'Disponible' : 'No disponible',
+      profileImagePreview: this.profileImagePreview ? 'Disponible' : 'No disponible'
+    });
+  }
+
+  // Alerta para errores
+  async showAlert(header: string, message: string) {
+    const alert = await this._alertController.create({
+      header,
+      message,
+      buttons: ['OK'],
+      cssClass: this.isDarkMode ? 'dark-alert' : 'light-alert'
+    });
+    await alert.present();
+  }
+
+  handleImageLoad() {
+    console.log('Imagen cargada correctamente');
+
+    // En la próxima actualización del ciclo de vida de Angular
+    setTimeout(() => {
+      this.initializeCropFrame();
+    }, 100);
+  }
+
+  onZoomChange(event: any) {
+    if (!this.imageContainerRect) return;
+
+    // Obtener el valor del slider (entre 1 y 3)
+    const zoomValue = event.detail.value;
+
+    // Calcular el nuevo tamaño como porcentaje de la imagen
+    // El tamaño más pequeño es 30% de la imagen, el más grande es 90%
+    const minSide = Math.min(this.imageContainerRect.width, this.imageContainerRect.height);
+    const minSize = minSide * 0.3;
+    const maxSize = minSide * 0.9;
+
+    // Interpolar entre min y max basado en el valor del zoom
+    // zoomValue=1 → cropFrameSize=maxSize (zoom mínimo = recuadro grande)
+    // zoomValue=3 → cropFrameSize=minSize (zoom máximo = recuadro pequeño)
+    const range = maxSize - minSize;
+    const reversedZoom = 4 - zoomValue; // Invertimos para que el comportamiento sea intuitivo
+    this.cropFrameSize = minSize + ((reversedZoom - 1) / 2) * range;
+
+    // Restringir la posición después de cambiar el tamaño
+    this.constrainFramePosition();
+  }
+
+  async showSuccessToast(message: string) {
+    const alertElement = document.createElement('div');
+    alertElement.textContent = message;
+    alertElement.className = `success-toast ${this.isDarkMode ? 'dark-toast' : 'light-toast'}`;
+    document.body.appendChild(alertElement);
+
+    setTimeout(() => {
+      alertElement.classList.add('show');
+
+      setTimeout(() => {
+        alertElement.classList.remove('show');
+        setTimeout(() => document.body.removeChild(alertElement), 300);
+      }, 2000);
+    }, 100);
+  }
+
+  ngAfterViewInit() {
+    // Inicializar después de que la vista esté lista
+    setTimeout(() => {
+      this.initializeCropFrame();
+    }, 500);
+    
+    // Agregar listeners globales para manejar el movimiento
+    // fuera del elemento cuando se arrastra
+    document.addEventListener('mousemove', this.handleGlobalMouseMove.bind(this));
+    document.addEventListener('mouseup', this.handleGlobalMouseUp.bind(this));
+    document.addEventListener('touchmove', this.handleGlobalTouchMove.bind(this), { passive: false });
+    document.addEventListener('touchend', this.handleGlobalTouchEnd.bind(this));
+  }
+
+  ngOnDestroy() {
+    document.removeEventListener('mousemove', this.handleGlobalMouseMove.bind(this));
+    document.removeEventListener('mouseup', this.handleGlobalMouseUp.bind(this));
+    document.removeEventListener('touchmove', this.handleGlobalTouchMove.bind(this));
+    document.removeEventListener('touchend', this.handleGlobalTouchEnd.bind(this));
+  }
+
+  handleGlobalMouseMove(event: MouseEvent) {
+    this.onFrameMouseMove(event);
+  }
+  
+  handleGlobalMouseUp() {
+    this.onFrameMouseUp();
+  }
+  
+  handleGlobalTouchMove(event: TouchEvent) {
+    if (this.isFrameDragging) {
+      this.onFrameTouchMove(event);
+    }
+  }
+  
+  handleGlobalTouchEnd() {
+    this.onFrameTouchEnd();
+  }
+
+  initializeCropFrame() {
+    const imgElement = this.cropImageElement?.nativeElement;
+    if (!imgElement || !imgElement.complete) {
+      // Si la imagen no está cargada, intentarlo nuevamente después
+      imgElement?.addEventListener('load', () => this.initializeCropFrame());
+      return;
+    }
+    
+    console.log('Inicializando recuadro con imagen cargada:', imgElement.src.slice(0, 30) + '...');
+    
+    // Obtener el rectángulo del contenedor de la imagen
+    const imgRect = imgElement.getBoundingClientRect();
+    this.imageContainerRect = imgRect;
+    
+    // Inicializar el tamaño del recuadro al 70% del lado más pequeño de la imagen
+    const minSide = Math.min(imgRect.width, imgRect.height) * 0.7;
+    this.cropFrameSize = minSide;
+    
+    // Centrar el recuadro en la imagen (IMPORTANTE)
+    this.cropFrameX = 0;
+    this.cropFrameY = 0;
+    
+    console.log('Recuadro inicializado:', {
+      imageRect: imgRect,
+      cropFrameSize: this.cropFrameSize,
+      cropFramePosition: { x: this.cropFrameX, y: this.cropFrameY }
+    });
+    
+    // Forzar actualización de la vista
+    this._zone.run(() => {});
+  }
+
+  onFrameTouchStart(event: TouchEvent) {
+    if (event.touches.length === 1) {
+      this.isFrameDragging = true;
+      this.lastTouchX = event.touches[0].clientX;
+      this.lastTouchY = event.touches[0].clientY;
+      event.preventDefault();
+    }
+  }
+
+  onFrameTouchMove(event: TouchEvent) {
+    if (!this.isFrameDragging || event.touches.length !== 1) return;
+
+    const deltaX = event.touches[0].clientX - this.lastTouchX;
+    const deltaY = event.touches[0].clientY - this.lastTouchY;
+
+    this.moveFrame(deltaX, deltaY);
+
+    this.lastTouchX = event.touches[0].clientX;
+    this.lastTouchY = event.touches[0].clientY;
+    event.preventDefault();
+  }
+
+  onFrameTouchEnd() {
+    this.isFrameDragging = false;
+  }
+
+  onFrameMouseDown(event: MouseEvent) {
+    this.isFrameDragging = true;
+    this.lastTouchX = event.clientX;
+    this.lastTouchY = event.clientY;
+    event.preventDefault();
+  }
+
+  onFrameMouseMove(event: MouseEvent) {
+    if (!this.isFrameDragging) return;
+    
+    const deltaX = event.clientX - this.lastTouchX;
+    const deltaY = event.clientY - this.lastTouchY;
+    
+    this.moveFrame(deltaX, deltaY);
+    
+    this.lastTouchX = event.clientX;
+    this.lastTouchY = event.clientY;
+  
+    // Prevenir comportamiento predeterminado
+    event.preventDefault();
+  }
+  
+
+  onFrameMouseUp() {
+    this.isFrameDragging = false;
+  }
+
+  // Mover el recuadro con restricciones
+  moveFrame(deltaX: number, deltaY: number) {
+    this.cropFrameX += deltaX;
+    this.cropFrameY += deltaY;
+
+    // Restringir posición
+    this.constrainFramePosition();
+  }
+
+  // Restringir la posición del recuadro dentro de los límites de la imagen
+  constrainFramePosition() {
+    if (!this.imageContainerRect) return;
+
+    const halfFrameSize = this.cropFrameSize / 2;
+
+    // Calcular los límites basados en el centro de la imagen
+    const imageWidth = this.imageContainerRect.width;
+    const imageHeight = this.imageContainerRect.height;
+
+    // Calcular márgenes máximos desde el centro
+    const maxX = (imageWidth / 2) - halfFrameSize;
+    const maxY = (imageHeight / 2) - halfFrameSize;
+
+    // Aplicar restricciones
+    this.cropFrameX = Math.max(-maxX, Math.min(maxX, this.cropFrameX));
+    this.cropFrameY = Math.max(-maxY, Math.min(maxY, this.cropFrameY));
   }
 }

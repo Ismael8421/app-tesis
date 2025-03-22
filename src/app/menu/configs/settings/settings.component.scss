@@ -117,6 +117,11 @@ ion-select {
   
   ion-label {
     font-weight: 500;
+    color: var(--ion-color-danger) !important;
+  }
+  
+  &::part(native) {
+    background: var(--ion-item-background) !important;
   }
 }
 

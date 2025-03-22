@@ -229,3 +229,85 @@
   border-radius: var(--ion-border-radius);
   box-shadow: var(--ion-box-shadow);
 }
+
+/* Estilos específicos para los select y alertas en modo oscuro */
+.dark-theme ion-alert,
+body:not(.light-theme) ion-alert {
+  --background: #2a2a2a !important;
+  --color: #ffffff !important;
+}
+
+.dark-theme ion-alert .alert-title,
+body:not(.light-theme) ion-alert .alert-title,
+.dark-theme ion-alert .alert-sub-title,
+body:not(.light-theme) ion-alert .alert-sub-title,
+.dark-theme ion-alert .alert-message,
+body:not(.light-theme) ion-alert .alert-message {
+  color: #ffffff !important;
+}
+
+.dark-theme ion-alert .alert-radio-group,
+body:not(.light-theme) ion-alert .alert-radio-group,
+.dark-theme ion-alert .alert-checkbox-group,
+body:not(.light-theme) ion-alert .alert-checkbox-group {
+  background-color: #2a2a2a !important;
+}
+
+.dark-theme ion-alert .alert-radio-label,
+body:not(.light-theme) ion-alert .alert-radio-label,
+.dark-theme ion-alert .alert-checkbox-label,
+body:not(.light-theme) ion-alert .alert-checkbox-label {
+  color: #ffffff !important;
+}
+
+.dark-theme ion-alert .alert-radio-icon,
+body:not(.light-theme) ion-alert .alert-radio-icon {
+  border-color: #717171 !important;
+}
+
+.dark-theme ion-alert [aria-checked="true"] .alert-radio-icon,
+body:not(.light-theme) ion-alert [aria-checked="true"] .alert-radio-icon {
+  border-color: var(--ion-color-primary) !important;
+}
+
+.dark-theme ion-alert [aria-checked="true"] .alert-radio-inner,
+body:not(.light-theme) ion-alert [aria-checked="true"] .alert-radio-inner {
+  background-color: var(--ion-color-primary) !important;
+}
+
+.dark-theme ion-alert .alert-button,
+body:not(.light-theme) ion-alert .alert-button {
+  color: var(--ion-color-primary) !important;
+}
+
+/* Estilos específicos para el texto del ion-select en el modo oscuro */
+.dark-theme ion-select,
+body:not(.light-theme) ion-select {
+  --color: white !important;
+  --placeholder-color: white !important;
+  --placeholder-opacity: 1 !important;
+}
+
+.dark-theme ion-select::part(text),
+body:not(.light-theme) ion-select::part(text),
+.dark-theme ion-select::part(placeholder),
+body:not(.light-theme) ion-select::part(placeholder) {
+  color: white !important;
+  opacity: 1 !important;
+}
+
+/* Estilos para el menú de selección - Interfaz de acción (action sheet) */
+.dark-theme ion-action-sheet,
+body:not(.light-theme) ion-action-sheet {
+  --background: #2a2a2a !important;
+  --button-background: #2a2a2a !important;
+  --button-color: white !important;
+}
+
+/* Ajuste para el botón Cancelar y OK */
+.dark-theme .action-sheet-cancel,
+body:not(.light-theme) .action-sheet-cancel,
+.dark-theme .alert-button-cancel,
+body:not(.light-theme) .alert-button-cancel {
+  color: var(--ion-color-danger) !important;
+}

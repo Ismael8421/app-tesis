@@ -16,6 +16,7 @@ import {
   closeOutline,
   addOutline,
   removeOutline,
+  refreshOutline,
   camera,
   chevronDownOutline
 } from 'ionicons/icons';
@@ -97,6 +98,9 @@ export class ProfileComponent implements OnInit {
   @ViewChild('cropImage') cropImageElement: ElementRef<HTMLImageElement> | undefined;
   @ViewChild('cropFrame') cropFrameElement: ElementRef<HTMLDivElement> | undefined;
 
+  imageRotation: number = 0; // Para la rotación de la imagen en grados
+  frameScalePercent: number = 70; // Porcentaje inicial del tamaño del recuadro (70%)
+
   imageWidth = 0; // Ancho natural de la imagen
   imageHeight = 0; // Alto natural de la imagen
   cropSize = 300; // Tamaño del cuadro de recorte en píxeles
@@ -125,6 +129,7 @@ export class ProfileComponent implements OnInit {
       'close-outline': closeOutline,
       'add-outline': addOutline,
       'remove-outline': removeOutline,
+      'refresh-outline': refreshOutline, // Añadir este
       'chevron-down-outline': chevronDownOutline
     });
 
@@ -285,6 +290,7 @@ export class ProfileComponent implements OnInit {
   cancelCrop() {
     this.isCropModalOpen = false;
     this.tempImageUrl = null;
+    this.imageRotation = 0; // Resetear rotación
   }
 
   // Método para abrir el modal de recorte manualmente (botón de emergencia)
@@ -305,7 +311,7 @@ export class ProfileComponent implements OnInit {
 
   async saveCroppedImage() {
     this.isProcessingImage = true;
-
+    
     try {
       // Verificar usuario
       const currentUser = this._auth.currentUser;
@@ -313,72 +319,189 @@ export class ProfileComponent implements OnInit {
         this.showAlert('Error', 'Usuario no identificado');
         return;
       }
-
+      
       // Obtener referencias a elementos
       const img = this.cropImageElement?.nativeElement;
       const frame = this.cropFrameElement?.nativeElement;
-
+      
       if (!img || !frame || !this.imageContainerRect) {
         this.showAlert('Error', 'No se pudo encontrar los elementos necesarios');
         return;
       }
-
-      // Calcular la relación entre la imagen mostrada y su tamaño real
-      const displayedWidth = this.imageContainerRect.width;
-      const displayedHeight = this.imageContainerRect.height;
-      const imgNaturalWidth = img.naturalWidth;
-      const imgNaturalHeight = img.naturalHeight;
-
-      // Calcular la escala
-      const scaleX = imgNaturalWidth / displayedWidth;
-      const scaleY = imgNaturalHeight / displayedHeight;
-
-      // Calcular la posición del centro de la imagen mostrada
-      const displayedCenterX = displayedWidth / 2;
-      const displayedCenterY = displayedHeight / 2;
-
-      // Calcular la posición del recuadro relativa al centro de la imagen
-      const frameLeft = displayedCenterX + this.cropFrameX - (this.cropFrameSize / 2);
-      const frameTop = displayedCenterY + this.cropFrameY - (this.cropFrameSize / 2);
-
-      // Calcular las coordenadas correspondientes en la imagen original
-      const sourceX = frameLeft * scaleX;
-      const sourceY = frameTop * scaleY;
-      const sourceWidth = this.cropFrameSize * scaleX;
-      const sourceHeight = this.cropFrameSize * scaleY;
-
-      // Crear un canvas del tamaño deseado para el resultado final
-      const canvas = document.createElement('canvas');
-      const finalSize = 300; // Tamaño final fijo
-      canvas.width = finalSize;
-      canvas.height = finalSize;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        throw new Error('No se pudo crear el contexto del canvas');
+      
+      // Dimensiones finales para el canvas
+      const finalSize = 300;
+      
+      // Paso 1: Crear un canvas con la imagen original
+      const originalCanvas = document.createElement('canvas');
+      originalCanvas.width = img.naturalWidth;
+      originalCanvas.height = img.naturalHeight;
+      
+      const originalCtx = originalCanvas.getContext('2d');
+      if (!originalCtx) {
+        throw new Error('No se pudo crear el contexto del canvas original');
       }
-
-      // Dibujar la porción recortada de la imagen original en el canvas
-      ctx.drawImage(
-        img,
-        sourceX, sourceY, sourceWidth, sourceHeight, // Área de origen en la imagen original
-        0, 0, finalSize, finalSize // Área de destino en el canvas
+      
+      // Dibujar la imagen original
+      originalCtx.drawImage(img, 0, 0);
+      
+      // Paso 2: Crear un canvas para la rotación
+      const rotatedCanvas = document.createElement('canvas');
+      let rotatedCtx = rotatedCanvas.getContext('2d');
+      
+      if (!rotatedCtx) {
+        throw new Error('No se pudo crear el contexto del canvas rotado');
+      }
+      
+      // Normalizar rotación
+      const rotation = ((this.imageRotation % 360) + 360) % 360;
+      
+      // Ajustar tamaño del canvas según rotación
+      if (rotation === 90 || rotation === 270) {
+        rotatedCanvas.width = originalCanvas.height;
+        rotatedCanvas.height = originalCanvas.width;
+      } else {
+        rotatedCanvas.width = originalCanvas.width;
+        rotatedCanvas.height = originalCanvas.height;
+      }
+      
+      // Aplicar rotación
+      rotatedCtx.save();
+      rotatedCtx.translate(rotatedCanvas.width / 2, rotatedCanvas.height / 2);
+      rotatedCtx.rotate((rotation * Math.PI) / 180);
+      
+      // Dibujar en el centro
+      if (rotation === 90 || rotation === 270) {
+        rotatedCtx.drawImage(
+          originalCanvas, 
+          -originalCanvas.height / 2, 
+          -originalCanvas.width / 2, 
+          originalCanvas.height, 
+          originalCanvas.width
+        );
+      } else {
+        rotatedCtx.drawImage(
+          originalCanvas, 
+          -originalCanvas.width / 2, 
+          -originalCanvas.height / 2, 
+          originalCanvas.width, 
+          originalCanvas.height
+        );
+      }
+      
+      rotatedCtx.restore();
+      
+      // Paso 3: Calcular la región de recorte
+      // Obtener las dimensiones de la imagen mostrada en pantalla
+      const displayedRect = img.getBoundingClientRect();
+      const frameRect = frame.getBoundingClientRect();
+      
+      // Calcular la proporción entre imagen original rotada y la mostrada en pantalla
+      let scaleX, scaleY;
+      
+      if (rotation === 90 || rotation === 270) {
+        scaleX = rotatedCanvas.width / displayedRect.height;
+        scaleY = rotatedCanvas.height / displayedRect.width;
+      } else {
+        scaleX = rotatedCanvas.width / displayedRect.width;
+        scaleY = rotatedCanvas.height / displayedRect.height;
+      }
+      
+      // Calcular centro de la imagen mostrada
+      const displayedCenterX = displayedRect.left + displayedRect.width / 2;
+      const displayedCenterY = displayedRect.top + displayedRect.height / 2;
+      
+      // Calcular el centro del frame en coordenadas absolutas de la ventana
+      const frameCenterX = frameRect.left + frameRect.width / 2;
+      const frameCenterY = frameRect.top + frameRect.height / 2;
+      
+      // Calcular el desplazamiento del frame desde el centro de la imagen
+      // como fracción del ancho/alto total
+      let relativeOffsetX, relativeOffsetY;
+      
+      if (rotation === 90 || rotation === 270) {
+        // Para rotación 90/270, intercambiamos los ejes
+        relativeOffsetX = (frameCenterY - displayedCenterY) / displayedRect.height;
+        relativeOffsetY = (rotation === 90 ? -1 : 1) * (frameCenterX - displayedCenterX) / displayedRect.width;
+      } else {
+        relativeOffsetX = (frameCenterX - displayedCenterX) / displayedRect.width;
+        relativeOffsetY = (frameCenterY - displayedCenterY) / displayedRect.height;
+        
+        // Para rotación 180, invertimos ambos ejes
+        if (rotation === 180) {
+          relativeOffsetX *= -1;
+          relativeOffsetY *= -1;
+        }
+      }
+      
+      // Calcular la escala relativa del frame respecto a la imagen mostrada
+      let relativeFrameScale;
+      if (rotation === 90 || rotation === 270) {
+        relativeFrameScale = frameRect.width / Math.min(displayedRect.height, displayedRect.width);
+      } else {
+        relativeFrameScale = frameRect.width / Math.min(displayedRect.width, displayedRect.height);
+      }
+      
+      // Calcular la región de recorte en la imagen rotada
+      const cropX = rotatedCanvas.width / 2 + relativeOffsetX * rotatedCanvas.width - (relativeFrameScale * rotatedCanvas.width) / 2;
+      const cropY = rotatedCanvas.height / 2 + relativeOffsetY * rotatedCanvas.height - (relativeFrameScale * rotatedCanvas.height) / 2;
+      const cropSize = relativeFrameScale * Math.min(rotatedCanvas.width, rotatedCanvas.height);
+      
+      // Paso 4: Crear canvas final y recortar
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = finalSize;
+      finalCanvas.height = finalSize;
+      
+      const finalCtx = finalCanvas.getContext('2d');
+      if (!finalCtx) {
+        throw new Error('No se pudo crear el contexto del canvas final');
+      }
+      
+      // Dibujar la región recortada en el canvas final
+      finalCtx.drawImage(
+        rotatedCanvas,
+        cropX, cropY, cropSize, cropSize,
+        0, 0, finalSize, finalSize
       );
-
-      // Obtener la data URL
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-
-      // Guardar localmente
+      
+      // Paso 5: Para debugging, mostrar los canvas en el DOM
+      // Útil para identificar problemas, comenta esto en producción
+      /*
+      document.body.appendChild(originalCanvas);
+      document.body.appendChild(rotatedCanvas);
+      document.body.appendChild(finalCanvas);
+      originalCanvas.style.position = 'fixed';
+      rotatedCanvas.style.position = 'fixed';
+      finalCanvas.style.position = 'fixed';
+      originalCanvas.style.top = '10px';
+      rotatedCanvas.style.top = '10px';
+      finalCanvas.style.top = '10px';
+      originalCanvas.style.left = '10px';
+      rotatedCanvas.style.left = originalCanvas.width + 20 + 'px';
+      finalCanvas.style.left = originalCanvas.width + rotatedCanvas.width + 30 + 'px';
+      originalCanvas.style.zIndex = '9999';
+      rotatedCanvas.style.zIndex = '9999';
+      finalCanvas.style.zIndex = '9999';
+      originalCanvas.style.border = '2px solid red';
+      rotatedCanvas.style.border = '2px solid green';
+      finalCanvas.style.border = '2px solid blue';
+      */
+      
+      // Obtener la imagen resultante como dataURL
+      const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.9);
+      
+      // Guardar la imagen
       this._profileImageService.saveProfileImage(currentUser.uid, dataUrl);
-
+      
       // Actualizar la vista
       this.profileImagePreview = dataUrl;
       this.isCropModalOpen = false;
       this.tempImageUrl = null;
-
+      this.imageRotation = 0; // Resetear rotación
+      
       // Mostrar mensaje de éxito
       this.showSuccessToast('Foto de perfil actualizada');
-
+      
     } catch (error) {
       console.error('Error al recortar la imagen:', error);
       this.showAlert('Error', 'No se pudo guardar la imagen');
@@ -460,7 +583,7 @@ export class ProfileComponent implements OnInit {
     setTimeout(() => {
       this.initializeCropFrame();
     }, 500);
-    
+
     // Agregar listeners globales para manejar el movimiento
     // fuera del elemento cuando se arrastra
     document.addEventListener('mousemove', this.handleGlobalMouseMove.bind(this));
@@ -479,17 +602,17 @@ export class ProfileComponent implements OnInit {
   handleGlobalMouseMove(event: MouseEvent) {
     this.onFrameMouseMove(event);
   }
-  
+
   handleGlobalMouseUp() {
     this.onFrameMouseUp();
   }
-  
+
   handleGlobalTouchMove(event: TouchEvent) {
     if (this.isFrameDragging) {
       this.onFrameTouchMove(event);
     }
   }
-  
+
   handleGlobalTouchEnd() {
     this.onFrameTouchEnd();
   }
@@ -497,22 +620,19 @@ export class ProfileComponent implements OnInit {
   initializeCropFrame() {
     const imgElement = this.cropImageElement?.nativeElement;
     if (!imgElement || !imgElement.complete) {
-      // Si la imagen no está cargada, intentarlo nuevamente después
       imgElement?.addEventListener('load', () => this.initializeCropFrame());
       return;
     }
-    
-    console.log('Inicializando recuadro con imagen cargada:', imgElement.src.slice(0, 30) + '...');
     
     // Obtener el rectángulo del contenedor de la imagen
     const imgRect = imgElement.getBoundingClientRect();
     this.imageContainerRect = imgRect;
     
-    // Inicializar el tamaño del recuadro al 70% del lado más pequeño de la imagen
-    const minSide = Math.min(imgRect.width, imgRect.height) * 0.7;
-    this.cropFrameSize = minSide;
+    // Inicializar el tamaño del recuadro al porcentaje configurado
+    const minSide = Math.min(imgRect.width, imgRect.height);
+    this.cropFrameSize = minSide * (this.frameScalePercent / 100);
     
-    // Centrar el recuadro en la imagen (IMPORTANTE)
+    // Centrar el recuadro en la imagen
     this.cropFrameX = 0;
     this.cropFrameY = 0;
     
@@ -521,9 +641,6 @@ export class ProfileComponent implements OnInit {
       cropFrameSize: this.cropFrameSize,
       cropFramePosition: { x: this.cropFrameX, y: this.cropFrameY }
     });
-    
-    // Forzar actualización de la vista
-    this._zone.run(() => {});
   }
 
   onFrameTouchStart(event: TouchEvent) {
@@ -531,7 +648,7 @@ export class ProfileComponent implements OnInit {
       this.isFrameDragging = true;
       this.lastTouchX = event.touches[0].clientX;
       this.lastTouchY = event.touches[0].clientY;
-      event.preventDefault();
+      event.preventDefault(); // Importante para evitar scroll
     }
   }
 
@@ -561,19 +678,19 @@ export class ProfileComponent implements OnInit {
 
   onFrameMouseMove(event: MouseEvent) {
     if (!this.isFrameDragging) return;
-    
+
     const deltaX = event.clientX - this.lastTouchX;
     const deltaY = event.clientY - this.lastTouchY;
-    
+
     this.moveFrame(deltaX, deltaY);
-    
+
     this.lastTouchX = event.clientX;
     this.lastTouchY = event.clientY;
-  
+
     // Prevenir comportamiento predeterminado
     event.preventDefault();
   }
-  
+
 
   onFrameMouseUp() {
     this.isFrameDragging = false;
@@ -605,5 +722,35 @@ export class ProfileComponent implements OnInit {
     // Aplicar restricciones
     this.cropFrameX = Math.max(-maxX, Math.min(maxX, this.cropFrameX));
     this.cropFrameY = Math.max(-maxY, Math.min(maxY, this.cropFrameY));
+  }
+
+  rotateImage(degrees: number) {
+    this.imageRotation = (this.imageRotation + degrees) % 360;
+    
+    // Después de rotar, es necesario recalcular los límites
+    setTimeout(() => {
+      // Re-obtener el rectángulo de la imagen después de la rotación
+      const imgElement = this.cropImageElement?.nativeElement;
+      if (imgElement) {
+        this.imageContainerRect = imgElement.getBoundingClientRect();
+        
+        // Asegurarse de que el recuadro esté dentro de los límites después de rotar
+        this.constrainFramePosition();
+      }
+    }, 350); // Esperar a que termine la transición de rotación
+  }
+
+  onFrameSizeChange(event: any) {
+    // Obtener el valor del slider (entre 30 y 90)
+    this.frameScalePercent = event.detail.value;
+    
+    if (!this.imageContainerRect) return;
+    
+    // Calcular el nuevo tamaño como porcentaje de la imagen
+    const minSide = Math.min(this.imageContainerRect.width, this.imageContainerRect.height);
+    this.cropFrameSize = minSide * (this.frameScalePercent / 100);
+    
+    // Restringir la posición después de cambiar el tamaño
+    this.constrainFramePosition();
   }
 }

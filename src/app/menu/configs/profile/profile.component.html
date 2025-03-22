@@ -107,6 +107,7 @@
             [src]="tempImageUrl" 
             alt="Imagen para recortar"
             class="crop-image"
+            [style.transform]="'rotate(' + imageRotation + 'deg)'"
             (load)="handleImageLoad()"
           >
           
@@ -121,6 +122,32 @@
             (mousedown)="onFrameMouseDown($event)"
             (mousemove)="onFrameMouseMove($event)"
             (mouseup)="onFrameMouseUp()">
+          </div>
+        </div>
+        
+        <!-- Controles para zoom y rotación -->
+        <div class="edit-controls">
+          <div class="control-group">
+            <ion-label>Tamaño del recorte</ion-label>
+            <ion-range
+              min="30"
+              max="90"
+              step="1"
+              [value]="frameScalePercent"
+              (ionChange)="onFrameSizeChange($event)"
+              aria-label="Tamaño del recorte">
+              <ion-icon name="remove-outline" slot="start"></ion-icon>
+              <ion-icon name="add-outline" slot="end"></ion-icon>
+            </ion-range>
+          </div>
+          
+          <div class="rotate-control">
+            <ion-button (click)="rotateImage(-90)">
+              <ion-icon name="refresh-outline" class="rotate-left"></ion-icon>
+            </ion-button>
+            <ion-button (click)="rotateImage(90)">
+              <ion-icon name="refresh-outline"></ion-icon>
+            </ion-button>
           </div>
         </div>
       </div>

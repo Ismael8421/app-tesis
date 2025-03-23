@@ -73,9 +73,20 @@
             </ion-item>
           </ion-list>
 
-          <ion-button expand="block">
-            Editar perfil
-          </ion-button>
+          <div class="profile-actions">
+            <ion-button expand="block" class="edit-profile-btn" (click)="openEditProfileModal()">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              Editar perfil
+            </ion-button>
+            
+            <ion-button expand="block" 
+                       fill="outline" 
+                       class="reset-preferences-btn" 
+                       (click)="resetPreferencesForm()">
+              <ion-icon name="refresh-outline" slot="start"></ion-icon>
+              Reiniciar preferencias
+            </ion-button>
+          </div>
         </ion-card-content>
       </ion-card>
     </ng-container>
@@ -172,12 +183,92 @@
       <div class="fullscreen-image-container">
         <div class="square-image-wrapper">
           <img 
-            [src]="profileImagePreview || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg'" 
+            [src]="profileImagePreview || 'icons/logo_tesis.png'" 
             alt="Foto de perfil"
             class="fullscreen-image"
           >
         </div>
       </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Modal para editar perfil -->
+<ion-modal [isOpen]="isEditProfileModalOpen" [backdropDismiss]="false" [animated]="true" class="edit-profile-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Editar perfil</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cancelEditProfile()">Cancelar</ion-button>
+          <ion-button (click)="saveProfile()" [disabled]="isProcessingForm" strong>
+            <ion-spinner *ngIf="isProcessingForm" name="crescent" class="save-spinner"></ion-spinner>
+            <span *ngIf="!isProcessingForm">Guardar</span>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <ion-list>
+          <ion-item>
+            <ion-label position="stacked">Nombre de usuario</ion-label>
+            <ion-input formControlName="nombreUsuario" placeholder="Nombre de usuario"></ion-input>
+            <ion-note slot="error" *ngIf="profileForm.get('nombreUsuario')?.hasError('required') && profileForm.get('nombreUsuario')?.touched">
+              El nombre de usuario es obligatorio
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Nombre</ion-label>
+            <ion-input formControlName="nombre" placeholder="Nombre"></ion-input>
+            <ion-note slot="error" *ngIf="profileForm.get('nombre')?.hasError('required') && profileForm.get('nombre')?.touched">
+              El nombre es obligatorio
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Apellido</ion-label>
+            <ion-input formControlName="apellido" placeholder="Apellido"></ion-input>
+            <ion-note slot="error" *ngIf="profileForm.get('apellido')?.hasError('required') && profileForm.get('apellido')?.touched">
+              El apellido es obligatorio
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Año Lectivo</ion-label>
+            <ion-select formControlName="anioLectivo" placeholder="Seleccionar año lectivo">
+              <ion-select-option value="Segundo">Segundo</ion-select-option>
+              <ion-select-option value="Tercero">Tercero</ion-select-option>
+            </ion-select>
+            <ion-note slot="error" *ngIf="profileForm.get('anioLectivo')?.hasError('required') && profileForm.get('anioLectivo')?.touched">
+              El año lectivo es obligatorio
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Carrera</ion-label>
+            <ion-select formControlName="carrera" placeholder="Seleccionar carrera">
+              <ion-select-option *ngFor="let carrera of carreras" [value]="carrera.value">
+                {{carrera.display}}
+              </ion-select-option>
+            </ion-select>
+            <ion-note slot="error" *ngIf="profileForm.get('carrera')?.hasError('required') && profileForm.get('carrera')?.touched">
+              La carrera es obligatoria
+            </ion-note>
+          </ion-item>
+          
+          <!-- Campo de mención solo si existe -->
+          <ion-item *ngIf="hasMencion">
+            <ion-label position="stacked">Mención</ion-label>
+            <ion-select formControlName="mencion" placeholder="Seleccionar mención">
+              <ion-select-option *ngFor="let mencion of mencionesActuales" [value]="mencion.valor">
+                {{mencion.display}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </form>
     </ion-content>
   </ng-template>
 </ion-modal>

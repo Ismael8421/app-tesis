@@ -37,6 +37,16 @@ ion-header {
       height: 80px;
       border: 3px solid var(--ion-color-primary);
       overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+      
+      &:active {
+        transform: scale(0.98);
+      }
     }
 
     .change-photo-btn {
@@ -186,9 +196,9 @@ ion-button {
 .crop-image {
   position: relative;
   max-width: 100%;
-  max-height: 65vh; /* Reducir de 80vh a 65vh */
+  max-height: 65vh;
   object-fit: contain;
-  transition: transform 0.3s ease; /* Agrega transición para rotación suave */
+  transition: transform 0.3s ease;
 }
 
 .edit-controls {
@@ -196,10 +206,10 @@ ion-button {
   max-width: 500px;
   padding: 16px;
   margin-top: 16px;
-  
+
   .control-group {
     margin-bottom: 16px;
-    
+
     ion-label {
       display: block;
       margin-bottom: 8px;
@@ -207,17 +217,17 @@ ion-button {
       color: var(--ion-color-medium);
     }
   }
-  
+
   .rotate-control {
     display: flex;
     justify-content: center;
     gap: 16px;
-    
+
     ion-button {
       --padding-start: 16px;
       --padding-end: 16px;
     }
-    
+
     .rotate-left {
       transform: scaleX(-1);
     }
@@ -257,7 +267,6 @@ ion-button {
   width: 16px;
   height: 16px;
 }
-
 
 // Botón de emergencia
 .emergency-btn-container {
@@ -306,10 +315,6 @@ ion-button {
   pointer-events: all;
   cursor: move;
   z-index: 10;
-  /* Inicialmente centrado - ELIMINA ESTAS LÍNEAS si tienes problemas */
-  /* top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); */
 }
 
 .image-container {
@@ -328,7 +333,6 @@ ion-button {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  /* Esto hace que se vea circular */
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -338,7 +342,6 @@ ion-button {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Esto mantiene las proporciones correctas */
   }
 }
 
@@ -346,6 +349,81 @@ ion-button {
 .crop-modal {
   --border-radius: 16px;
   --backdrop-opacity: 0.85;
+}
+
+// ESTILOS PARA MODAL DE IMAGEN COMPLETA - Fuera de media queries
+.fullscreen-image-modal {
+  --width: 100%;
+  --height: 100%;
+  --backdrop-opacity: 0.9;
+  --border-radius: 0;
+  
+  ion-header {
+    background: rgba(0, 0, 0, 0.5); // Añadir un fondo semi-transparente
+    
+    ion-toolbar {
+      --background: transparent;
+      --border-color: transparent;
+      
+      ion-title {
+        color: white !important; // Forzar color blanco
+        font-weight: 500;
+        opacity: 1;
+      }
+      
+      ion-button {
+        --color: white !important; // Forzar color blanco
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.fullscreen-image-content {
+  --background: rgba(0, 0, 0, 0.9);
+  --padding: 0;
+  --keyboard-offset: 0;
+  --overflow: hidden;
+}
+
+.fullscreen-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 0; // Quitar padding
+  box-sizing: border-box;
+  overflow: hidden; // Asegurar que no haya desbordamiento
+  position: fixed; // Fijar posición
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.square-image-wrapper {
+  // Ajustar el tamaño para evitar cualquier desbordamiento
+  width: min(85vw, 85vh);
+  height: min(85vw, 85vh);
+  max-width: 500px;
+  max-height: 500px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: auto; // Centrar automáticamente
+}
+
+.fullscreen-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  aspect-ratio: 1/1;
+  object-position: center;
 }
 
 // Responsive
@@ -360,11 +438,43 @@ ion-button {
     width: 350px;
     height: 350px;
   }
+  
+  // Modificar solo lo necesario para pantallas grandes
+  .fullscreen-image-modal {
+    --width: 90%;
+    --height: 90%;
+    --border-radius: 16px;
+  }
+  
+  .square-image-wrapper {
+    max-width: 600px;
+    max-height: 600px;
+  }
+
+  .fullscreen-image-modal ion-header {
+    background: rgba(0, 0, 0, 0.3); // Más sutil en pantallas grandes
+  }
 }
 
 @media (max-width: 480px) {
   .crop-preview-container {
     width: 280px;
     height: 280px;
+  }
+  
+  .square-image-wrapper {
+    width: 90vw;
+    height: 90vw;
+  }
+  
+  .fullscreen-image-container {
+    padding: 8px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .square-image-wrapper {
+    max-width: 700px;
+    max-height: 700px;
   }
 }

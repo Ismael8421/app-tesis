@@ -86,6 +86,8 @@ export class ProfileComponent implements OnInit {
   private _profileImageService = inject(ProfileImageService);
   private _zone = inject(NgZone);
 
+  isFullImageModalOpen = false;
+
   // Variables para el recuadro de recorte
   cropFrameSize = 200; // Tamaño inicial del recuadro en px
   cropFrameX = 0; // Posición X del recuadro
@@ -170,6 +172,20 @@ export class ProfileComponent implements OnInit {
       this.error = 'Error al cargar los datos del perfil';
       this.loading = false;
     }
+  }
+
+  openFullImageModal() {
+    if (this.profileImagePreview) {
+      this._zone.run(() => {
+        this.isFullImageModalOpen = true;
+      });
+    }
+  }
+
+  closeFullImageModal() {
+    this._zone.run(() => {
+      this.isFullImageModalOpen = false;
+    });
   }
 
   // Actualizar el estado del modo oscuro
@@ -308,7 +324,6 @@ export class ProfileComponent implements OnInit {
   }
 
   // Corregir el método saveCroppedImage() en profile.component.ts
-
   async saveCroppedImage() {
     this.isProcessingImage = true;
     
@@ -393,59 +408,50 @@ export class ProfileComponent implements OnInit {
       
       // Paso 3: Calcular la región de recorte
       // Obtener las dimensiones de la imagen mostrada en pantalla
-      const displayedRect = img.getBoundingClientRect();
+      const imgRect = img.getBoundingClientRect();
       const frameRect = frame.getBoundingClientRect();
       
-      // Calcular la proporción entre imagen original rotada y la mostrada en pantalla
-      let scaleX, scaleY;
+      // Calcular el centro de la imagen en el DOM
+      const imgCenterX = imgRect.left + imgRect.width / 2;
+      const imgCenterY = imgRect.top + imgRect.height / 2;
       
-      if (rotation === 90 || rotation === 270) {
-        scaleX = rotatedCanvas.width / displayedRect.height;
-        scaleY = rotatedCanvas.height / displayedRect.width;
-      } else {
-        scaleX = rotatedCanvas.width / displayedRect.width;
-        scaleY = rotatedCanvas.height / displayedRect.height;
-      }
-      
-      // Calcular centro de la imagen mostrada
-      const displayedCenterX = displayedRect.left + displayedRect.width / 2;
-      const displayedCenterY = displayedRect.top + displayedRect.height / 2;
-      
-      // Calcular el centro del frame en coordenadas absolutas de la ventana
+      // Calcular el centro del marco de recorte en el DOM
       const frameCenterX = frameRect.left + frameRect.width / 2;
       const frameCenterY = frameRect.top + frameRect.height / 2;
       
-      // Calcular el desplazamiento del frame desde el centro de la imagen
-      // como fracción del ancho/alto total
-      let relativeOffsetX, relativeOffsetY;
+      // Calcular el desplazamiento relativo (de -1 a 1) del marco desde el centro de la imagen
+      let relOffsetX = (frameCenterX - imgCenterX) / (imgRect.width / 2);
+      let relOffsetY = (frameCenterY - imgCenterY) / (imgRect.height / 2);
       
-      if (rotation === 90 || rotation === 270) {
-        // Para rotación 90/270, intercambiamos los ejes
-        relativeOffsetX = (frameCenterY - displayedCenterY) / displayedRect.height;
-        relativeOffsetY = (rotation === 90 ? -1 : 1) * (frameCenterX - displayedCenterX) / displayedRect.width;
-      } else {
-        relativeOffsetX = (frameCenterX - displayedCenterX) / displayedRect.width;
-        relativeOffsetY = (frameCenterY - displayedCenterY) / displayedRect.height;
-        
-        // Para rotación 180, invertimos ambos ejes
-        if (rotation === 180) {
-          relativeOffsetX *= -1;
-          relativeOffsetY *= -1;
-        }
+      // Ajustar el desplazamiento basado en la rotación
+      if (rotation === 90) {
+        const temp = relOffsetX;
+        relOffsetX = -relOffsetY;
+        relOffsetY = temp;
+      } else if (rotation === 180) {
+        relOffsetX = -relOffsetX;
+        relOffsetY = -relOffsetY;
+      } else if (rotation === 270) {
+        const temp = relOffsetX;
+        relOffsetX = relOffsetY;
+        relOffsetY = -temp;
       }
       
-      // Calcular la escala relativa del frame respecto a la imagen mostrada
-      let relativeFrameScale;
-      if (rotation === 90 || rotation === 270) {
-        relativeFrameScale = frameRect.width / Math.min(displayedRect.height, displayedRect.width);
-      } else {
-        relativeFrameScale = frameRect.width / Math.min(displayedRect.width, displayedRect.height);
-      }
+      // Calcular el tamaño relativo del marco comparado con la imagen
+      const imgMinDim = Math.min(imgRect.width, imgRect.height);
+      const frameRelSize = frameRect.width / imgMinDim;
       
-      // Calcular la región de recorte en la imagen rotada
-      const cropX = rotatedCanvas.width / 2 + relativeOffsetX * rotatedCanvas.width - (relativeFrameScale * rotatedCanvas.width) / 2;
-      const cropY = rotatedCanvas.height / 2 + relativeOffsetY * rotatedCanvas.height - (relativeFrameScale * rotatedCanvas.height) / 2;
-      const cropSize = relativeFrameScale * Math.min(rotatedCanvas.width, rotatedCanvas.height);
+      // Calcular la región de recorte en el canvas rotado
+      const rotatedMinDim = Math.min(rotatedCanvas.width, rotatedCanvas.height);
+      const cropSize = rotatedMinDim * frameRelSize;
+      
+      // Calcular las coordenadas centrales del área de recorte
+      const cropCenterX = rotatedCanvas.width / 2 + relOffsetX * (rotatedCanvas.width / 2);
+      const cropCenterY = rotatedCanvas.height / 2 + relOffsetY * (rotatedCanvas.height / 2);
+      
+      // Calcular las coordenadas superiores izquierdas del área de recorte
+      const cropX = cropCenterX - (cropSize / 2);
+      const cropY = cropCenterY - (cropSize / 2);
       
       // Paso 4: Crear canvas final y recortar
       const finalCanvas = document.createElement('canvas');
@@ -463,29 +469,6 @@ export class ProfileComponent implements OnInit {
         cropX, cropY, cropSize, cropSize,
         0, 0, finalSize, finalSize
       );
-      
-      // Paso 5: Para debugging, mostrar los canvas en el DOM
-      // Útil para identificar problemas, comenta esto en producción
-      /*
-      document.body.appendChild(originalCanvas);
-      document.body.appendChild(rotatedCanvas);
-      document.body.appendChild(finalCanvas);
-      originalCanvas.style.position = 'fixed';
-      rotatedCanvas.style.position = 'fixed';
-      finalCanvas.style.position = 'fixed';
-      originalCanvas.style.top = '10px';
-      rotatedCanvas.style.top = '10px';
-      finalCanvas.style.top = '10px';
-      originalCanvas.style.left = '10px';
-      rotatedCanvas.style.left = originalCanvas.width + 20 + 'px';
-      finalCanvas.style.left = originalCanvas.width + rotatedCanvas.width + 30 + 'px';
-      originalCanvas.style.zIndex = '9999';
-      rotatedCanvas.style.zIndex = '9999';
-      finalCanvas.style.zIndex = '9999';
-      originalCanvas.style.border = '2px solid red';
-      rotatedCanvas.style.border = '2px solid green';
-      finalCanvas.style.border = '2px solid blue';
-      */
       
       // Obtener la imagen resultante como dataURL
       const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.9);

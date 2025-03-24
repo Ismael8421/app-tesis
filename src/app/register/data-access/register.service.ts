@@ -1,3 +1,6 @@
+// src/app/register/data-access/register.service.ts
+// Actualización del servicio para manejar datos parciales y verificación de perfil
+
 import { Injectable, inject } from '@angular/core';
 import { Firestore, setDoc, doc, getDoc } from '@angular/fire/firestore';
 
@@ -11,6 +14,8 @@ export interface userCreate {
   uid?: string;
 }
 
+// Clave para almacenar datos temporales del formulario
+const FORM_STORAGE_KEY = 'pendingRegistrationForm';
 
 @Injectable({
   providedIn: 'root'
@@ -74,6 +79,9 @@ export class RegisterService {
         uid: uid
       });
 
+      // Limpiar datos guardados temporalmente
+      this.clearSavedFormData(uid);
+
       console.log(`Documento creado con éxito en la colección ${collectionName}`);
     } catch (error) {
       console.error('Error al escribir en Firestore:', error);
@@ -92,4 +100,43 @@ export class RegisterService {
     }
   }
 
+  // --- Métodos nuevos para manejar datos parciales ---
+
+  /**
+   * Guarda temporalmente los datos del formulario para un UID específico
+   */
+  saveFormData(uid: string, formData: Partial<userCreate>): void {
+    try {
+      const key = `${FORM_STORAGE_KEY}_${uid}`;
+      localStorage.setItem(key, JSON.stringify(formData));
+    } catch (error) {
+      console.error('Error al guardar datos del formulario:', error);
+    }
+  }
+
+  /**
+   * Recupera los datos temporales guardados para un UID específico
+   */
+  getSavedFormData(uid: string): Partial<userCreate> | null {
+    try {
+      const key = `${FORM_STORAGE_KEY}_${uid}`;
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Error al recuperar datos del formulario:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Limpia los datos temporales guardados para un UID específico
+   */
+  clearSavedFormData(uid: string): void {
+    try {
+      const key = `${FORM_STORAGE_KEY}_${uid}`;
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.error('Error al limpiar datos del formulario:', error);
+    }
+  }
 }

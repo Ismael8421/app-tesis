@@ -3,4 +3,20 @@
     <!-- Página 1: Datos personales -->
     <app-personal-data />
   </form>
+
+  <!-- Alerta para confirmación de salida -->
+  <ion-alert
+    [isOpen]="showExitAlert()"
+    header="¿Estás seguro?"
+    message="Si sales ahora, tus datos no se guardarán completamente en el sistema. Podrás volver para completar el registro más tarde."
+    [buttons]="exitAlertButtons"
+  ></ion-alert>
+
+  <!-- Alerta para formulario incompleto -->
+  <ion-alert
+    [isOpen]="showIncompleteAlert()"
+    header="Formulario incompleto"
+    message="Por favor completa todos los campos obligatorios antes de continuar."
+    [buttons]="incompleteAlertButtons"
+  ></ion-alert>
 </ion-content>

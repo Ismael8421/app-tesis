@@ -1,23 +1,28 @@
-// Colores principales
-$error-color: #dc3545;       // Color de error
+// Variables de color para compatibilidad con modo claro/oscuro
+$primary-color: var(--ion-color-primary);
+$text-color: var(--ion-text-color);
+$background-color: var(--ion-background-color);
+$item-background: var(--ion-item-background);
+$border-color: var(--ion-border-color);
+$error-color: var(--ion-color-danger);
 
-// Main container
+// Contenedor principal
 div[formGroup] {
   position: relative;
   width: 100%;
-  background: white;
+  background: var(--ion-background-color);
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-// Title
+// Título
 ion-text {
   width: 100%;
   
   h1 {
-    color: #FFB86C;
+    color: var(--ion-text-color);
     font-size: 28px;
     font-weight: 600;
     text-align: center;
@@ -25,87 +30,88 @@ ion-text {
   }
 }
 
-// Form list
+// Lista del formulario
 ion-list {
-  background: #6B7F8D;
+  background: var(--ion-card-background);
   border-radius: 15px;
   padding: 20px;
   margin: 10px auto;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--ion-box-shadow);
+  border: 1px solid var(--ion-border-color);
 }
 
-// Form items
+// Elementos del formulario
 ion-item {
-  --background: #7D8FA0;
+  --background: var(--ion-item-background);
   --border-radius: 8px;
   --padding-start: 10px;
   --padding-end: 10px;
   --inner-padding-end: 0;
   margin-bottom: 15px;
-  --border-color: transparent;
+  --border-color: var(--ion-border-color);
   --highlight-height: 0;
-  --color: #FFB86C;
+  --color: var(--ion-text-color);
   
   &::part(native) {
     padding: 10px;
     border-radius: 8px;
   }
   
-  // Labels
+  // Etiquetas
   ion-label {
-    --color: #FFB86C;
+    --color: var(--ion-text-color);
     font-size: 16px;
     font-weight: 500;
-    color: #FFB86C;
   }
   
   ion-label::part(text) {
-    color: #FFB86C;
+    color: var(--ion-text-color);
   }
   
-  // Inputs and selects
+  // Inputs y selects
   ion-input, ion-select {
     --padding-start: 8px;
     --padding-end: 8px;
     font-size: 16px;
-    --color: #FFB86C;
-    --placeholder-color: #FFB86C;
-  }
-  
-  // Select options text color 
-  ion-select-option {
-    color: #FFB86C;
+    --color: var(--ion-text-color);
+    --placeholder-color: var(--ion-text-color);
+    --placeholder-opacity: 0.7;
   }
   
   ion-select::part(text) {
-    color: #FFB86C;
+    color: var(--ion-text-color);
   }
   
   ion-select::part(placeholder) {
-    color: #FFB86C;
-    opacity: 0.8;
+    color: var(--ion-text-color);
+    opacity: 0.7;
   }
 }
 
-// Error messages
+// Mensajes de error
 ion-text[color="danger"] {
   margin: -10px 0 15px 10px;
   display: block;
   
   small {
-    color: $error-color;
+    color: var(--ion-color-danger);
   }
 }
 
-// Button styles
+// Estilo del botón
 ion-button {
-  --background: #FFB86C;
-  --color: #333;
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
   --border-radius: 25px;
   width: 180px;
   height: 48px;
   margin: 30px auto 20px;
   font-weight: 500;
+}
+
+// Añadimos algunas transiciones suaves para cambios de tema
+ion-item, ion-list, ion-button, h1 {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

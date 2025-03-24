@@ -1,18 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, ControlContainer, Validators } from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
+import { FormGroup, ControlContainer, Validators, FormControl, AsyncValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { IonButton, IonInput, IonItem, IonLabel, IonList, IonSelect, IonSelectOption, IonText } from '@ionic/angular/standalone';
+import { IonButton, IonInput, IonItem, IonLabel, IonList, IonSelect, IonSelectOption, IonText, IonSpinner } from '@ionic/angular/standalone';
+import { RegisterService } from '../data-access/register.service';
+import { UsernameValidators } from '../validators/username.validators';
+
 @Component({
   selector: 'app-personal-data',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, IonText, IonList, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton ],
+  imports: [ ReactiveFormsModule, CommonModule, IonText, IonList, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonButton, IonSpinner ],
   templateUrl: './personal-data.component.html',
   styleUrl: './personal-data.component.scss'
 })
 export class PersonalDataComponent implements OnInit {
   form!: FormGroup;
   showMencion: boolean = false;
+  private _registerService = inject(RegisterService);
 
   // Array de carreras para mostrar/valor
   carreras = [
@@ -74,6 +78,11 @@ export class PersonalDataComponent implements OnInit {
     const parentForm = this.controlContainer.control as FormGroup;
     this.form = parentForm;
 
+    const usernameControl = this.form.get('username');
+    if (usernameControl) {
+      usernameControl.setAsyncValidators(UsernameValidators.usernameExists(this._registerService));
+    }
+
     // Suscribirse a los cambios
     this.form.get('course')?.valueChanges.subscribe(() => this.checkMencionVisibility());
     this.form.get('profession')?.valueChanges.subscribe(() => this.checkMencionVisibility());
@@ -107,5 +116,10 @@ export class PersonalDataComponent implements OnInit {
     }
     
     mencionControl?.updateValueAndValidity();
+  }
+
+  isCheckingUsername(): boolean {
+    const control = this.form.get('username');
+    return control ? control.pending : false;
   }
 }

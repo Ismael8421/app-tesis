@@ -166,19 +166,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.showIncompleteAlert.set(true);
       return;
     }
-
+  
     try {
       this.loading.set(true);
       const user = this._authService.currentUser;
-
+  
       if (!user || !user.uid) {
         console.error('No se encontró un usuario autenticado.');
         return;
       }
-
+  
       const uid = user.uid;
       const { username, name, lastName, course, profession, mencion } = this.form.value;
-
+  
       const userData: userCreate = {
         nombreUsuario: username || '',
         nombre: name || '',
@@ -187,16 +187,53 @@ export class RegisterComponent implements OnInit, OnDestroy {
         carrera: profession || '',
         mencion: mencion || '' // Si no hay mención, será string vacío
       };
-
-      await this._userCreate.create(uid, userData);
-      this._router.navigateByUrl('/menu');
-
+  
+      try {
+        await this._userCreate.create(uid, userData);
+        this._router.navigateByUrl('/menu');
+      } catch (error: any) {
+        console.error('Error al crear el documento:', error);
+        // Si el error es por nombre de usuario duplicado, mostrar alerta
+        if (error.message && error.message.includes('ya está en uso')) {
+          // Marcar el campo como erróneo manualmente
+          this.form.get('username')?.setErrors({
+            usernameExists: true
+          });
+          // Mostrar un mensaje al usuario
+          this.showError(error.message);
+        } else {
+          this.showError('Ha ocurrido un error al crear el usuario. Por favor intenta de nuevo.');
+        }
+      }
+  
     } catch (error) {
       console.error('Error al crear el documento:', error);
+      this.showError('Ha ocurrido un error al procesar tu solicitud. Por favor intenta de nuevo.');
     } finally {
       this.loading.set(false);
     }
   }
+
+  showError(message: string) {
+    // Aquí puedes implementar la lógica para mostrar un mensaje de error
+    // Por ejemplo, usando una alerta de Ionic
+    
+    // Definimos una nueva propiedad para la alerta de error
+    this.errorMessage = message;
+    this.showErrorAlert.set(true);
+  }
+  
+  // Añadir estas propiedades al componente
+  showErrorAlert = signal(false);
+  errorMessage: string = '';
+  
+  // Añadir botones para la alerta de error
+  errorAlertButtons = [
+    {
+      text: 'Entendido',
+      handler: () => { this.showErrorAlert.set(false); }
+    }
+  ];
   
   // Función auxiliar para verificar si una carrera requiere mención
   private requiereMencion(carrera: string): boolean {

@@ -8,10 +8,14 @@
     <ion-item>
       <ion-label position="floating">Nombre de Usuario</ion-label>
       <ion-input id="username" type="text" formControlName="username"></ion-input>
+      <ion-spinner *ngIf="isCheckingUsername()" name="dots" slot="end"></ion-spinner>
     </ion-item>
     <div *ngIf="form.controls['username'].invalid && form.controls['username'].touched">
-      <ion-text color="danger">
+      <ion-text color="danger" *ngIf="form.controls['username'].errors?.['required']">
         <small>Este campo es obligatorio</small>
+      </ion-text>
+      <ion-text color="danger" *ngIf="form.controls['username'].errors?.['usernameExists']">
+        <small>Este nombre de usuario ya está en uso</small>
       </ion-text>
     </div>
 

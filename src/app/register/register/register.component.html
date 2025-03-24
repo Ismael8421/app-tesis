@@ -13,10 +13,17 @@
   ></ion-alert>
 
   <!-- Alerta para formulario incompleto -->
-  <ion-alert
+  <!-- <ion-alert
     [isOpen]="showIncompleteAlert()"
     header="Formulario incompleto"
     message="Por favor completa todos los campos obligatorios antes de continuar."
     [buttons]="incompleteAlertButtons"
+  ></ion-alert> -->
+
+  <ion-alert
+  [isOpen]="showErrorAlert()"
+  header="Error"
+  [message]="errorMessage"
+  [buttons]="errorAlertButtons"
   ></ion-alert>
 </ion-content>

@@ -65,6 +65,12 @@ export class RegisterService {
 
   async create(uid: string, user: userCreate) {
     try {
+      // Verificar si el nombre de usuario ya está tomado
+      const isUsernameTaken = await this.isUsernameTaken(user.nombreUsuario);
+      if (isUsernameTaken) {
+        throw new Error(`El nombre de usuario "${user.nombreUsuario}" ya está en uso`);
+      }
+  
       const userWithUID = { ...user, uid };
       const collectionName = this.getCollectionName(user.carrera);
       
@@ -78,10 +84,13 @@ export class RegisterService {
         carrera: user.carrera,
         uid: uid
       });
-
+  
+      // Vincular el nombre de usuario al UID
+      await this.linkUsernameToUID(user.nombreUsuario, uid);
+  
       // Limpiar datos guardados temporalmente
       this.clearSavedFormData(uid);
-
+  
       console.log(`Documento creado con éxito en la colección ${collectionName}`);
     } catch (error) {
       console.error('Error al escribir en Firestore:', error);
@@ -137,6 +146,18 @@ export class RegisterService {
       localStorage.removeItem(key);
     } catch (error) {
       console.error('Error al limpiar datos del formulario:', error);
+    }
+  }
+
+  async isUsernameTaken(username: string): Promise<boolean> {
+    try {
+      const usernameDoc = doc(this._firestore, `usernames/${username}`);
+      const usernameSnapshot = await getDoc(usernameDoc);
+      
+      return usernameSnapshot.exists();
+    } catch (error) {
+      console.error('Error al verificar el nombre de usuario:', error);
+      throw error;
     }
   }
 }

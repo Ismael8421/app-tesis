@@ -70,5 +70,11 @@
 	<string>Necesitamos acceso a tu galería para que puedas seleccionar imágenes</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Necesitamos permiso para guardar imágenes en tu galería.</string>
+	<!-- Configuración para la seguridad de transporte -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

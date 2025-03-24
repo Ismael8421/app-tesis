@@ -1,6 +1,43 @@
 // Eliminamos las variables locales y usamos las variables CSS de Ionic
 // para garantizar la compatibilidad con el sistema de temas global
 
+.network-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  
+  ion-icon {
+    margin-right: 8px;
+  }
+  
+  &.offline {
+    background-color: rgba(var(--ion-color-warning-rgb), 0.2);
+    color: var(--ion-color-warning-shade);
+  }
+  
+  &.online {
+    background-color: rgba(var(--ion-color-success-rgb), 0.2);
+    color: var(--ion-color-success-shade);
+  }
+}
+
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0;
+  color: var(--ion-color-medium);
+  
+  ion-spinner {
+    margin-bottom: 12px;
+  }
+}
+
 .chat-container {
   max-width: 800px;
   margin: 0 auto;
@@ -9,12 +46,34 @@
   transition: background-color 0.3s ease;
 }
 
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ion-background-color);
+  color: var(--ion-text-color);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .chat-title {
+  --background: var(--ion-toolbar-background);
+  --color: var(--ion-text-color);
+  box-shadow: 0 2px 10px var(--ion-box-shadow-color);
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 24px;
   text-align: center;
   color: var(--ion-text-color);
+}
+
+.back-icon {
+  font-size: 24px;
+  color: var(--ion-color-primary);
+  transition: transform 0.3s ease;
+}
+
+.back-icon:hover {
+  transform: translateX(-3px);
 }
 
 .search-container {

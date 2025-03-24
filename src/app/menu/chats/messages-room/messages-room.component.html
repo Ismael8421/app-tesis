@@ -1,6 +1,16 @@
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <div class="chat-container">
     <div class="chat-title">Chats</div>
+
+    <!-- Indicador de estado de red -->
+    <div *ngIf="!isOnline" class="network-status offline">
+      <ion-icon name="cloud-offline"></ion-icon>
+      Sin conexión - Mostrando datos almacenados
+    </div>
 
     <div class="search-container">
       <form (submit)="$event.preventDefault()">
@@ -22,7 +32,13 @@
       Mostrando {{filteredChats.length}} resultado(s) para "{{searchTerm}}"
     </div>
 
-    <ion-list lines="full" class="ion-no-padding">
+    <!-- Indicador de carga -->
+    <div *ngIf="isLoading" class="loading-indicator">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Cargando chats...</span>
+    </div>
+
+    <ion-list lines="full" class="ion-no-padding" *ngIf="!isLoading">
       <ng-container *ngIf="currentUser">
         <ion-item *ngFor="let chat of filteredChats" button detail
         class="chat-item"

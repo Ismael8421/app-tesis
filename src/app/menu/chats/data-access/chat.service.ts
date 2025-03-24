@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Database, ref, push, set, onValue, get, update, query, orderByChild } from '@angular/fire/database';
-import { Observable } from 'rxjs';
+import { Observable, from, of, combineLatest, BehaviorSubject } from 'rxjs';
+import { map, switchMap, tap, catchError } from 'rxjs/operators';
+import { ChatStorageService } from './chat-storage.service';
+import { NetworkService } from './network.service';
 
 interface Message {
   content: string;
   senderId: string;
   senderName: string;
   timestamp: number;
-  readBy: { [key: string]: boolean }; // New field to track who has read the message
+  readBy: { [key: string]: boolean };
+  id?: string;
 }
 
 interface Chat {
@@ -16,13 +20,20 @@ interface Chat {
   lastMessage?: string;
   lastMessageTimestamp?: number;
   createdAt: number;
+  unreadMessages?: { [key: string]: boolean };
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  constructor(private db: Database) { }
+  private forceRefresh$ = new BehaviorSubject<boolean>(false);
+
+  constructor(
+    private db: Database,
+    private storageService: ChatStorageService,
+    private networkService: NetworkService
+  ) { }
 
   private async sendNotificationForNewMessage(chatId: string, senderId: string, message: string): Promise<void> {
     try {
@@ -349,24 +360,96 @@ export class ChatService {
     });
   }
 
-  getUserChatsRealtime(userId: string): Observable<any[]> {
-    return new Observable(subscriber => {
-      if (!userId) {
-        console.log('No userId provided to getUserChatsRealtime');
-        subscriber.next([]);
-        return;
-      }
+  getUserChatsRealtime(userId: string): Observable<Chat[]> {
+    if (!userId) {
+      console.log('No userId provided to getUserChatsRealtime');
+      return of([]);
+    }
+    
+    // Combinamos la fuente local y la remota
+    return combineLatest([
+      // Datos locales (cargados inmediatamente)
+      this.storageService.getUserChats(userId),
+      
+      // Indicador de refresco forzado
+      this.forceRefresh$,
+      
+      // Estado de la red
+      this.networkService.isOnline$
+    ]).pipe(
+      switchMap(([localChats, forceRefresh, isOnline]) => {
+        console.log('Chats locales cargados:', localChats.length);
+        
+        // Si no hay conexión, devolvemos solo los datos locales
+        if (!isOnline) {
+          console.log('Sin conexión: usando solo datos locales');
+          return of(localChats);
+        }
+        
+        // Si hay datos locales y no se fuerza actualización, los devolvemos primero
+        if (localChats.length > 0 && !forceRefresh) {
+          // Emitimos los datos locales primero mientras cargamos los remotos
+          setTimeout(() => this.loadRemoteChats(userId), 0);
+          return of(localChats);
+        }
+        
+        // Si no hay datos locales o se fuerza actualización, cargamos datos remotos
+        return this.loadRemoteChats(userId);
+      })
+    );
+  }
   
-      console.log('Starting realtime chat subscription for user:', userId);
+  getMessagesRealtime(chatId: string): Observable<Message[]> {
+    if (!chatId) return of([]);
+    
+    return combineLatest([
+      // Datos locales (cargados inmediatamente)
+      this.storageService.getChatMessages(chatId),
+      
+      // Indicador de refresco forzado
+      this.forceRefresh$,
+      
+      // Estado de la red
+      this.networkService.isOnline$
+    ]).pipe(
+      switchMap(([localMessages, forceRefresh, isOnline]) => {
+        console.log('Mensajes locales cargados:', localMessages.length);
+        
+        // Si no hay conexión, devolvemos solo los datos locales
+        if (!isOnline) {
+          console.log('Sin conexión: usando solo mensajes locales');
+          return of(localMessages);
+        }
+        
+        // Si hay datos locales y no se fuerza actualización, los devolvemos primero
+        if (localMessages.length > 0 && !forceRefresh) {
+          // Emitimos los datos locales primero mientras cargamos los remotos
+          setTimeout(() => this.loadRemoteMessages(chatId), 0);
+          return of(localMessages);
+        }
+        
+        // Si no hay datos locales o se fuerza actualización, cargamos datos remotos
+        return this.loadRemoteMessages(chatId);
+      })
+    );
+  }
+
+  private loadRemoteChats(userId: string): Observable<Chat[]> {
+    console.log('Cargando chats desde Firebase para:', userId);
+    
+    return new Observable<Chat[]>(subscriber => {
       const userChatsRef = ref(this.db, `userChats/${userId}`);
       
       const unsubscribe = onValue(userChatsRef, async (snapshot) => {
         try {
-          console.log('UserChats snapshot received');
+          console.log('UserChats snapshot recibido desde Firebase');
           
           if (!snapshot.exists()) {
-            console.log('No chats found for user');
+            console.log('No se encontraron chats para el usuario');
             subscriber.next([]);
+            
+            // Guardar el array vacío en almacenamiento local
+            await this.storageService.saveUserChats(userId, []);
             return;
           }
   
@@ -392,56 +475,86 @@ export class ChatService {
             .filter(chat => chat !== null)
             .sort((a, b) => (b.lastMessageTimestamp || 0) - (a.lastMessageTimestamp || 0));
   
-          console.log('Emitting updated chats:', chats.length);
+          console.log('Emitiendo chats actualizados desde Firebase:', chats.length);
+          
+          // Guardar en almacenamiento local
+          await this.storageService.saveUserChats(userId, chats);
+          
           subscriber.next(chats);
         } catch (error) {
-          console.error('Error getting user chats:', error);
+          console.error('Error obteniendo chats del usuario:', error);
           subscriber.error(error);
         }
       }, error => {
-        console.error('Error in chat subscription:', error);
+        console.error('Error en suscripción de chats:', error);
         subscriber.error(error);
       });
   
-      // Cleanup function
+      // Función de limpieza
       return () => {
-        console.log('Cleaning up chat subscription');
+        console.log('Limpiando suscripción de chats');
         unsubscribe();
       };
     });
   }
   
-  getMessagesRealtime(chatId: string): Observable<any[]> {
-    return new Observable(subscriber => {
+  forceRefreshChats(): void {
+    this.forceRefresh$.next(true);
+    // Reiniciamos después de un tiempo para futuras solicitudes
+    setTimeout(() => this.forceRefresh$.next(false), 100);
+  }
+
+  private loadRemoteMessages(chatId: string): Observable<Message[]> {
+    console.log('Cargando mensajes desde Firebase para chat:', chatId);
+    
+    return new Observable<Message[]>(subscriber => {
       const messagesRef = ref(this.db, `messages/${chatId}`);
       const orderedRef = query(messagesRef, orderByChild('timestamp'));
 
-      const unsubscribe = onValue(orderedRef, (snapshot) => {
+      const unsubscribe = onValue(orderedRef, async (snapshot) => {
         try {
           if (!snapshot.exists()) {
             subscriber.next([]);
+            
+            // Guardar el array vacío en almacenamiento local
+            await this.storageService.saveChatMessages(chatId, []);
             return;
           }
 
-          const messages: any[] = [];
+          const messages: Message[] = [];
           snapshot.forEach((childSnapshot) => {
             messages.push({
-              id: childSnapshot.key,
+              id: childSnapshot.key || undefined,
               ...childSnapshot.val()
             });
           });
+          
+          // Guardar en almacenamiento local
+          await this.storageService.saveChatMessages(chatId, messages);
 
           subscriber.next(messages);
         } catch (error) {
-          console.error('Error getting messages:', error);
+          console.error('Error obteniendo mensajes:', error);
           subscriber.error(error);
         }
       }, error => {
-        console.error('Error in messages subscription:', error);
+        console.error('Error en suscripción de mensajes:', error);
         subscriber.error(error);
       });
 
       return () => unsubscribe();
     });
+  }
+
+  forceRefreshMessages(): void {
+    this.forceRefresh$.next(true);
+    // Reiniciamos después de un tiempo para futuras solicitudes
+    setTimeout(() => this.forceRefresh$.next(false), 100);
+  }
+  
+  // Método para limpiar datos de usuario al cerrar sesión
+  async clearUserData(userId: string): Promise<void> {
+    if (!userId) return;
+    await this.storageService.clearUserData(userId);
   }
 }

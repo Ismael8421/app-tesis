@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy, inject, NgZone, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import { ChatService } from '../data-access/chat.service';
+import { ChatStorageService } from '../data-access/chat-storage.service';
+import { NetworkService } from '../data-access/network.service';
 import { Auth } from '@angular/fire/auth';
 import { Observable, Subscription, interval, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RecomendatioIconComponent } from '../../../UI/recomendatio-icon/recomendatio-icon.component';
-import { IonAvatar, IonContent, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonAvatar, IonContent, IonIcon, IonItem, IonLabel, IonList, IonRefresher, IonRefresherContent, IonSpinner } from '@ionic/angular/standalone';
 import { RegisterService } from '../../../register/data-access/register.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ThemeService } from '../../configs/settings/data-access/theme.service';
@@ -17,10 +19,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './messages-room.component.html',
   styleUrls: ['./messages-room.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, RecomendatioIconComponent, IonContent, IonList, IonItem, IonAvatar, IonLabel]
+  imports: [CommonModule, FormsModule, RecomendatioIconComponent, IonContent, IonList, IonItem, 
+    IonAvatar, IonLabel, IonRefresher, IonRefresherContent, IonSpinner, IonIcon]
 })
 export class MessagesRoomComponent implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
+  private storageService = inject(ChatStorageService);
+  private networkService = inject(NetworkService);
   private auth = inject(Auth);
   private router = inject(Router);
   private registerService = inject(RegisterService);
@@ -29,10 +34,12 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   private appRef = inject(ApplicationRef);
   private _themeService = inject(ThemeService);
   
+  // Suscripciones
   private chatsSubscription?: Subscription;
   private authStateSubscription?: Subscription;
   private refreshSubscription?: Subscription;
   private searchSubscription?: Subscription;
+  private networkSubscription?: Subscription;
   
   // Intervalo de refresco en milisegundos (15 segundos)
   private REFRESH_INTERVAL = 15000;
@@ -49,7 +56,9 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   isSearching: boolean = false;
   private searchSubject = new Subject<string>();
   
-  // Variable para modo oscuro
+  // Variables para UI
+  isOnline: boolean = true;
+  isLoading: boolean = true;
   isDarkMode: boolean = false;
 
   constructor() {
@@ -68,6 +77,20 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     // Configurar el debounce para la búsqueda
     this.setupSearchDebounce();
     
+    // Suscribirse a cambios en la conectividad
+    this.networkSubscription = this.networkService.isOnline$.subscribe(isOnline => {
+      this.zone.run(() => {
+        this.isOnline = isOnline;
+        
+        // Si recuperamos la conectividad, actualizar datos
+        if (isOnline) {
+          this.chatService.forceRefreshChats();
+        }
+        
+        this.cdr.detectChanges();
+      });
+    });
+    
     // Suscribirse a los cambios de autenticación
     this.authStateSubscription = new Observable<any>(observer => {
       return this.auth.onAuthStateChanged(
@@ -83,7 +106,28 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
       
       // Configurar refresco periódico
       this.setupPeriodicRefresh();
+      
+      // Cargar nombres de usuario desde la caché
+      this.loadCachedUserNames();
     });
+  }
+  
+  // Cargar nombres de usuario desde la caché
+  private async loadCachedUserNames() {
+    if (!this.currentUser) return;
+    
+    try {
+      const cachedNames = await this.storageService.getUserNames();
+      
+      if (Object.keys(cachedNames).length > 0) {
+        this.zone.run(() => {
+          this.userNames = cachedNames;
+          this.cdr.detectChanges();
+        });
+      }
+    } catch (error) {
+      console.error('Error cargando nombres de usuario en caché:', error);
+    }
   }
 
   // Actualizar el estado del modo oscuro
@@ -150,7 +194,10 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     
     // Refrescar cada X segundos (definido por REFRESH_INTERVAL)
     this.refreshSubscription = interval(this.REFRESH_INTERVAL).subscribe(() => {
-      this.fetchChatsData();
+      // Solo actualizar si estamos en línea
+      if (this.isOnline) {
+        this.chatService.forceRefreshChats();
+      }
     });
   }
 
@@ -164,72 +211,45 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     if (!this.currentUser) {
       this.chats = [];
       this.filteredChats = [];
+      this.isLoading = false;
       return;
     }
     
-    // Realizar la obtención inicial de datos
-    this.fetchChatsData();
-  }
-  
-  private fetchChatsData() {
-    if (!this.currentUser) return;
+    // Mostrar indicador de carga
+    this.isLoading = true;
     
-    // Limpiar suscripción anterior si existe
-    if (this.chatsSubscription) {
-      this.chatsSubscription.unsubscribe();
-    }
-    
-    // Crear nueva suscripción
+    // Suscribirse a los chats (que ahora usa la caché)
     this.chatsSubscription = this.chatService.getUserChatsRealtime(this.currentUser.uid)
       .subscribe({
         next: (chats) => {
-          // Verificar si hay cambios en los chats antes de actualizar
-          const hasChanges = this.detectChangesInChats(chats);
-          
-          if (hasChanges) {
-            // Actualizar directamente la propiedad chats
-            this.zone.run(() => {
-              this.chats = chats;
-              
-              // Inicializar los chats filtrados si es la primera carga
-              if (this.filteredChats.length === 0 && !this.searchTerm) {
-                this.filteredChats = [...this.chats];
-              } else {
-                // Si ya hay una búsqueda activa, actualizar los resultados
-                this.performSearch(this.searchTerm);
-              }
-              
-              // Forzar la detección de cambios
-              this.cdr.detectChanges();
-              this.appRef.tick();
-              
-              // Cargar nombres de usuario para los chats
-              this.loadUserNames(chats);
-            });
-          }
+          this.zone.run(() => {
+            // Ocultar indicador de carga
+            this.isLoading = false;
+            
+            // Actualizar los chats
+            this.chats = chats;
+            
+            // Inicializar los chats filtrados si es la primera carga
+            if (this.filteredChats.length === 0 && !this.searchTerm) {
+              this.filteredChats = [...this.chats];
+            } else {
+              // Si ya hay una búsqueda activa, actualizar los resultados
+              this.performSearch(this.searchTerm);
+            }
+            
+            // Forzar la detección de cambios
+            this.cdr.detectChanges();
+            this.appRef.tick();
+            
+            // Cargar nombres de usuario para los chats
+            this.loadUserNames(chats);
+          });
         },
-        error: (error) => console.error('Error in chats subscription:', error)
+        error: (error) => {
+          console.error('Error in chats subscription:', error);
+          this.isLoading = false;
+        }
       });
-  }
-  
-  // Método para detectar cambios en los chats
-  private detectChangesInChats(newChats: any[]): boolean {
-    if (this.chats.length !== newChats.length) {
-      return true;
-    }
-    
-    // Comparar timestamps de últimos mensajes
-    for (const newChat of newChats) {
-      const existingChat = this.chats.find(chat => chat.id === newChat.id);
-      if (!existingChat || 
-          existingChat.lastMessageTimestamp !== newChat.lastMessageTimestamp || 
-          existingChat.lastMessage !== newChat.lastMessage ||
-          JSON.stringify(existingChat.unreadMessages) !== JSON.stringify(newChat.unreadMessages)) {
-        return true;
-      }
-    }
-    
-    return false;
   }
   
   private async loadUserNames(chats: any[]) {
@@ -264,6 +284,9 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
       this.zone.run(() => {
         this.userNames = { ...this.userNames, ...newUserNames };
         
+        // Guardar nombres en caché
+        this.storageService.saveUserNames(this.userNames);
+        
         // Volver a ejecutar la búsqueda si hay una activa
         if (this.searchTerm) {
           this.performSearch(this.searchTerm);
@@ -288,6 +311,9 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     if (this.searchSubscription) {
       this.searchSubscription.unsubscribe();
     }
+    if (this.networkSubscription) {
+      this.networkSubscription.unsubscribe();
+    }
   }
 
   navigateTo(chatId: string) {
@@ -305,5 +331,21 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     if (!otherUserId) return 'Usuario';
     
     return this.userNames[otherUserId] || 'Cargando...';
+  }
+  
+  // Método para el pull-to-refresh
+  handleRefresh(event: any) {
+    if (this.isOnline && this.currentUser) {
+      // Forzar actualización de los datos
+      this.chatService.forceRefreshChats();
+      
+      // Completar el evento de refresco después de un breve retraso
+      setTimeout(() => {
+        event.target.complete();
+      }, 1000);
+    } else {
+      // Si no hay conexión, simplemente completar el refresco
+      event.target.complete();
+    }
   }
 }

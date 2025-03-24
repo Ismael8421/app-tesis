@@ -1,4 +1,8 @@
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <div class="chat">
     <ion-header>
       <ion-toolbar class="chat-title">
@@ -10,7 +14,7 @@
 
         <ion-title class="title-container" *ngIf="chatData$ | async as chatData">
           <h1>{{ chatData.otherUserName }}</h1>
-          <h2>En línea</h2>
+          <h2>{{ isOnline ? 'En línea' : 'Sin conexión' }}</h2>
         </ion-title>
 
         <ion-avatar slot="end" class="avatar">
@@ -19,9 +23,21 @@
       </ion-toolbar>
     </ion-header>
 
+    <!-- Indicador de estado de red -->
+    <div *ngIf="!isOnline" class="network-status offline">
+      <ion-icon name="cloud-offline"></ion-icon>
+      Sin conexión - Mostrando mensajes almacenados
+    </div>
+
     <div class="messages">
       <div class="messages-content" #scrollContainer>
-        <ng-container *ngIf="currentUser && messages$ | async as messages">
+        <!-- Loading indicator -->
+        <div *ngIf="isLoading" class="loading-indicator">
+          <ion-spinner name="crescent"></ion-spinner>
+          <span>Cargando mensajes...</span>
+        </div>
+
+        <ng-container *ngIf="currentUser && !isLoading && (messages$ | async) as messages">
           <div *ngFor="let message of messages" 
                [ngClass]="{
                  'message-sent': currentUser && message.senderId === currentUser.uid,
@@ -47,12 +63,14 @@
       <ion-input [(ngModel)]="mensaje" 
                  placeholder="Enviar mensaje" 
                  class="message-input"
-                 (keyup.enter)="enviar_mensaje()"></ion-input>
+                 (keyup.enter)="enviar_mensaje()"
+                 [disabled]="!isOnline || isSending"></ion-input>
 
       <ion-button (click)="enviar_mensaje()" 
                   class="message-submit"
-                  [disabled]="!mensaje.trim()">
-        Enviar
+                  [disabled]="!mensaje.trim() || !isOnline || isSending">
+        <ion-spinner *ngIf="isSending" name="dots" class="send-spinner"></ion-spinner>
+        <span *ngIf="!isSending">Enviar</span>
       </ion-button>
     </div>
   </div>

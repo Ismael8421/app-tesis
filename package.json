@@ -28,6 +28,8 @@
     "@capacitor/core": "^7.0.1",
     "@capacitor/ios": "^7.0.1",
     "@capacitor/local-notifications": "^7.0.0",
+    "@capacitor/network": "^7.0.0",
+    "@capacitor/preferences": "^7.0.0",
     "@capacitor/push-notifications": "^7.0.0",
     "@ionic/angular": "^8.4.2",
     "firebase": "^11.4.0",

@@ -60,6 +60,45 @@
   transform: scale(1.1);
 }
 
+/* Indicador de estado de red */
+.network-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  
+  ion-icon {
+    margin-right: 8px;
+  }
+  
+  &.offline {
+    background-color: rgba(var(--ion-color-warning-rgb), 0.2);
+    color: var(--ion-color-warning-shade);
+  }
+  
+  &.online {
+    background-color: rgba(var(--ion-color-success-rgb), 0.2);
+    color: var(--ion-color-success-shade);
+  }
+}
+
+/* Loading indicator */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0;
+  color: var(--ion-color-medium);
+  
+  ion-spinner {
+    margin-bottom: 12px;
+  }
+}
+
 /* Messages area */
 .messages {
   height: 100%;
@@ -148,12 +187,20 @@
   --padding-end: 15px;
   --box-shadow: 0 2px 5px var(--ion-box-shadow-color);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-width: 70px;
+  display: flex;
+  justify-content: center;
 }
 
 .message-submit:active {
   --background: var(--ion-color-primary-shade);
   transform: scale(0.95);
   --box-shadow: 0 1px 2px var(--ion-box-shadow-color);
+}
+
+/* Spinner dentro del botón de enviar */
+.send-spinner {
+  display: inline-block;
 }
 
 .no-messages {

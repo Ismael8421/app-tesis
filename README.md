@@ -1,3 +1,5 @@
+Se agrega la opción de eliminar conversaciones pero hay que arreglar bug de que si un usuario elimina un chat y este inicia uno con el mismo que elimino, para el otro (el que eliminaron) se le crean dos chats con el mismo usuario
+
 # AppTesis
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.12.

@@ -307,4 +307,35 @@ export class ChatStorageService {
       console.error('Error limpiando datos expirados:', error);
     }
   }
+
+  async deleteChatData(chatId: string, userId: string): Promise<void> {
+    if (!chatId) return;
+    
+    try {
+      // Eliminar mensajes del chat
+      await Preferences.remove({ key: `${this.MESSAGES_PREFIX}${chatId}` });
+      
+      // Actualizar la lista de chats del usuario si existe
+      if (userId) {
+        const { value } = await Preferences.get({ key: `${this.CHATS_KEY}_${userId}` });
+        
+        if (value) {
+          const data = JSON.parse(value);
+          const updatedChats = data.chats.filter((chat: any) => chat.id !== chatId);
+          
+          await Preferences.set({
+            key: `${this.CHATS_KEY}_${userId}`,
+            value: JSON.stringify({
+              chats: updatedChats,
+              timestamp: Date.now()
+            })
+          });
+        }
+      }
+      
+      console.log(`Datos del chat ${chatId} eliminados del almacenamiento local`);
+    } catch (error) {
+      console.error('Error eliminando datos del chat:', error);
+    }
+  }
 }

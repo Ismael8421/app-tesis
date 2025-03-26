@@ -41,9 +41,11 @@
     <ion-list lines="full" class="ion-no-padding" *ngIf="!isLoading">
       <ng-container *ngIf="currentUser">
         <ion-item *ngFor="let chat of filteredChats" button detail
-        class="chat-item"
-        [class.unread]="chat.unreadMessages?.[currentUser.uid]"
-        (click)="navigateTo(chat.id)">
+          class="chat-item"
+          [class.unread]="chat.unreadMessages?.[currentUser.uid]"
+          (click)="navigateTo(chat.id)"
+          (touchstart)="onChatItemTouchStart($event, chat)"
+          (touchend)="onChatItemTouchEnd($event)">
           <ion-avatar slot="start">
             <img
               src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg">
@@ -69,5 +71,27 @@
         <p>No se encontraron resultados para "{{searchTerm}}"</p>
       </div>
     </ion-list>
+    
+    <!-- Mensaje informativo sobre long press -->
+    <div *ngIf="filteredChats.length > 0" class="long-press-hint">
+      <small>Mantén presionado un chat para ver más opciones</small>
+    </div>
   </div>
+  
+  <!-- Action Sheet para acciones de chat -->
+  <ion-action-sheet
+    [isOpen]="showActionSheet"
+    header="Opciones de chat"
+    [buttons]="actionSheetButtons"
+    (didDismiss)="closeActionSheet()">
+  </ion-action-sheet>
+  
+  <!-- Confirmación de eliminación -->
+  <ion-alert
+    [isOpen]="showDeleteConfirm"
+    header="Eliminar conversación"
+    message="¿Estás seguro que deseas eliminar esta conversación? Esta acción no se puede deshacer."
+    [buttons]="alertButtons"
+    (didDismiss)="cancelDelete()">
+  </ion-alert>
 </ion-content>

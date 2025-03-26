@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Database, ref, push, set, onValue, get, update, query, orderByChild } from '@angular/fire/database';
+import { Database, ref, push, set, onValue, get, update, query, orderByChild, remove } from '@angular/fire/database';
 import { Observable, from, of, combineLatest, BehaviorSubject } from 'rxjs';
 import { map, switchMap, tap, catchError } from 'rxjs/operators';
 import { ChatStorageService } from './chat-storage.service';
@@ -556,5 +556,58 @@ export class ChatService {
   async clearUserData(userId: string): Promise<void> {
     if (!userId) return;
     await this.storageService.clearUserData(userId);
+  }
+
+  async deleteChat(chatId: string, userId: string): Promise<void> {
+    if (!chatId || !userId) {
+      throw new Error('Se requieren chatId y userId para eliminar un chat');
+    }
+
+    try {
+      // Verificar que el chat exista y que el usuario sea participante
+      const chatRef = ref(this.db, `chats/${chatId}`);
+      const chatSnapshot = await get(chatRef);
+      
+      if (!chatSnapshot.exists()) {
+        throw new Error('El chat no existe');
+      }
+      
+      const chatData = chatSnapshot.val();
+      
+      // Verificar que el usuario sea participante del chat
+      if (!chatData.participants.includes(userId)) {
+        throw new Error('El usuario no es participante de este chat');
+      }
+      
+      // 1. Eliminar la referencia del chat para este usuario
+      const userChatRef = ref(this.db, `userChats/${userId}/${chatId}`);
+      await remove(userChatRef);
+      
+      // 2. Actualizar el estado del chat (opcional: marcar como eliminado para este usuario)
+      // Podríamos mantener un registro de quién ha eliminado el chat sin eliminarlo completamente
+      const updates: any = {};
+      updates[`chats/${chatId}/deletedBy/${userId}`] = true;
+      await update(ref(this.db), updates);
+      
+      // 3. Si ambos usuarios han eliminado el chat, eliminar completamente el chat y sus mensajes
+      const otherUserId = chatData.participants.find((id: string) => id !== userId);
+      if (otherUserId && chatData.deletedBy && chatData.deletedBy[otherUserId]) {
+        // Ambos usuarios han eliminado el chat, eliminarlo completamente
+        await remove(ref(this.db, `chats/${chatId}`));
+        await remove(ref(this.db, `messages/${chatId}`));
+      }
+      
+      // 4. Eliminar también de la caché local
+      await this.storageService.deleteChatData(chatId, userId);
+      
+      // 5. Forzar actualización de la lista de chats
+      this.forceRefreshChats();
+      
+      console.log(`Chat ${chatId} eliminado exitosamente para el usuario ${userId}`);
+      
+    } catch (error) {
+      console.error('Error al eliminar chat:', error);
+      throw new Error('No se pudo eliminar el chat');
+    }
   }
 }

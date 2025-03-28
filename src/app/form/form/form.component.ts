@@ -493,9 +493,9 @@ export class FormComponent {
             redes: this.form.get('offer_skills_sec_inf')?.get('networks')?.value || ''
           },
           ciencias_seg_of: {
-            laboratorio: this.form.get('offer_skills_sec_science')?.get('lab')?.value || '',
-            psicologia: this.form.get('offer_skills_sec_science')?.get('psychology')?.value || '',
-            redaccionCreativaSeg: this.form.get('offer_skills_sec_science')?.get('creativeWritingSec')?.value || ''
+            laboratorio: this.form.get('offer_skills_sec_sciences')?.get('lab')?.value || '',
+            psicologia: this.form.get('offer_skills_sec_sciences')?.get('psychology')?.value || '',
+            redaccionCreativaSeg: this.form.get('offer_skills_sec_sciences')?.get('creativeWritingSec')?.value || ''
           }
         },
         habilidad_ofrecida_ter: {

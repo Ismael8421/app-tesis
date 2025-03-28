@@ -5,8 +5,8 @@
 
   <ion-list *ngIf="userData?.anioLectivo === 'Segundo'" formGroupName="wanted_skills_sec_science">
     <ion-item>
-      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
-      <ion-select id="programming" formControlName="programing">
+      <ion-label position="floating">Experimentos prácticos de fenómenos físicos y químicos</ion-label>
+      <ion-select id="lab" formControlName="lab" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -15,8 +15,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
-      <ion-select id="support" formControlName="support">
+      <ion-label position="floating">Estudio del comportamiento y procesos mentales humanos</ion-label>
+      <ion-select id="psychology" formControlName="psychology" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -25,18 +25,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
-      <ion-select id="web" formControlName="web">
-        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
-        <ion-select-option value="Alto">Alto</ion-select-option>
-        <ion-select-option value="Medio">Medio</ion-select-option>
-        <ion-select-option value="Bajo">Bajo</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
-      <ion-select id="networks" formControlName="networks">
+      <ion-label position="floating">Creación de textos interesantes y bien estructurados</ion-label>
+      <ion-select id="creativeWritingSec" formControlName="creativeWritingSec" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>

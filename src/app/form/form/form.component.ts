@@ -93,14 +93,42 @@ export class FormComponent {
         O5: new FormControl(false),
         O6: new FormControl(false)
       }),
+
+      //busca segundos
+      wanted_skills_sec_ieme: new FormGroup({
+        installationsSec: new FormControl(''),
+        electricalEngSec: new FormControl(''),
+        electronicsSec: new FormControl(''),
+        automationElecSec: new FormControl('')
+      }),
+      wanted_skills_sec_mcm: new FormGroup({
+        weldingMcmSec: new FormControl(''),
+        millingSec: new FormControl(''),
+        latheSec: new FormControl(''),
+        drawingMcmSec: new FormControl('')
+      }),
+      wanted_skills_sec_ema: new FormGroup({
+        systemSec: new FormControl(''),
+        electronicSec: new FormControl(''),
+        maintenanceSec: new FormControl('')
+      }),
+      wanted_skills_sec_mec: new FormGroup({
+        digitalElectronics: new FormControl(''),
+        cncSec: new FormControl(''),
+        manufactureSec: new FormControl(''),
+        automationSystems: new FormControl('')
+      }),
       wanted_skills_sec_inf: new FormGroup({
         programing: new FormControl(''),
         support: new FormControl(''),
         web: new FormControl(''),
         networks: new FormControl('')
       }),
-
-      //busca segundos
+      wanted_skills_sec_science: new FormGroup({
+        lab: new FormControl(''),
+        psychology: new FormControl(''),
+        creativeWritingSec: new FormControl('')
+      }),
 
       //busca terceros
       wanted_skills_third_ieme: new FormGroup({
@@ -171,11 +199,39 @@ export class FormComponent {
       }),
 
       //ofrecido segundos
+      offer_skills_sec_ieme: new FormGroup({
+        installationsSec: new FormControl(''),
+        electricalEngSec: new FormControl(''),
+        electronicsSec: new FormControl(''),
+        automationElecSec: new FormControl('')
+      }),
+      offer_skills_sec_mcm: new FormGroup({
+        weldingMcmSec: new FormControl(''),
+        millingSec: new FormControl(''),
+        latheSec: new FormControl(''),
+        drawingMcmSec: new FormControl('')
+      }),
+      offer_skills_sec_ema: new FormGroup({
+        systemSec: new FormControl(''),
+        electronicSec: new FormControl(''),
+        maintenanceSec: new FormControl('')
+      }),
+      offer_skills_sec_mec: new FormGroup({
+        digitalElectronics: new FormControl(''),
+        cncSec: new FormControl(''),
+        manufactureSec: new FormControl(''),
+        automationSystems: new FormControl('')
+      }),
       offer_skills_sec_inf: new FormGroup({
         programing: new FormControl(''),
         support: new FormControl(''),
         web: new FormControl(''),
         networks: new FormControl('')
+      }),
+      offer_skills_sec_sciences: new FormGroup({
+        lab: new FormControl(''),
+        psychology: new FormControl(''),
+        creativeWritingSec: new FormControl(''),
       }),
       
 
@@ -303,11 +359,39 @@ export class FormComponent {
         horas: this.form.get('hours')?.value || '',
         carrera_buscada: this.getSelectedCarreras(),
         habilidad_buscada_seg: {
+          ieme_seg: {
+            instalacionesSeg: this.form.get('wanted_skills_sec_ieme')?.get('installationsSec')?.value || '',
+            electricidadSeg: this.form.get('wanted_skills_sec_ieme')?.get('electricalEngSec')?.value || '',
+            electronicaSeg: this.form.get('wanted_skills_sec_ieme')?.get('electronicsSec')?.value || '',
+            automatizacionSeg: this.form.get('wanted_skills_sec_ieme')?.get('automationElecSec')?.value || ''
+          },
+          mcm_seg: {
+            soldaduraMcmSeg: this.form.get('wanted_skills_sec_mcm')?.get('weldingMcmSec')?.value || '',
+            fresadoraSeg: this.form.get('wanted_skills_sec_mcm')?.get('millingSec')?.value || '',
+            tornoSeg: this.form.get('wanted_skills_sec_mcm')?.get('latheSec')?.value || '',
+            dibujoMcmSeg: this.form.get('wanted_skills_sec_mcm')?.get('drawingMcmSec')?.value || '',
+          },
+          ema_seg: {
+            sistemasSeg: this.form.get('wanted_skills_sec_ema')?.get('systemSec')?.value || '',
+            electronicaSeg: this.form.get('wanted_skills_sec_ema')?.get('electronicSec')?.value || '',
+            mantenimientoSeg: this.form.get('wanted_skills_sec_ema')?.get('maintenanceSec')?.value || '',
+          },
+          mec_seg: {
+            electronicaDigital: this.form.get('wanted_skills_sec_mec')?.get('digitalElectronics')?.value || '',
+            cncMecSeg: this.form.get('wanted_skills_sec_mec')?.get('cncSec')?.value || '',
+            manufacturaMecSeg: this.form.get('wanted_skills_sec_mec')?.get('manufactureSec')?.value || '',
+            automatizacionMecSeg: this.form.get('wanted_skills_sec_mec')?.get('automationSystems')?.value || ''
+          },
           informatica_seg: {
             programacion: this.form.get('wanted_skills_sec_inf')?.get('programing')?.value || '',
             soporte: this.form.get('wanted_skills_sec_inf')?.get('support')?.value || '',
             web: this.form.get('wanted_skills_sec_inf')?.get('web')?.value || '',
             redes: this.form.get('wanted_skills_sec_inf')?.get('networks')?.value || ''
+          },
+          ciencias_seg: {
+            laboratorio: this.form.get('wanted_skills_sec_science')?.get('lab')?.value || '',
+            psicologia: this.form.get('wanted_skills_sec_science')?.get('psychology')?.value || '',
+            redaccionCreativaSeg: this.form.get('wanted_skills_sec_science')?.get('creativeWritingSec')?.value || ''
           }
         },
         habilidad_buscada_ter: {
@@ -379,11 +463,39 @@ export class FormComponent {
           }
         },
         habilidad_ofrecida_seg: {
+          ieme_seg_of: {
+            instalacionesSeg: this.form.get('offer_skills_sec_ieme')?.get('installationsSec')?.value || '',
+            electricidadSeg: this.form.get('offer_skills_sec_ieme')?.get('electricalEngSec')?.value || '',
+            electronicaSeg: this.form.get('offer_skills_sec_ieme')?.get('electronicsSec')?.value || '',
+            automatizacionSeg: this.form.get('offer_skills_sec_ieme')?.get('automationElecSec')?.value || ''
+          },
+          mcm_seg_of: {
+            soldaduraMcmSeg: this.form.get('offer_skills_sec_mcm')?.get('weldingMcmSec')?.value || '',
+            fresadoraSeg: this.form.get('offer_skills_sec_mcm')?.get('millingSec')?.value || '',
+            tornoSeg: this.form.get('offer_skills_sec_mcm')?.get('latheSec')?.value || '',
+            dibujoMcmSeg: this.form.get('offer_skills_sec_mcm')?.get('drawingMcmSec')?.value || '',
+          },
+          ema_seg_of: {
+            sistemasSeg: this.form.get('offer_skills_sec_ema')?.get('systemSec')?.value || '',
+            electronicaSeg: this.form.get('offer_skills_sec_ema')?.get('electronicSec')?.value || '',
+            mantenimientoSeg: this.form.get('offer_skills_sec_ema')?.get('maintenanceSec')?.value || '',
+          },
+          mec_seg_of: {
+            electronicaDigital: this.form.get('offer_skills_sec_mec')?.get('digitalElectronics')?.value || '',
+            cncMecSeg: this.form.get('offer_skills_sec_mec')?.get('cncSec')?.value || '',
+            manufacturaMecSeg: this.form.get('offer_skills_sec_mec')?.get('manufactureSec')?.value || '',
+            automatizacionMecSeg: this.form.get('offer_skills_sec_mec')?.get('automationSystems')?.value || ''
+          },
           informatica_seg_of: {
             programacion: this.form.get('offer_skills_sec_inf')?.get('programing')?.value || '',
             soporte: this.form.get('offer_skills_sec_inf')?.get('support')?.value || '',
             web: this.form.get('offer_skills_sec_inf')?.get('web')?.value || '',
             redes: this.form.get('offer_skills_sec_inf')?.get('networks')?.value || ''
+          },
+          ciencias_seg_of: {
+            laboratorio: this.form.get('offer_skills_sec_science')?.get('lab')?.value || '',
+            psicologia: this.form.get('offer_skills_sec_science')?.get('psychology')?.value || '',
+            redaccionCreativaSeg: this.form.get('offer_skills_sec_science')?.get('creativeWritingSec')?.value || ''
           }
         },
         habilidad_ofrecida_ter: {

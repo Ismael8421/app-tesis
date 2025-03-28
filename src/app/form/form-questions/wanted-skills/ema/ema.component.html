@@ -5,8 +5,8 @@
 
   <ion-list *ngIf="userData?.anioLectivo === 'Segundo'" formGroupName="wanted_skills_sec_ema">
     <ion-item>
-      <ion-label position="floating">Desarrollo de programas o aplicaciones</ion-label>
-      <ion-select id="programming" formControlName="programing">
+      <ion-label position="floating">Funcionamiento y aplicación de circuitos y sistemas eléctricos</ion-label>
+      <ion-select id="systemSec" formControlName="systemSec" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -15,8 +15,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Construcción y programación de circuitos electrónicos</ion-label>
-      <ion-select id="support" formControlName="support">
+      <ion-label position="floating">Estudio de componentes y circuitos electrónicos básicos</ion-label>
+      <ion-select id="electronicSec" formControlName="electronicSec" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>
@@ -25,18 +25,8 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Diseño y desarrollo de páginas web</ion-label>
-      <ion-select id="web" formControlName="web">
-        <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
-        <ion-select-option value="Alto">Alto</ion-select-option>
-        <ion-select-option value="Medio">Medio</ion-select-option>
-        <ion-select-option value="Bajo">Bajo</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
-      <ion-label position="floating">Configuración de sistemas operativos y redes de computadoras</ion-label>
-      <ion-select id="networks" formControlName="networks">
+      <ion-label position="floating">Diagnóstico y reparación de sistemas electrónicos automotrices</ion-label>
+      <ion-select id="maintenanceSec" formControlName="maintenanceSec" placeholder="Elige una opción">
         <ion-select-option value="" disabled selected>Elige una opción</ion-select-option>
         <ion-select-option value="Alto">Alto</ion-select-option>
         <ion-select-option value="Medio">Medio</ion-select-option>

@@ -2,11 +2,44 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
 
 //habilidades buscadas segundos
+export interface habilidad_ieme_seg {
+  instalacionesSeg?: string;
+  electricidadSeg?: string;
+  electronicaSeg?: string;
+  automatizacionSeg?: string;
+}
+
+export interface habilidad_mcm_seg {
+  soldaduraMcmSeg?: string;
+  fresadoraSeg?: string;
+  tornoSeg?: string;
+  dibujoMcmSeg?: string;
+}
+
+export interface habilidad_ema_seg {
+  sistemasSeg?: string;
+  electronicaSeg?: string;
+  mantenimientoSeg?: string;
+}
+
+export interface habilidad_mec_seg {
+  electronicaDigital?: string;
+  cncMecSeg?: string;
+  manufacturaMecSeg?: string;
+  automatizacionMecSeg?: string;
+}
+
 export interface habilid_inf_seg {
   programacion?: string;
   soporte?: string;
   web?: string;
   redes?: string;
+}
+
+export interface habilidad_ciencias_seg {
+  laboratorio?: string;
+  psicologia?: string;
+  redaccionCreativaSeg?: string;
 }
 
 //habilidades buscadas terceros
@@ -83,11 +116,44 @@ export interface habilid_inf_ter {
 }
 
 //habilidades ofrecidas segundos
+export interface habilidad_ieme_seg_of {
+  instalacionesSeg?: string;
+  electricidadSeg?: string;
+  electronicaSeg?: string;
+  automatizacionSeg?: string;
+}
+
+export interface habilidad_mcm_seg_of {
+  soldaduraMcmSeg?: string;
+  fresadoraSeg?: string;
+  tornoSeg?: string;
+  dibujoMcmSeg?: string;
+}
+
+export interface habilidad_ema_seg_of {
+  sistemasSeg?: string;
+  electronicaSeg?: string;
+  mantenimientoSeg?: string;
+}
+
+export interface habilidad_mec_seg_of {
+  electronicaDigital?: string;
+  cncMecSeg?: string;
+  manufacturaMecSeg?: string;
+  automatizacionMecSeg?: string;
+}
+
 export interface habilid_inf_seg_of {
   programacion?: string;
   soporte?: string;
   web?: string;
   redes?: string;
+}
+
+export interface habilidad_ciencias_seg_of {
+  laboratorio?: string;
+  psicologia?: string;
+  redaccionCreativaSeg?: string;
 }
 
 //habilidades ofrecidas terceros
@@ -169,7 +235,12 @@ export interface formCreate {
   horas: string;
   carrera_buscada: string[];
   habilidad_buscada_seg?: {
-    informatica_seg?: habilid_inf_seg
+    ieme_seg?: habilidad_ieme_seg,
+    mcm_seg?: habilidad_mcm_seg,
+    ema_seg?: habilidad_ema_seg,
+    mec_seg?: habilidad_mec_seg,
+    informatica_seg?: habilid_inf_seg,
+    ciencias_seg?: habilidad_ciencias_seg
   };
   habilidad_buscada_ter?: {
     ieme_ter?: habilidad_ieme_ter,
@@ -180,7 +251,12 @@ export interface formCreate {
     ciecias_ter?: habilidad_ciencias_ter
   };
   habilidad_ofrecida_seg?: {
-    informatica_seg_of?: habilid_inf_seg_of
+    ieme_seg_of?: habilidad_ieme_seg_of,
+    mcm_seg_of?: habilidad_mcm_seg_of,
+    ema_seg_of?: habilidad_ema_seg_of,
+    mec_seg_of?: habilidad_mec_seg_of,
+    informatica_seg_of?: habilid_inf_seg_of,
+    ciencias_seg_of?: habilidad_ciencias_seg_of
   };
   habilidad_ofrecida_ter?: {
     ieme_ter_of?: habilidad_ieme_ter_of,

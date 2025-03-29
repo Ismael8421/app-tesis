@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit} from '@angular/core';
+import { Component, Input, OnInit} from '@angular/core';
 import { ControlContainer, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IonCheckbox, IonItem, IonLabel, IonList, IonRadio, IonRadioGroup, IonText } from '@ionic/angular/standalone';
 
@@ -11,7 +11,12 @@ import { IonCheckbox, IonItem, IonLabel, IonList, IonRadio, IonRadioGroup, IonTe
   styleUrls: ['./preferences.component.scss'],
 })
 export class PreferencesComponent implements OnInit {
+  showErrors = false; // Inicialmente no mostrar errores
   form!: FormGroup;
+
+  @Input() set shouldShowErrors(value: boolean) {
+    this.showErrors = value;
+  }
 
   constructor(private controlContainer: ControlContainer) {}
 

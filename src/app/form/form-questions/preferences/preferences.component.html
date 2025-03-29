@@ -29,6 +29,11 @@
         <ion-checkbox #checkbox4 slot="start" formControlName="Q1O4"></ion-checkbox>
         <ion-label>Fines de semana por la tarde</ion-label>
       </ion-item>
+      
+      <!-- Un solo mensaje de error para todo el grupo -->
+      <div class="error-message" *ngIf="form.get('schedule')?.hasError('requireCheckbox') && showErrors">
+        Debes seleccionar al menos una opción de horario.
+      </div>
     </div>
 
     <!-- Método de trabajo -->
@@ -51,6 +56,11 @@
         <ion-radio slot="start" value="ambos"></ion-radio>
         <ion-label>Ambos</ion-label>
       </ion-item>
+      
+      <!-- Mensaje de error para método -->
+      <div class="error-message" *ngIf="form.get('method')?.invalid && form.get('method')?.touched">
+        Debes seleccionar un método de trabajo.
+      </div>
     </ion-radio-group>
 
     <!-- Nivel de dedicación -->
@@ -73,6 +83,11 @@
         <ion-radio slot="start" value="flexible"></ion-radio>
         <ion-label>Flexible según necesidad</ion-label>
       </ion-item>
+      
+      <!-- Mensaje de error para horas -->
+      <div class="error-message" *ngIf="form.get('hours')?.invalid && form.get('hours')?.touched">
+        Debes seleccionar un nivel de dedicación.
+      </div>
     </ion-radio-group>
   </ion-list>
 </div>

@@ -1,4 +1,4 @@
-import { Component, NgModule, inject, signal } from '@angular/core';
+import { Component, EventEmitter, NgModule, Output, inject, signal } from '@angular/core';
 import { PreferencesComponent } from '../form-questions/preferences/preferences.component';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
@@ -63,9 +63,23 @@ export class FormComponent {
   form: FormGroup;
   page: number = 1;
 
+  showErrors = false;
+
+  @Output() showFormErrors = new EventEmitter<boolean>();
+  
+
   nextPage() {
-    if (this.page < 7) {
-      this.page++;
+    if (this.isPageComplete(this.page)) {
+      // Si la página está completa, avanzar
+      if (this.page < 7) {
+        this.page++;
+      }
+      // Reset showErrors cuando avanzamos
+      this.showErrors = false;
+    } else {
+      // Si la página no está completa, mostrar errores
+      this.showErrors = true;
+      this.showFormErrors.emit(true);
     }
   }
 
@@ -82,7 +96,7 @@ export class FormComponent {
         Q1O2: new FormControl(false),
         Q1O3: new FormControl(false),
         Q1O4: new FormControl(false)
-      }),
+      }, this.atLeastOneCheckedValidator()),
       method: new FormControl(''),
       hours: new FormControl(''),
       wanted_profession: new FormGroup({
@@ -92,7 +106,7 @@ export class FormComponent {
         O4: new FormControl(false),
         O5: new FormControl(false),
         O6: new FormControl(false)
-      }),
+      }, this.atLeastOneCheckedValidator()),
 
       //busca segundos
       wanted_skills_sec_ieme: new FormGroup({
@@ -233,7 +247,7 @@ export class FormComponent {
         psychology: new FormControl(''),
         creativeWritingSec: new FormControl(''),
       }),
-      
+
 
       //ofrecido terceros
       offer_skills_third_ieme: new FormGroup({
@@ -504,13 +518,13 @@ export class FormComponent {
             instalaciones: this.form.get('offer_skills_third_ieme')?.get('installations')?.value || '',
             automatismosEle: this.form.get('offer_skills_third_ieme')?.get('automationElec')?.value || '',
             electronica: this.form.get('offer_skills_third_ieme')?.get('electronics')?.value || '',
-  	        potencia: this.form.get('offer_skills_third_ieme')?.get('power')?.value || '',
- 	          maquinas: this.form.get('offer_skills_third_ieme')?.get('machines')?.value || '',
- 	          industrial: this.form.get('offer_skills_third_ieme')?.get('industrial')?.value || '',
- 	          microcontroladores: this.form.get('offer_skills_third_ieme')?.get('microcontrollersIeme')?.value || '',
- 	          electronicaAplicada: this.form.get('offer_skills_third_ieme')?.get('appliedElectronics')?.value || '',
-	          comunicaciones: this.form.get('offer_skills_third_ieme')?.get('communications')?.value || '',
-	          redesComputadoras: this.form.get('offer_skills_third_ieme')?.get('computersNetworks')?.value || '',
+            potencia: this.form.get('offer_skills_third_ieme')?.get('power')?.value || '',
+            maquinas: this.form.get('offer_skills_third_ieme')?.get('machines')?.value || '',
+            industrial: this.form.get('offer_skills_third_ieme')?.get('industrial')?.value || '',
+            microcontroladores: this.form.get('offer_skills_third_ieme')?.get('microcontrollersIeme')?.value || '',
+            electronicaAplicada: this.form.get('offer_skills_third_ieme')?.get('appliedElectronics')?.value || '',
+            comunicaciones: this.form.get('offer_skills_third_ieme')?.get('communications')?.value || '',
+            redesComputadoras: this.form.get('offer_skills_third_ieme')?.get('computersNetworks')?.value || '',
           },
           mcm_ter_of: {
             metrologia: this.form.get('offer_skills_third_mcm')?.get('metrology')?.value || '',
@@ -662,21 +676,33 @@ export class FormComponent {
   }
 
   isPageComplete(page: number): boolean {
+    console.log('Verificando compleción de página:', page);
+    
     const result = (() => {
       switch (page) {
         case 1:
-          return this.isPreferencesComplete();
+          const prefComplete = this.isPreferencesComplete();
+          console.log('Página 1 (Preferencias) completa:', prefComplete);
+          return prefComplete;
         case 2:
-          return this.isWantedProfessionComplete();
+          const profComplete = this.isWantedProfessionComplete();
+          console.log('Página 2 (Profesión deseada) completa:', profComplete);
+          return profComplete;
         case 3:
-          const complete = this.isWantedSkillsComplete();
-          return complete;
+          const skillsComplete = this.isWantedSkillsComplete();
+          console.log('Página 3 (Habilidades buscadas) completa:', skillsComplete);
+          return skillsComplete;
         case 4:
-          return this.isOfferSkillsComplete();
+          const offerComplete = this.isOfferSkillsComplete();
+          console.log('Página 4 (Habilidades ofrecidas) completa:', offerComplete);
+          return offerComplete;
         default:
+          console.log('Página desconocida:', page);
           return false;
       }
     })();
+    
+    console.log('Resultado final para página', page, ':', result);
     return result;
   }
 
@@ -685,65 +711,135 @@ export class FormComponent {
     const methodControl = this.form.get('method');
     const hoursControl = this.form.get('hours');
 
-    const scheduleValid = scheduleGroup?.valid ?? false;
-    const methodValid = (methodControl?.value !== '' && methodControl?.valid) ?? false;
-    const hoursValid = (hoursControl?.value !== '' && hoursControl?.valid) ?? false;
+    // Verifica que schedule tenga al menos una opción seleccionada
+    const scheduleValid = scheduleGroup ? !scheduleGroup.hasError('requireCheckbox') : false;
 
-    const isValid = scheduleValid && methodValid && hoursValid;
+    // Verifica que method y hours tengan valores, con conversión explícita a boolean
+    const methodValid = Boolean(methodControl?.value) && Boolean(methodControl?.valid);
+    const hoursValid = Boolean(hoursControl?.value) && Boolean(hoursControl?.valid);
 
-    return isValid;
+    return scheduleValid && methodValid && hoursValid;
   }
 
 
   private isWantedProfessionComplete(): boolean {
-    return this.form.get('wanted_profession')?.valid ?? false;
+    const wantedProfessionGroup = this.form.get('wanted_profession');
+    return wantedProfessionGroup ? !wantedProfessionGroup.hasError('requireCheckbox') : false;
   }
 
   private isWantedSkillsComplete(): boolean {
     const selectedProfessions = this.form.get('wanted_profession')?.value;
     if (!selectedProfessions) return false;
 
-    // Verificar las habilidades según las profesiones seleccionadas
-    if (selectedProfessions.O5) { // Si seleccionó informática
-      if (this.userData?.anioLectivo === 'Segundo') {
-        const secInfValid = this.form.get('wanted_skills_sec_inf')?.valid ?? false;
-        return secInfValid;
-      } else if (this.userData?.anioLectivo === 'Tercero') {
-        const thirdInfValid = this.form.get('wanted_skills_third_inf')?.valid ?? false;
-        return thirdInfValid;
+    let allValid = true;
+
+    // IEME
+    if (selectedProfessions.O1) {
+      const groupName = this.userData?.anioLectivo === 'Segundo' ? 'wanted_skills_sec_ieme' : 'wanted_skills_third_ieme';
+      const group = this.form.get(groupName);
+      if (!group || !this.areAllFieldsInGroupFilled(group)) {
+        allValid = false;
       }
     }
-    // Agregar más validaciones según sea necesario para otras carreras
-    return true;
+
+    // MCM
+    if (selectedProfessions.O2) {
+      const groupName = this.userData?.anioLectivo === 'Segundo' ? 'wanted_skills_sec_mcm' : 'wanted_skills_third_mcm';
+      const group = this.form.get(groupName);
+      if (!group || !this.areAllFieldsInGroupFilled(group)) {
+        allValid = false;
+      }
+    }
+
+    // EMA
+    if (selectedProfessions.O3) {
+      const groupName = this.userData?.anioLectivo === 'Segundo' ? 'wanted_skills_sec_ema' : 'wanted_skills_third_ema';
+      const group = this.form.get(groupName);
+      if (!group || !this.areAllFieldsInGroupFilled(group)) {
+        allValid = false;
+      }
+    }
+
+    // Mecatrónica
+    if (selectedProfessions.O4) {
+      const groupName = this.userData?.anioLectivo === 'Segundo' ? 'wanted_skills_sec_mec' : 'wanted_skills_third_mec';
+      const group = this.form.get(groupName);
+      if (!group || !this.areAllFieldsInGroupFilled(group)) {
+        allValid = false;
+      }
+    }
+
+    // Informática
+    if (selectedProfessions.O5) {
+      const groupName = this.userData?.anioLectivo === 'Segundo' ? 'wanted_skills_sec_inf' : 'wanted_skills_third_inf';
+      const group = this.form.get(groupName);
+      if (!group || !this.areAllFieldsInGroupFilled(group)) {
+        allValid = false;
+      }
+    }
+
+    // Ciencias
+    if (selectedProfessions.O6) {
+      const groupName = this.userData?.anioLectivo === 'Segundo' ? 'wanted_skills_sec_science' : 'wanted_skills_third_science';
+      const group = this.form.get(groupName);
+      if (!group || !this.areAllFieldsInGroupFilled(group)) {
+        allValid = false;
+      }
+    }
+
+    return allValid;
   }
 
+  // Método auxiliar para verificar que todos los campos en un grupo tengan valor
+  private areAllFieldsInGroupFilled(group: AbstractControl): boolean {
+    if (!(group instanceof FormGroup)) return false;
+    
+    return Object.keys(group.controls).every(key => {
+      const control = group.get(key);
+      return control?.value !== '' && control?.value !== null && control?.value !== undefined;
+    });
+  }
+
+
   private isOfferSkillsComplete(): boolean {
-    if (this.userData?.carrera !== 'Informatica') return true;
-
-    if (this.userData?.anioLectivo === 'Segundo') {
-      const secInfValid = this.form.get('offer_skills_sec_inf')?.valid ?? false;
-      const allFieldsCompleted = Object.values(this.form.get('offer_skills_sec_inf')?.value ?? {})
-        .every(value => value !== null && value !== '' && value !== undefined);
-      return secInfValid && allFieldsCompleted;
+    if (!this.userData?.carrera) return false;
+  
+    const groupPrefix = this.userData.anioLectivo === 'Segundo' ? 'offer_skills_sec_' : 'offer_skills_third_';
+    let groupSuffix = '';
+  
+    switch (this.userData.carrera) {
+      case 'Informatica': groupSuffix = 'inf'; break;
+      case 'IEME': groupSuffix = 'ieme'; break;
+      case 'MCM': groupSuffix = 'mcm'; break;
+      case 'EMA': groupSuffix = 'ema'; break;
+      case 'Mecatronica': groupSuffix = 'mec'; break;
+      case 'Ciencias': groupSuffix = 'sciences'; break;
+      default: return false;
     }
-    else if (this.userData?.anioLectivo === 'Tercero') {
-      const thirdInfGroup = this.form.get('offer_skills_third_inf');
-      if (!thirdInfGroup) return false;
-
-      // Obtener los campos requeridos según la mención
-      const requiredFields = this.userData?.mencion === 'Programacion movil'
-        ? ['programming1', 'desing', 'cad', 'support1', 'mobile']
-        : ['programming1', 'desing', 'cad', 'web1', 'networks1'];
-
-      // Verificar que todos los campos requeridos tengan un valor
-      const allRequiredFieldsCompleted = requiredFields.every(field => {
-        const value = thirdInfGroup.get(field)?.value;
-        return value !== null && value !== '' && value !== undefined;
-      });
-
-      return allRequiredFieldsCompleted;
+  
+    const groupName = groupPrefix + groupSuffix;
+    const group = this.form.get(groupName);
+    
+    // Debug: Veamos qué contiene el grupo
+    console.log('Grupo validando:', groupName);
+    console.log('Contenido del grupo:', group?.value);
+    
+    // Si el grupo no existe, retornamos false
+    if (!group) {
+      console.log('Grupo no encontrado:', groupName);
+      return false;
     }
-
+    
+    // Ahora usemos una lógica más simple para validación inicial
+    // Consideremos la página como válida si el grupo no tiene errores
+    if (group.valid) {
+      console.log('Grupo válido:', groupName);
+      return true;
+    }
+    
+    console.log('Grupo inválido:', groupName, 'Errores:', group.errors);
+    
+    // Si llegamos aquí, el grupo tiene errores
     return false;
   }
 

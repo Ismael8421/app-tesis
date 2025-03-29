@@ -5,6 +5,16 @@
   background-color: #121212;
 }
 
+.error-message {
+  color: #ff4081;
+  font-size: 14px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: rgba(255, 64, 129, 0.1);
+  border-radius: 4px;
+}
+
 form {
   display: flex;
   flex-direction: column;

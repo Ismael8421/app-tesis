@@ -11,6 +11,16 @@
   color: var(--ion-text-color);
   margin-bottom: 120px; // Space for fixed buttons
 
+  .error-message {
+    color: #ff4081;
+    font-size: 14px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding: 8px;
+    background-color: rgba(255, 64, 129, 0.1);
+    border-radius: 4px;
+  }
+
   // Header styles
   ion-text {
     text-align: center;

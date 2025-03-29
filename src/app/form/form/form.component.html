@@ -2,12 +2,12 @@
   <ion-list>
     <!-- Preguntas Generales -->
     <div *ngIf="page === 1">
-      <app-preferences></app-preferences>
+      <app-preferences [shouldShowErrors]="showErrors"></app-preferences>
     </div>
 
     <!-- Preguntas de que carrera busca -->
     <div *ngIf="page === 2">
-      <app-wanted-profession></app-wanted-profession>
+      <app-wanted-profession [shouldShowErrors]="showErrors"></app-wanted-profession>
     </div>
 
     <!-- Preguntas de que habilidades busca de la carrera -->

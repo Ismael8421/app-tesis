@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ControlContainer, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { IonCheckbox, IonItem, IonLabel, IonList, IonRadio, IonRadioGroup, IonText } from '@ionic/angular/standalone';
 
@@ -12,6 +12,11 @@ import { IonCheckbox, IonItem, IonLabel, IonList, IonRadio, IonRadioGroup, IonTe
 })
 export class WantedProfessionComponent  implements OnInit {
   form!: FormGroup;
+  showErrors = false;
+
+  @Input() set shouldShowErrors(value: boolean) {
+    this.showErrors = value;
+  }
 
   constructor(private controlContainer: ControlContainer) {}
 

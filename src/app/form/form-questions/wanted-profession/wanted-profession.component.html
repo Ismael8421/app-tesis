@@ -34,5 +34,9 @@
       <ion-checkbox slot="start" formControlName="O6"></ion-checkbox>
       <ion-label>Conocimientos de la biología humana, animal y/o química</ion-label>
     </ion-item>
+
+    <div class="error-message" *ngIf="form.get('wanted_profession')?.hasError('requireCheckbox') && showErrors">
+      Debes seleccionar al menos una habilidad para tu proyecto.
+    </div>
   </ion-list>
 </div>

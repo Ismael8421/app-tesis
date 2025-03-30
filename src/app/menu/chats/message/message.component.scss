@@ -126,6 +126,21 @@
   animation: fadeIn 0.3s ease;
 }
 
+.message-temp {
+  opacity: 0.8;
+}
+
+.sending-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  
+  ion-spinner {
+    width: 14px;
+    height: 14px;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

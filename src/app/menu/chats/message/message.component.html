@@ -37,22 +37,26 @@
           <span>Cargando mensajes...</span>
         </div>
 
-        <ng-container *ngIf="currentUser && !isLoading && (messages$ | async) as messages">
-          <div *ngFor="let message of messages" 
+        <ng-container *ngIf="currentUser && !isLoading">
+          <div *ngFor="let message of allMessages | async" 
                [ngClass]="{
                  'message-sent': currentUser && message.senderId === currentUser.uid,
-                 'message-received': currentUser && message.senderId !== currentUser.uid
+                 'message-received': currentUser && message.senderId !== currentUser.uid,
+                 'message-temp': message.isTemp
                }"
                class="message">
             <div class="message-bubble">
               <div class="message-text">{{ message.content }}</div>
               <div class="message-time">
                 {{ message.timestamp | date:'shortTime' }}
+                <span *ngIf="message.isTemp" class="sending-indicator">
+                  <ion-spinner name="dots" size="small"></ion-spinner>
+                </span>
               </div>
             </div>
           </div>
                   
-          <div *ngIf="messages.length === 0" class="no-messages">
+          <div *ngIf="(allMessages | async)?.length === 0" class="no-messages">
             <p>No hay mensajes aún. ¡Sé el primero en escribir!</p>
           </div>
         </ng-container>

@@ -1,6 +1,8 @@
+// Modificaciones en message.component.ts
+
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild, inject } from '@angular/core';
-import { Observable, from, Subscription, of } from 'rxjs';
-import { map, switchMap, tap, catchError } from 'rxjs/operators';
+import { Observable, from, Subscription, of, BehaviorSubject } from 'rxjs';
+import { map, switchMap, tap, catchError, filter } from 'rxjs/operators';
 import { ChatService } from '../data-access/chat.service';
 import { ChatStorageService } from '../data-access/chat-storage.service';
 import { NetworkService } from '../data-access/network.service';
@@ -38,15 +40,16 @@ export class MessageComponent implements OnInit, OnDestroy {
   private userStatusService = inject(UserStatusService);
   private _themeService = inject(ThemeService);
   
-  private messagesSubscription?: Subscription;
-  private networkSubscription?: Subscription;
+  private subscriptions: Subscription[] = [];
   private markAsReadInterval: any;
 
   mensaje: string = '';
-  messages$: Observable<any[]>;
   currentUser = this.auth.currentUser;
   otherUserName: string = 'Usuario';
   chatData$: Observable<any>;
+  
+  // Estado de mensajes con BehaviorSubject
+  allMessages = new BehaviorSubject<any[]>([]);
   
   // Variables para UI
   isOnline: boolean = true;
@@ -56,9 +59,6 @@ export class MessageComponent implements OnInit, OnDestroy {
   
   constructor() {
     const chatId = this.route.snapshot.paramMap.get('id') || '';
-    
-    // Usar mensajes con caché
-    this.messages$ = this.chatService.getMessagesRealtime(chatId);
     
     this.chatData$ = from(this.chatService.getChat(chatId)).pipe(
       switchMap(async (chat) => {
@@ -107,9 +107,11 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.updateDarkModeStatus();
     
     // Suscribirse a cambios en la conectividad
-    this.networkSubscription = this.networkService.isOnline$.subscribe(isOnline => {
-      this.isOnline = isOnline;
-    });
+    this.subscriptions.push(
+      this.networkService.isOnline$.subscribe(isOnline => {
+        this.isOnline = isOnline;
+      })
+    );
     
     if (!this.currentUser) {
       this.router.navigate(['/login']);
@@ -121,15 +123,28 @@ export class MessageComponent implements OnInit, OnDestroy {
     // Actualizar el estado del usuario para indicar que está activo en este chat
     this.userStatusService.refreshStatus();
     
-    // Suscripción a los mensajes en tiempo real
-    this.messagesSubscription = this.messages$.subscribe(messages => {
-      this.isLoading = false;
-      
-      setTimeout(() => {
-        this.scrollToBottom();
-        this.markMessagesAsRead();
-      }, 100);
-    });
+    // Cargar mensajes iniciales y suscribirse a actualizaciones
+    this.loadMessages();
+    
+    // Suscribirse a eventos de mensajes nuevos
+    this.subscriptions.push(
+      this.chatService.messageAddedEvent$
+        .pipe(filter(event => event.chatId === chatId))
+        .subscribe(event => {
+          // Comprobar si el mensaje ya está en la lista
+          const currentMessages = this.allMessages.value;
+          const messageExists = currentMessages.some(m => m.id === event.message.id);
+          
+          if (!messageExists) {
+            // Añadir el nuevo mensaje a la lista
+            const updatedMessages = [...currentMessages, event.message];
+            this.allMessages.next(updatedMessages);
+            
+            // Desplazar al final
+            setTimeout(() => this.scrollToBottom(), 100);
+          }
+        })
+    );
 
     // Configurar un intervalo para marcar mensajes como leídos periódicamente
     this.markAsReadInterval = setInterval(() => {
@@ -142,21 +157,47 @@ export class MessageComponent implements OnInit, OnDestroy {
     this.markMessagesAsRead();
   }
   
+  // Cargar mensajes iniciales
+  private loadMessages() {
+    const chatId = this.getChatId();
+    
+    // Mostrar carga
+    this.isLoading = true;
+    
+    // Suscribirse a los mensajes
+    this.subscriptions.push(
+      this.chatService.getMessages(chatId).subscribe({
+        next: (messages) => {
+          this.isLoading = false;
+          this.allMessages.next(messages);
+          
+          // Desplazar al final después de cargar mensajes
+          setTimeout(() => this.scrollToBottom(), 100);
+          
+          // Marcar mensajes como leídos
+          this.markMessagesAsRead();
+        },
+        error: (error) => {
+          console.error('Error loading messages:', error);
+          this.isLoading = false;
+        }
+      })
+    );
+  }
+
   // Actualizar el estado del modo oscuro
   updateDarkModeStatus() {
     this.isDarkMode = this._themeService.isDarkMode();
   }
 
   ngOnDestroy() {
-    if (this.messagesSubscription) {
-      this.messagesSubscription.unsubscribe();
-    }
-    if (this.networkSubscription) {
-      this.networkSubscription.unsubscribe();
-    }
+    // Limpiar todas las suscripciones
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    
     if (this.markAsReadInterval) {
       clearInterval(this.markAsReadInterval);
     }
+    
     // Asegurarse de marcar los mensajes como leídos al salir
     this.markMessagesAsRead();
     
@@ -197,29 +238,70 @@ export class MessageComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Guardar el texto del mensaje
+    const mensajeTexto = this.mensaje.trim();
+    
     try {
+      // Mostrar estado de envío
       this.isSending = true;
       
-      await this.chatService.sendMessage(
+      // Limpiar input inmediatamente
+      this.mensaje = '';
+      
+      // Crear mensaje temporal para mostrar inmediatamente
+      const timestamp = Date.now();
+      const tempMessage = {
+        content: mensajeTexto,
+        senderId: this.currentUser.uid,
+        senderName: this.currentUser.displayName || 'Usuario',
+        timestamp: timestamp,
+        readBy: { [this.currentUser.uid]: true },
+        id: 'temp-' + timestamp,
+        isTemp: true
+      };
+      
+      // Añadir mensaje temporal a la lista
+      const currentMessages = this.allMessages.value;
+      this.allMessages.next([...currentMessages, tempMessage]);
+      
+      // Scroll para mostrar el mensaje temporal
+      setTimeout(() => this.scrollToBottom(), 50);
+      
+      // Enviar mensaje a Firebase
+      const messageId = await this.chatService.sendMessage(
         this.getChatId(),
         this.currentUser.uid,
         this.currentUser.displayName || 'Usuario',
-        this.mensaje
+        mensajeTexto
       );
       
-      this.mensaje = '';
+      // Actualizar estado
       this.isSending = false;
       
-      // Asegurar que los mensajes se actualicen
-      this.chatService.forceRefreshMessages();
+      // Reemplazar mensaje temporal con el real
+      const updatedMessages = this.allMessages.value.map(msg => {
+        if (msg.id === tempMessage.id) {
+          return {
+            ...msg,
+            id: messageId,
+            isTemp: false
+          };
+        }
+        return msg;
+      });
       
-      // Scroll al fondo para ver el mensaje nuevo
+      this.allMessages.next(updatedMessages);
+      
+      // Scroll para asegurar visibilidad
       setTimeout(() => this.scrollToBottom(), 100);
     } catch (error) {
       console.error('Error sending message:', error);
       this.isSending = false;
       
-      // Mostrar mensaje de error
+      // Restaurar mensaje si hay error
+      this.mensaje = mensajeTexto;
+      
+      // Mostrar error
       alert('Error al enviar el mensaje. Por favor, inténtalo de nuevo.');
     }
   }
@@ -231,15 +313,15 @@ export class MessageComponent implements OnInit, OnDestroy {
   // Método para el pull-to-refresh
   handleRefresh(event: any) {
     if (this.isOnline) {
-      // Forzar actualización de los mensajes
-      this.chatService.forceRefreshMessages();
+      // Recargar mensajes
+      this.loadMessages();
       
-      // Completar el evento de refresco después de un breve retraso
+      // Completar el evento de refresco
       setTimeout(() => {
         event.target.complete();
       }, 1000);
     } else {
-      // Si no hay conexión, simplemente completar el refresco
+      // Si no hay conexión, simplemente completar
       event.target.complete();
     }
   }

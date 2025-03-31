@@ -1,3 +1,7 @@
-Arreglado el bug de los chat eliminados y duplicados
+-Arreglado el bug de los chat eliminados y duplicados
 
-Falta arreglar las habilidades en las personas recomendadas
+-Arreglado Falta arreglar las habilidades en las personas recomendadas
+
+Terminar el algoritmo
+
+Implementar el subir fotos de perfil a la base de datos

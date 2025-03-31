@@ -38,8 +38,10 @@
   
             <!-- Habilidades del usuario -->
             <div class="skills-section">
+              <!-- Para cualquier carrera, mostramos solo las propiedades existentes -->
               <!-- Para segundos -->
               <div *ngIf="user.anioLectivo === 'Segundo'" class="skills-container">
+                <!-- INFORMÁTICA - Segundo año -->
                 <p *ngIf="user.habilidad_ofrecida_seg?.informatica_seg_of?.programacion" class="skill-item">
                   <span class="skill-label">Programación:</span>
                   <span class="skill-value">{{user.habilidad_ofrecida_seg.informatica_seg_of.programacion}}</span>
@@ -56,10 +58,93 @@
                   <span class="skill-label">Redes:</span>
                   <span class="skill-value">{{user.habilidad_ofrecida_seg.informatica_seg_of.redes}}</span>
                 </p>
+            
+                <!-- IEME - Segundo año -->
+                <p *ngIf="user?.offer_skills_sec_ieme?.installationsSec || user.habilidad_ofrecida_seg?.ieme_seg_of?.installationsSec" class="skill-item">
+                  <span class="skill-label">Instalaciones eléctricas:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_ieme?.installationsSec || user.habilidad_ofrecida_seg?.ieme_seg_of?.installationsSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_ieme?.electricalEngSec || user.habilidad_ofrecida_seg?.ieme_seg_of?.electricalEngSec" class="skill-item">
+                  <span class="skill-label">Circuitos eléctricos:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_ieme?.electricalEngSec || user.habilidad_ofrecida_seg?.ieme_seg_of?.electricalEngSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_ieme?.electronicsSec || user.habilidad_ofrecida_seg?.ieme_seg_of?.electronicsSec" class="skill-item">
+                  <span class="skill-label">Reparación electrónica:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_ieme?.electronicsSec || user.habilidad_ofrecida_seg?.ieme_seg_of?.electronicsSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_ieme?.automationElecSec || user.habilidad_ofrecida_seg?.ieme_seg_of?.automationElecSec" class="skill-item">
+                  <span class="skill-label">Automatización:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_ieme?.automationElecSec || user.habilidad_ofrecida_seg?.ieme_seg_of?.automationElecSec}}</span>
+                </p>
+            
+                <!-- MCM - Segundo año -->
+                <p *ngIf="user?.offer_skills_sec_mcm?.weldingMcmSec || user.habilidad_ofrecida_seg?.mcm_seg_of?.weldingMcmSec" class="skill-item">
+                  <span class="skill-label">Soldadura:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_mcm?.weldingMcmSec || user.habilidad_ofrecida_seg?.mcm_seg_of?.weldingMcmSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_mcm?.millingSec || user.habilidad_ofrecida_seg?.mcm_seg_of?.millingSec" class="skill-item">
+                  <span class="skill-label">Fresado:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_mcm?.millingSec || user.habilidad_ofrecida_seg?.mcm_seg_of?.millingSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_mcm?.latheSec || user.habilidad_ofrecida_seg?.mcm_seg_of?.latheSec" class="skill-item">
+                  <span class="skill-label">Torno:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_mcm?.latheSec || user.habilidad_ofrecida_seg?.mcm_seg_of?.latheSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_mcm?.drawingMcmSec || user.habilidad_ofrecida_seg?.mcm_seg_of?.drawingMcmSec" class="skill-item">
+                  <span class="skill-label">Dibujo mecánico:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_mcm?.drawingMcmSec || user.habilidad_ofrecida_seg?.mcm_seg_of?.drawingMcmSec}}</span>
+                </p>
+            
+                <!-- EMA - Segundo año -->
+                <p *ngIf="user?.offer_skills_sec_ema?.systemSec || user.habilidad_ofrecida_seg?.ema_seg_of?.systemSec" class="skill-item">
+                  <span class="skill-label">Sistemas eléctricos:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_ema?.systemSec || user.habilidad_ofrecida_seg?.ema_seg_of?.systemSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_ema?.electronicSec || user.habilidad_ofrecida_seg?.ema_seg_of?.electronicSec" class="skill-item">
+                  <span class="skill-label">Electrónica básica:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_ema?.electronicSec || user.habilidad_ofrecida_seg?.ema_seg_of?.electronicSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_ema?.maintenanceSec || user.habilidad_ofrecida_seg?.ema_seg_of?.maintenanceSec" class="skill-item">
+                  <span class="skill-label">Mantenimiento automotriz:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_ema?.maintenanceSec || user.habilidad_ofrecida_seg?.ema_seg_of?.maintenanceSec}}</span>
+                </p>
+            
+                <!-- Mecatrónica - Segundo año -->
+                <p *ngIf="user?.offer_skills_sec_mec?.digitalElectronics || user.habilidad_ofrecida_seg?.mec_seg_of?.digitalElectronics" class="skill-item">
+                  <span class="skill-label">Electrónica digital:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_mec?.digitalElectronics || user.habilidad_ofrecida_seg?.mec_seg_of?.digitalElectronics}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_mec?.cncSec || user.habilidad_ofrecida_seg?.mec_seg_of?.cncSec" class="skill-item">
+                  <span class="skill-label">CNC:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_mec?.cncSec || user.habilidad_ofrecida_seg?.mec_seg_of?.cncSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_mec?.manufactureSec || user.habilidad_ofrecida_seg?.mec_seg_of?.manufactureSec" class="skill-item">
+                  <span class="skill-label">Manufactura:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_mec?.manufactureSec || user.habilidad_ofrecida_seg?.mec_seg_of?.manufactureSec}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_mec?.automationSystems || user.habilidad_ofrecida_seg?.mec_seg_of?.automationSystems" class="skill-item">
+                  <span class="skill-label">Automatización:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_mec?.automationSystems || user.habilidad_ofrecida_seg?.mec_seg_of?.automationSystems}}</span>
+                </p>
+            
+                <!-- Ciencias - Segundo año -->
+                <p *ngIf="user?.offer_skills_sec_sciences?.lab || user.habilidad_ofrecida_seg?.ciencias_seg_of?.laboratorio" class="skill-item">
+                  <span class="skill-label">Laboratorio:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_sciences?.lab || user.habilidad_ofrecida_seg?.ciencias_seg_of?.laboratorio}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_sciences?.psychology || user.habilidad_ofrecida_seg?.ciencias_seg_of?.psicologia" class="skill-item">
+                  <span class="skill-label">Psicología:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_sciences?.psychology || user.habilidad_ofrecida_seg?.ciencias_seg_of?.psicologia}}</span>
+                </p>
+                <p *ngIf="user?.offer_skills_sec_sciences?.creativeWritingSec || user.habilidad_ofrecida_seg?.ciencias_seg_of?.redaccionCreativaSeg" class="skill-item">
+                  <span class="skill-label">Redacción creativa:</span>
+                  <span class="skill-value">{{user?.offer_skills_sec_sciences?.creativeWritingSec || user.habilidad_ofrecida_seg?.ciencias_seg_of?.redaccionCreativaSeg}}</span>
+                </p>
               </div>
-  
+            
               <!-- Para terceros -->
               <div *ngIf="user.anioLectivo === 'Tercero'" class="skills-container">
+                <!-- INFORMÁTICA - Tercer año -->
                 <p *ngIf="user.habilidad_ofrecida_ter?.informatica_ter_of?.programacion" class="skill-item">
                   <span class="skill-label">Programación:</span>
                   <span class="skill-value">{{user.habilidad_ofrecida_ter.informatica_ter_of.programacion}}</span>
@@ -72,6 +157,7 @@
                   <span class="skill-label">Modelado 3D:</span>
                   <span class="skill-value">{{user.habilidad_ofrecida_ter.informatica_ter_of.cad}}</span>
                 </p>
+                
                 <!-- Mención en Programación móvil -->
                 <ng-container *ngIf="user.mencion === 'Programacion movil'">
                   <p *ngIf="user.habilidad_ofrecida_ter?.informatica_ter_of?.soporte" class="skill-item">
@@ -83,6 +169,7 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.informatica_ter_of.movil}}</span>
                   </p>
                 </ng-container>
+                
                 <!-- Mención en Aplicaciones web -->
                 <ng-container *ngIf="user.mencion === 'Aplicaciones web'">
                   <p *ngIf="user.habilidad_ofrecida_ter?.informatica_ter_of?.web" class="skill-item">
@@ -92,6 +179,176 @@
                   <p *ngIf="user.habilidad_ofrecida_ter?.informatica_ter_of?.redes" class="skill-item">
                     <span class="skill-label">Redes:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.informatica_ter_of.redes}}</span>
+                  </p>
+                </ng-container>
+            
+                <!-- IEME - Tercer año -->
+                <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.electrotecnia" class="skill-item">
+                  <span class="skill-label">Electrotecnia:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.electrotecnia}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.instalaciones" class="skill-item">
+                  <span class="skill-label">Instalaciones:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.instalaciones}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.electronica" class="skill-item">
+                  <span class="skill-label">Electrónica:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.electronica}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.potencia" class="skill-item">
+                  <span class="skill-label">Electrónica de potencia:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.potencia}}</span>
+                </p>
+                
+                <!-- Mención en Sistemas Eléctricos de Potencia -->
+                <ng-container *ngIf="user.mencion === 'Sistemas electricos de Potencia'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.maquinas" class="skill-item">
+                    <span class="skill-label">Máquinas eléctricas:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.maquinas}}</span>
+                  </p>
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.industrial" class="skill-item">
+                    <span class="skill-label">Automatización industrial:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.industrial}}</span>
+                  </p>
+                </ng-container>
+                
+                <!-- Mención en Electrónica Digital -->
+                <ng-container *ngIf="user.mencion === 'Electronica digital'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.electronicaAplicada" class="skill-item">
+                    <span class="skill-label">Electrónica aplicada:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.electronicaAplicada}}</span>
+                  </p>
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.comunicaciones" class="skill-item">
+                    <span class="skill-label">Comunicaciones:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.comunicaciones}}</span>
+                  </p>
+                </ng-container>
+            
+                <!-- MCM - Tercer año -->
+                <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.metrologia" class="skill-item">
+                  <span class="skill-label">Metrología:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.mcm_ter_of.metrologia}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.metalurgia" class="skill-item">
+                  <span class="skill-label">Metalurgia:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.mcm_ter_of.metalurgia}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.soldaduraMcm" class="skill-item">
+                  <span class="skill-label">Soldadura:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.mcm_ter_of.soldaduraMcm}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.fabricacion" class="skill-item">
+                  <span class="skill-label">Fabricación:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.mcm_ter_of.fabricacion}}</span>
+                </p>
+                
+                <!-- Mención en Precisión -->
+                <ng-container *ngIf="user.mencion === 'Mecanica de precision y produccion de serie'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.molds" class="skill-item">
+                    <span class="skill-label">Moldes y matrices:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.mcm_ter_of.molds}}</span>
+                  </p>
+                </ng-container>
+                
+                <!-- Mención en Diseño -->
+                <ng-container *ngIf="user.mencion === 'Diseno y automatizacion de maquinas y mecanismos'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.machinesMcm" class="skill-item">
+                    <span class="skill-label">Diseño de máquinas:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.mcm_ter_of.machinesMcm}}</span>
+                  </p>
+                </ng-container>
+            
+                <!-- EMA - Tercer año -->
+                <p *ngIf="user.habilidad_ofrecida_ter?.ema_ter_of?.motores" class="skill-item">
+                  <span class="skill-label">Motores:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ema_ter_of.motores}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.ema_ter_of?.sistemasElectronicos" class="skill-item">
+                  <span class="skill-label">Sistemas electrónicos:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ema_ter_of.sistemasElectronicos}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.ema_ter_of?.sistemasElectricos" class="skill-item">
+                  <span class="skill-label">Sistemas eléctricos:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ema_ter_of.sistemasElectricos}}</span>
+                </p>
+                
+                <!-- Mención en Mantenimiento -->
+                <ng-container *ngIf="user.mencion === 'Mantenimiento automotriz'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ema_ter_of?.mantenimiento" class="skill-item">
+                    <span class="skill-label">Mantenimiento:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ema_ter_of.mantenimiento}}</span>
+                  </p>
+                </ng-container>
+                
+                <!-- Mención en Electrotecnia -->
+                <ng-container *ngIf="user.mencion === 'Electrotecnia automotriz'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ema_ter_of?.automotriz" class="skill-item">
+                    <span class="skill-label">Electrónica automotriz:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ema_ter_of.automotriz}}</span>
+                  </p>
+                </ng-container>
+            
+                <!-- Mecatrónica - Tercer año -->
+                <p *ngIf="user.habilidad_ofrecida_ter?.mec_ter_of?.microcontroladores" class="skill-item">
+                  <span class="skill-label">Microcontroladores:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.mec_ter_of.microcontroladores}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.mec_ter_of?.servomecanismos" class="skill-item">
+                  <span class="skill-label">Servomecanismos:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.mec_ter_of.servomecanismos}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.mec_ter_of?.automatizacion" class="skill-item">
+                  <span class="skill-label">Automatización:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.mec_ter_of.automatizacion}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.mec_ter_of?.manufactura" class="skill-item">
+                  <span class="skill-label">Manufactura:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.mec_ter_of.manufactura}}</span>
+                </p>
+            
+                <!-- Ciencias - Tercer año -->
+                <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.redaccionCreativa" class="skill-item">
+                  <span class="skill-label">Redacción creativa:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.redaccionCreativa}}</span>
+                </p>
+                <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.investigacion" class="skill-item">
+                  <span class="skill-label">Investigación:</span>
+                  <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.investigacion}}</span>
+                </p>
+                
+                <!-- Mención en Ciencias de la salud -->
+                <ng-container *ngIf="user.mencion === 'Ciencias de la salud'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.biologia" class="skill-item">
+                    <span class="skill-label">Biología:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.biologia}}</span>
+                  </p>
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.morfologia" class="skill-item">
+                    <span class="skill-label">Morfología:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.morfologia}}</span>
+                  </p>
+                </ng-container>
+                
+                <!-- Mención en Ciencias de la política -->
+                <ng-container *ngIf="user.mencion === 'Ciencias de la politica'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.sociologia" class="skill-item">
+                    <span class="skill-label">Sociología:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.sociologia}}</span>
+                  </p>
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.politica" class="skill-item">
+                    <span class="skill-label">Política:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.politica}}</span>
+                  </p>
+                </ng-container>
+                
+                <!-- Mención en Matemática y Física -->
+                <ng-container *ngIf="user.mencion === 'Matematica y Fisica avanzada'">
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.matematica" class="skill-item">
+                    <span class="skill-label">Matemáticas:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.matematica}}</span>
+                  </p>
+                  <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.fisica" class="skill-item">
+                    <span class="skill-label">Física:</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.fisica}}</span>
                   </p>
                 </ng-container>
               </div>

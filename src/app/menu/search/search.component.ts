@@ -29,7 +29,7 @@ register();
     CheckIconComponent,
     MessagesIconComponent,
     HeartIconComponent,
-    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert, IonSpinner 
+    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert, IonSpinner
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',
@@ -51,7 +51,7 @@ export class SearchComponent {
   formData: formCreate | null = null;
   isFormComplete: boolean = true;
   showAlert: boolean = false;
-  
+
   // Colecciones para las diferentes carreras
   private carreraCollections = [
     'Informatica',
@@ -61,7 +61,7 @@ export class SearchComponent {
     'Mecatronica',
     'Ciencias'
   ];
-  
+
   alertButtons = [{
     text: 'Ir',
     handler: () => {
@@ -88,12 +88,12 @@ export class SearchComponent {
             this.formService.getFormData(user.uid),
             this.formStateService.checkFormCompletion(user.uid)
           ]);
-  
+
           this.userData = registerData;
           this.formData = formData;
           this.isFormComplete = formCompleted;
           this.showAlert = !formCompleted;
-  
+
           // Cargar recomendaciones solo si el formulario está completo
           if (formCompleted && this.userData && this.formData) {
             await this.loadRecommendations();
@@ -109,88 +109,9 @@ export class SearchComponent {
     }, 1000);
   }
 
-  async loadRecommendations() {
-    try {
-      if (!this.formData || !this.userData) {
-        console.error('Faltan datos del usuario o del formulario');
-        return;
-      }
-
-      const allPotentialMatches: any[] = [];
-      const currentUserId = this.auth.currentUser?.uid;
-      
-      // Obtener carreras buscadas por el usuario
-      const carrerasBuscadas = this.formData.carrera_buscada || [];
-      
-      // Si no hay carreras buscadas, buscar en todas las colecciones
-      const collectionsToSearch = carrerasBuscadas.length > 0 
-        ? carrerasBuscadas.map(carrera => this.normalizeCarreraName(carrera))
-        : this.carreraCollections;
-      
-      // Buscar en cada colección correspondiente
-      for (const collectionName of collectionsToSearch) {
-        const carreraCollection = collection(this.firestore, collectionName);
-        const q = query(carreraCollection, where('uid', '!=', currentUserId));
-        
-        const querySnapshot = await getDocs(q);
-        
-        // Para cada usuario en la colección
-        for (const docSnap of querySnapshot.docs) {
-          // Obtener la información general del usuario
-          const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
-          const userData = userGeneralDoc.data();
-          
-          if (!userData) continue;
-          
-          const formCompleted = userData['formCompleted'] ?? false;
-          const userYear = userData['anioLectivo'];
-
-          if (this.userData?.anioLectivo === 'Tercero' && userYear === 'Segundo') {
-            continue; // Saltar este usuario y continuar con el siguiente
-          }
-          // Si el usuario actual es de segundo, excluir a los de tercero
-          if (this.userData?.anioLectivo === 'Segundo' && userYear === 'Tercero') {
-            continue; // Saltar este usuario y continuar con el siguiente
-          }
-          
-          // Solo considerar usuarios que hayan completado el formulario
-          if (formCompleted) {
-            // Priorizar usuarios de tercero como solicitaste
-            const userFormData = docSnap.data();
-            const userYear = userData['anioLectivo'];
-            const userCarrera = userData['carrera'];
-            
-            // Calcular puntuación de compatibilidad
-            const matchScore = this.calculateMatchScore(userFormData, userYear, userCarrera, docSnap.id);
-            
-            allPotentialMatches.push({
-              uid: docSnap.id,
-              nombreUsuario: userData['nombreUsuario'] || 'Usuario',
-              nombre: userData['nombre'] || '',
-              apellido: userData['apellido'] || '',
-              carrera: userData['carrera'] || '',
-              anioLectivo: userData['anioLectivo'] || '',
-              mencion: userData['mencion'] || '',
-              ...userFormData,
-              matchScore: matchScore
-            });
-          }
-        }
-      }
-      
-      // Ordenar por puntuación de compatibilidad (mayor a menor)
-      this.recommendedUsers = allPotentialMatches
-        .sort((a, b) => b.matchScore - a.matchScore)
-        .slice(0, 10); // Limitar a 10 recomendaciones
-      
-    } catch (error) {
-      console.error('Error al cargar recomendaciones:', error);
-    }
-  }
-
   // Función para normalizar el nombre de la carrera como aparece en Firestore
   private normalizeCarreraName(carrera: string): string {
-    const carreraMap: {[key: string]: string} = {
+    const carreraMap: { [key: string]: string } = {
       'informatica': 'Informatica',
       'ieme': 'IEME',
       'mcm': 'MCM',
@@ -198,222 +119,8 @@ export class SearchComponent {
       'mecatronica': 'Mecatronica',
       'ciencias': 'Ciencias'
     };
-    
+
     return carreraMap[carrera.toLowerCase()] || carrera;
-  }
-
-  // Función principal de cálculo de compatibilidad
-  private calculateMatchScore(otherUserData: any, otherUserYear: string, otherUserCarrera: string, otherUserId: string): number {
-    if (!this.formData || !otherUserData) return 0;
-    
-    let matchScore = 0;
-    
-    // 1. Verificar si la carrera del otro usuario está entre las buscadas por el usuario actual
-    const carreraAlias = {
-      'Informatica': 'informatica',
-      'IEME': 'ieme',
-      'MCM': 'mcm',
-      'EMA': 'ema',
-      'Mecatronica': 'mecatronica',
-      'Ciencias': 'ciencias'
-    };
-    
-    const normalizedCarrera = carreraAlias[otherUserCarrera as keyof typeof carreraAlias] || '';
-    
-    if (this.formData.carrera_buscada.includes(normalizedCarrera)) {
-      matchScore += 30; // Gran peso a coincidir con carreras buscadas
-    }
-    
-    // 2. Priorizar usuarios de tercero (como solicitaste)
-    if (this.userData?.anioLectivo === 'Tercero' && otherUserYear === 'Segundo') {
-      return -1; // Puntuación negativa para que no aparezca en las recomendaciones
-    }
-    // Si ambos son del mismo año o el usuario actual es de segundo, priorizar terceros
-    else if (otherUserYear === 'Tercero') {
-      matchScore += 20;
-    }
-    
-    // 3. Compatibilidad de horarios
-    const commonSchedules = this.formData.horario.filter(
-      horario => otherUserData.horario?.includes(horario)
-    );
-    matchScore += commonSchedules.length * 5;
-    
-    // 4. Compatibilidad de método de trabajo
-    if (this.formData.metodo === otherUserData.metodo || this.formData.metodo === 'ambos' || otherUserData.metodo === 'ambos') {
-      matchScore += 10;
-    }
-    
-    // 5. Compatibilidad de horas
-    if (this.formData.horas === otherUserData.horas || this.formData.horas === 'flexible' || otherUserData.horas === 'flexible') {
-      matchScore += 5;
-    }
-    
-    // 6. Evaluar match de habilidades (lo más importante)
-    matchScore += this.evaluateSkillsMatch(otherUserData, otherUserCarrera, otherUserYear);
-    
-    return matchScore;
-  }
-
-  // Función para evaluar compatibilidad de habilidades
-  private evaluateSkillsMatch(otherUserData: any, otherUserCarrera: string, otherUserYear: string): number {
-    if (!this.formData) return 0;
-    
-    let skillMatchScore = 0;
-    const valorHabilidad = { 'Alto': 3, 'Medio': 2, 'Bajo': 1 };
-    
-    // Obtener el alias normalizado de la carrera del otro usuario
-    const carreraAlias = {
-      'Informatica': 'informatica',
-      'IEME': 'ieme',
-      'MCM': 'mcm',
-      'EMA': 'ema',
-      'Mecatronica': 'mecatronica',
-      'Ciencias': 'ciencias'
-    };
-    
-    const otherUserCarreraAlias = carreraAlias[otherUserCarrera as keyof typeof carreraAlias] || '';
-    
-    // Solo verificar habilidades si la carrera del otro usuario es buscada por el usuario actual
-    if (this.formData.carrera_buscada.includes(otherUserCarreraAlias)) {
-      
-      // Para usuarios de tercero
-      if (otherUserYear === 'Tercero') {
-        // Según la carrera, verificar las habilidades correspondientes
-        switch (otherUserCarrera) {
-          case 'Informatica':
-            if (this.formData.habilidad_buscada_ter?.informatica_ter && otherUserData.habilidad_ofrecida_ter?.informatica_ter_of) {
-              // Evaluar programación
-              if (this.formData.habilidad_buscada_ter.informatica_ter.programacion && otherUserData.habilidad_ofrecida_ter.informatica_ter_of.programacion) {
-                const valorBuscado = this.formData.habilidad_buscada_ter.informatica_ter.programacion;
-                const valorOfrecido = otherUserData.habilidad_ofrecida_ter.informatica_ter_of.programacion;
-                if (valorOfrecido && valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                  skillMatchScore += 5;
-                }
-              }
-              
-              // Evaluar diseño
-              if (this.formData.habilidad_buscada_ter.informatica_ter.diseno && otherUserData.habilidad_ofrecida_ter.informatica_ter_of.diseno) {
-                const valorBuscado = this.formData.habilidad_buscada_ter.informatica_ter.diseno;
-                const valorOfrecido = otherUserData.habilidad_ofrecida_ter.informatica_ter_of.diseno;
-                if (valorOfrecido && valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                  skillMatchScore += 5;
-                }
-              }
-              
-              // Evaluar CAD
-              if (this.formData.habilidad_buscada_ter.informatica_ter.cad && otherUserData.habilidad_ofrecida_ter.informatica_ter_of.cad) {
-                const valorBuscado = this.formData.habilidad_buscada_ter.informatica_ter.cad;
-                const valorOfrecido = otherUserData.habilidad_ofrecida_ter.informatica_ter_of.cad;
-                if (valorOfrecido && valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                  skillMatchScore += 5;
-                }
-              }
-              
-              // Evaluar soporte
-              if (this.formData.habilidad_buscada_ter.informatica_ter.soporte && otherUserData.habilidad_ofrecida_ter.informatica_ter_of.soporte) {
-                const valorBuscado = this.formData.habilidad_buscada_ter.informatica_ter.soporte;
-                const valorOfrecido = otherUserData.habilidad_ofrecida_ter.informatica_ter_of.soporte;
-                if (valorOfrecido && valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                  skillMatchScore += 5;
-                }
-              }
-              
-              // Evaluar móvil
-              if (this.formData.habilidad_buscada_ter.informatica_ter.movil && otherUserData.habilidad_ofrecida_ter.informatica_ter_of.movil) {
-                const valorBuscado = this.formData.habilidad_buscada_ter.informatica_ter.movil;
-                const valorOfrecido = otherUserData.habilidad_ofrecida_ter.informatica_ter_of.movil;
-                if (valorOfrecido && valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                  skillMatchScore += 5;
-                }
-              }
-              
-              // Evaluar web
-              if (this.formData.habilidad_buscada_ter.informatica_ter.web && otherUserData.habilidad_ofrecida_ter.informatica_ter_of.web) {
-                const valorBuscado = this.formData.habilidad_buscada_ter.informatica_ter.web;
-                const valorOfrecido = otherUserData.habilidad_ofrecida_ter.informatica_ter_of.web;
-                if (valorOfrecido && valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                  skillMatchScore += 5;
-                }
-              }
-              
-              // Evaluar redes
-              if (this.formData.habilidad_buscada_ter.informatica_ter.redes && otherUserData.habilidad_ofrecida_ter.informatica_ter_of.redes) {
-                const valorBuscado = this.formData.habilidad_buscada_ter.informatica_ter.redes;
-                const valorOfrecido = otherUserData.habilidad_ofrecida_ter.informatica_ter_of.redes;
-                if (valorOfrecido && valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                  skillMatchScore += 5;
-                }
-              }
-            }
-            break;
-            
-          // Aquí podrías agregar lógica similar para otras carreras
-          case 'IEME':
-            if (this.formData.habilidad_buscada_ter?.ieme_ter && otherUserData.habilidad_ofrecida_ter?.ieme_ter_of) {
-              // Analizar cada habilidad relevante de IEME
-              // (similar a lo que hicimos con Informática)
-              const habilidadesBuscadas = this.formData.habilidad_buscada_ter.ieme_ter;
-              const habilidadesOfrecidas = otherUserData.habilidad_ofrecida_ter.ieme_ter_of;
-              
-              // Evaluar cada habilidad de IEME tercero
-              const habilidadesIEME = [
-                'electrotecnia', 'instalaciones', 'automatismosEle', 'electronica', 
-                'potencia', 'maquinas', 'industrial', 'microcontroladores',
-                'electronicaAplicada', 'comunicaciones', 'redesComputadoras'
-              ];
-              
-              for (const hab of habilidadesIEME) {
-                if (habilidadesBuscadas[hab as keyof typeof habilidadesBuscadas] && 
-                    habilidadesOfrecidas[hab as keyof typeof habilidadesOfrecidas]) {
-                  const valorBuscado = habilidadesBuscadas[hab as keyof typeof habilidadesBuscadas];
-                  const valorOfrecido = habilidadesOfrecidas[hab as keyof typeof habilidadesOfrecidas];
-                  
-                  if (valorOfrecido && valorBuscado && 
-                      valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= 
-                      valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                    skillMatchScore += 5;
-                  }
-                }
-              }
-            }
-            break;
-            
-          // Puedes agregar más casos para cada carrera
-        }
-      } 
-      // Para usuarios de segundo
-      else if (otherUserYear === 'Segundo') {
-        // Implementación similar pero con habilidades de segundo año
-        // Nota: Mencionaste que esto no está completamente implementado aún
-        if (otherUserCarrera === 'Informatica' && 
-            this.formData.habilidad_buscada_seg?.informatica_seg && 
-            otherUserData.habilidad_ofrecida_seg?.informatica_seg_of) {
-          
-          const habilidadesBuscadas = this.formData.habilidad_buscada_seg.informatica_seg;
-          const habilidadesOfrecidas = otherUserData.habilidad_ofrecida_seg.informatica_seg_of;
-          
-          // Evaluar cada habilidad de Informática segundo año
-          const habilidadesInformaticaSeg = ['programacion', 'soporte', 'web', 'redes'];
-          
-          for (const hab of habilidadesInformaticaSeg) {
-            if (habilidadesBuscadas[hab as keyof typeof habilidadesBuscadas] && 
-                habilidadesOfrecidas[hab as keyof typeof habilidadesOfrecidas]) {
-              const valorBuscado = habilidadesBuscadas[hab as keyof typeof habilidadesBuscadas];
-              const valorOfrecido = habilidadesOfrecidas[hab as keyof typeof habilidadesOfrecidas];
-              
-              if (valorOfrecido && valorBuscado && 
-                  valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >= 
-                  valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
-                skillMatchScore += 5;
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    return skillMatchScore;
   }
 
   async startChat(otherUserId: string, otherUserName: string) {
@@ -422,7 +129,7 @@ export class SearchComponent {
       console.error('No user logged in');
       return;
     }
-  
+
     try {
       const chatId = await this.chatService.startChat(currentUser.uid, otherUserId);
       if (chatId) {
@@ -432,4 +139,575 @@ export class SearchComponent {
       console.error('Error starting chat:', error);
     }
   }
+
+  //Algoritmo de recomendaciones
+  async loadRecommendations() {
+    console.log("Comenzando búsqueda de recomendaciones para usuario:", this.userData);
+
+    try {
+      if (!this.formData || !this.userData) {
+        console.error('Faltan datos del usuario o del formulario');
+        return;
+      }
+
+      const allPotentialMatches: any[] = [];
+      const currentUserId = this.auth.currentUser?.uid;
+
+      // Solo proceder si tenemos el año lectivo del usuario actual
+      if (!this.userData.anioLectivo) {
+        console.error('Falta año lectivo del usuario actual');
+        return;
+      }
+
+      const userAnioLectivo = this.userData.anioLectivo; // 'Segundo' o 'Tercero'
+      console.log('Año lectivo del usuario actual:', userAnioLectivo);
+
+      // Obtener carreras buscadas por el usuario
+      const carrerasBuscadas = this.formData.carrera_buscada || [];
+      console.log('Carreras buscadas:', carrerasBuscadas);
+
+      // Si no hay carreras buscadas, buscar en todas las colecciones
+      const collectionsToSearch = carrerasBuscadas.length > 0
+        ? carrerasBuscadas.map(carrera => this.normalizeCarreraName(carrera))
+        : this.carreraCollections;
+
+      console.log('Colecciones a buscar:', collectionsToSearch);
+
+      // Buscar en cada colección correspondiente
+      for (const collectionName of collectionsToSearch) {
+        console.log(`Buscando en colección: ${collectionName}`);
+        const carreraCollection = collection(this.firestore, collectionName);
+
+        // Primero obtenemos todos los usuarios que no sean el usuario actual
+        const q = query(carreraCollection, where('uid', '!=', currentUserId));
+        const querySnapshot = await getDocs(q);
+
+        console.log(`Encontrados ${querySnapshot.docs.length} documentos en ${collectionName}`);
+
+        // Para cada usuario en la colección
+        // Para cada usuario en la colección
+        for (const docSnap of querySnapshot.docs) {
+          // Obtener la información general del usuario
+          const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
+          const userData = userGeneralDoc.data();
+
+          if (!userData) {
+            console.log(`Sin datos para usuario ${docSnap.id}`);
+            continue;
+          }
+
+          const formCompleted = userData['formCompleted'] ?? false;
+
+          // Solo considerar usuarios que hayan completado el formulario
+          if (formCompleted) {
+            const userFormData = docSnap.data();
+
+            // Leer el año lectivo desde el documento de la colección específica
+            const otherUserYear = userFormData['anioLectivo']; // Cambiado: leer de userFormData
+            const userCarrera = userData['carrera'];
+
+            console.log(`Usuario ${userFormData['nombreUsuario'] || 'sin nombre'}, Año: ${otherUserYear}, Carrera: ${userCarrera}`);
+
+            // FILTRO CRÍTICO: Verificar que sean del mismo año lectivo
+            if (otherUserYear !== userAnioLectivo) {
+              console.log(`Descartando - Año diferente: ${otherUserYear} vs ${userAnioLectivo}`);
+              continue; // Si no son del mismo año, saltar este usuario
+            }
+
+            // Calcular puntuación de compatibilidad
+            const matchScore = this.calculateMatchScore(userFormData, userCarrera);
+            console.log(`Match score para ${userFormData['nombreUsuario'] || 'sin nombre'}: ${matchScore}`);
+
+            allPotentialMatches.push({
+              uid: docSnap.id,
+              nombreUsuario: userFormData['nombreUsuario'] || 'Usuario',
+              nombre: userFormData['nombre'] || '',
+              apellido: userFormData['apellido'] || '',
+              carrera: userCarrera || '',
+              anioLectivo: otherUserYear || '',
+              mencion: userFormData['mencion'] || '',
+              ...userFormData,
+              matchScore: matchScore
+            });
+          } else {
+            console.log(`Descartando - Formulario no completado`);
+          }
+        }
+      }
+
+      console.log(`Total de matches potenciales: ${allPotentialMatches.length}`);
+
+      console.log("Matches potenciales (sin filtrar):", allPotentialMatches.map(u => ({
+        nombre: u.nombreUsuario,
+        anio: u.anioLectivo,
+        carrera: u.carrera,
+        score: u.matchScore
+      })));
+
+      // Ordenar por puntuación de compatibilidad (mayor a menor)
+      this.recommendedUsers = allPotentialMatches
+        .sort((a, b) => b.matchScore - a.matchScore)
+        .slice(0, 10); // Limitar a 10 recomendaciones
+
+      console.log(`Recomendaciones finales: ${this.recommendedUsers.length}`);
+
+    } catch (error) {
+      console.error('Error al cargar recomendaciones:', error);
+    }
+  }
+
+  // Función principal de cálculo de compatibilidad (simplificada)
+  private calculateMatchScore(otherUserData: any, otherUserCarrera: string): number {
+    if (!this.formData || !otherUserData) return 0;
+
+    let matchScore = 0;
+    console.log(`Calculando puntuación para usuario con carrera: ${otherUserCarrera}`);
+
+    // 1. Verificar si la carrera del otro usuario está entre las buscadas por el usuario actual
+    const carreraAlias = {
+      'Informatica': 'informatica',
+      'IEME': 'ieme',
+      'MCM': 'mcm',
+      'EMA': 'ema',
+      'Mecatronica': 'mecatronica',
+      'Ciencias': 'ciencias'
+    };
+
+    const normalizedCarrera = carreraAlias[otherUserCarrera as keyof typeof carreraAlias] || '';
+
+    if (this.formData.carrera_buscada.includes(normalizedCarrera)) {
+      matchScore += 30; // Gran peso a coincidir con carreras buscadas
+      console.log(`+30 puntos por carrera buscada: ${normalizedCarrera}`);
+    } else {
+      console.log(`Carrera no está entre las buscadas: ${normalizedCarrera}`);
+    }
+
+    // 2. Compatibilidad de horarios
+    if (this.formData.horario && otherUserData.horario) {
+      const commonSchedules = this.formData.horario.filter(
+        horario => otherUserData.horario?.includes(horario)
+      );
+      matchScore += commonSchedules.length * 5;
+      console.log(`+${commonSchedules.length * 5} puntos por ${commonSchedules.length} horarios compatibles`);
+    } else {
+      console.log('No se pudo evaluar compatibilidad de horarios');
+    }
+
+    // 3. Compatibilidad de método de trabajo
+    if (this.formData.metodo && otherUserData.metodo) {
+      if (this.formData.metodo === otherUserData.metodo ||
+        this.formData.metodo === 'ambos' ||
+        otherUserData.metodo === 'ambos') {
+        matchScore += 10;
+        console.log(`+10 puntos por método de trabajo compatible: ${this.formData.metodo} vs ${otherUserData.metodo}`);
+      } else {
+        console.log(`Métodos de trabajo incompatibles: ${this.formData.metodo} vs ${otherUserData.metodo}`);
+      }
+    } else {
+      console.log('No se pudo evaluar compatibilidad de método de trabajo');
+    }
+
+    // 4. Compatibilidad de horas
+    if (this.formData.horas && otherUserData.horas) {
+      if (this.formData.horas === otherUserData.horas ||
+        this.formData.horas === 'flexible' ||
+        otherUserData.horas === 'flexible') {
+        matchScore += 5;
+        console.log(`+5 puntos por horas compatibles: ${this.formData.horas} vs ${otherUserData.horas}`);
+      } else {
+        console.log(`Horas incompatibles: ${this.formData.horas} vs ${otherUserData.horas}`);
+      }
+    } else {
+      console.log('No se pudo evaluar compatibilidad de horas');
+    }
+
+    // 5. Evaluar match de habilidades (lo más importante)
+    const skillScore = this.evaluateSkillsMatch(otherUserData, otherUserCarrera);
+    matchScore += skillScore;
+
+    console.log(`Puntuación final de compatibilidad: ${matchScore}`);
+    return matchScore;
+  }
+
+  private evaluateSkillsMatch(otherUserData: any, otherUserCarrera: string): number {
+    if (!this.formData || !this.userData) return 0;
+
+    // Verificamos que el año lectivo está definido
+    if (!this.userData.anioLectivo) {
+      console.log('No se puede evaluar skills sin año lectivo definido');
+      return 0;
+    }
+
+    let skillMatchScore = 0;
+    const valorHabilidad = { 'Alto': 3, 'Medio': 2, 'Bajo': 1 };
+
+    // Obtener el alias normalizado de la carrera del otro usuario
+    const carreraAlias = {
+      'Informatica': 'informatica',
+      'IEME': 'ieme',
+      'MCM': 'mcm',
+      'EMA': 'ema',
+      'Mecatronica': 'mecatronica',
+      'Ciencias': 'ciencias'
+    };
+
+    const otherUserCarreraAlias = carreraAlias[otherUserCarrera as keyof typeof carreraAlias] || '';
+
+    // Solo verificar habilidades si la carrera del otro usuario es buscada por el usuario actual
+    if (this.formData.carrera_buscada.includes(otherUserCarreraAlias)) {
+      console.log(`Evaluando habilidades para carrera: ${otherUserCarrera}`);
+
+      // Determinamos el año lectivo del usuario actual para evaluación de habilidades
+      const userAnioLectivo = this.userData.anioLectivo;
+
+      // Evaluar habilidades según el año lectivo
+      if (userAnioLectivo === 'Tercero') {
+        // Lógica para evaluar habilidades de tercero
+        console.log('Evaluando habilidades para Tercero');
+        return this.evaluateTerceroSkills(otherUserData, otherUserCarrera);
+      } else if (userAnioLectivo === 'Segundo') {
+        // Lógica para evaluar habilidades de segundo
+        console.log('Evaluando habilidades para Segundo');
+        return this.evaluateSegundoSkills(otherUserData, otherUserCarrera);
+      } else {
+        console.log(`Año lectivo no reconocido: ${userAnioLectivo}`);
+      }
+    } else {
+      console.log(`La carrera ${otherUserCarrera} (${otherUserCarreraAlias}) no está entre las buscadas por el usuario`);
+    }
+
+    return skillMatchScore;
+  }
+
+  // Evaluar habilidades específicas para estudiantes de tercero
+  private evaluateTerceroSkills(otherUserData: any, otherUserCarrera: string): number {
+    if (!this.formData) return 0;
+
+    let skillMatchScore = 0;
+    const valorHabilidad = { 'Alto': 3, 'Medio': 2, 'Bajo': 1 };
+
+    // Según la carrera, verificar las habilidades correspondientes
+    switch (otherUserCarrera) {
+      case 'Informatica':
+        if (this.formData.habilidad_buscada_ter?.informatica_ter && otherUserData.habilidad_ofrecida_ter?.informatica_ter_of) {
+          console.log('Evaluando habilidades de Informática (Tercero)');
+          const habilidades = [
+            'programacion', 'diseno', 'cad', 'soporte', 'movil', 'web', 'redes'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_ter.informatica_ter[hab as keyof typeof this.formData.habilidad_buscada_ter.informatica_ter];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_ter.informatica_ter_of[hab as keyof typeof otherUserData.habilidad_ofrecida_ter.informatica_ter_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para Informática (Tercero)');
+        }
+        break;
+
+      case 'IEME':
+        if (this.formData.habilidad_buscada_ter?.ieme_ter && otherUserData.habilidad_ofrecida_ter?.ieme_ter_of) {
+          console.log('Evaluando habilidades de IEME (Tercero)');
+          const habilidades = [
+            'electrotecnia', 'instalaciones', 'electronica', 'potencia',
+            'maquinas', 'industrial', 'electronicaAplicada', 'comunicaciones'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_ter.ieme_ter[hab as keyof typeof this.formData.habilidad_buscada_ter.ieme_ter];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_ter.ieme_ter_of[hab as keyof typeof otherUserData.habilidad_ofrecida_ter.ieme_ter_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para IEME (Tercero)');
+        }
+        break;
+
+      case 'MCM':
+        if (this.formData.habilidad_buscada_ter?.mcm_ter && otherUserData.habilidad_ofrecida_ter?.mcm_ter_of) {
+          console.log('Evaluando habilidades de MCM (Tercero)');
+          const habilidades = [
+            'metrologia', 'metalurgia', 'soldaduraMcm', 'fabricacion',
+            'dibujoMcm', 'automatizacionMcm', 'maquinasMcm', 'moldes'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_ter.mcm_ter[hab as keyof typeof this.formData.habilidad_buscada_ter.mcm_ter];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_ter.mcm_ter_of[hab as keyof typeof otherUserData.habilidad_ofrecida_ter.mcm_ter_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para MCM (Tercero)');
+        }
+        break;
+
+      case 'EMA':
+        if (this.formData.habilidad_buscada_ter?.ema_ter && otherUserData.habilidad_ofrecida_ter?.ema_ter_of) {
+          console.log('Evaluando habilidades de EMA (Tercero)');
+          const habilidades = [
+            'motores', 'sistemasElectronicos', 'sistemasElectricos', 'dibujoEma',
+            'mantenimiento', 'automotriz', 'seguridad'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_ter.ema_ter[hab as keyof typeof this.formData.habilidad_buscada_ter.ema_ter];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_ter.ema_ter_of[hab as keyof typeof otherUserData.habilidad_ofrecida_ter.ema_ter_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para EMA (Tercero)');
+        }
+        break;
+
+      case 'Mecatronica':
+        if (this.formData.habilidad_buscada_ter?.mecatronica_ter && otherUserData.habilidad_ofrecida_ter?.mec_ter_of) {
+          console.log('Evaluando habilidades de Mecatrónica (Tercero)');
+          const habilidades = [
+            'microcontroladores', 'servomecanismos', 'automatizacion', 'dibujoMec',
+            'simulacion', 'programacionMec', 'soldadura', 'manufactura', 'cnc'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_ter.mecatronica_ter[hab as keyof typeof this.formData.habilidad_buscada_ter.mecatronica_ter];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_ter.mec_ter_of[hab as keyof typeof otherUserData.habilidad_ofrecida_ter.mec_ter_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para Mecatrónica (Tercero)');
+        }
+        break;
+
+      case 'Ciencias':
+        if (this.formData.habilidad_buscada_ter?.ciecias_ter && otherUserData.habilidad_ofrecida_ter?.ciencias_ter_of) {
+          console.log('Evaluando habilidades de Ciencias (Tercero)');
+          const habilidades = [
+            'redaccionCreativa', 'dibujoCiencias', 'investigacion', 'biologia',
+            'morfologia', 'sociologia', 'politica', 'matematica', 'fisica'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_ter.ciecias_ter[hab as keyof typeof this.formData.habilidad_buscada_ter.ciecias_ter];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_ter.ciencias_ter_of[hab as keyof typeof otherUserData.habilidad_ofrecida_ter.ciencias_ter_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para Ciencias (Tercero)');
+        }
+        break;
+    }
+
+    console.log(`Puntuación final de habilidades para Tercero: ${skillMatchScore}`);
+    return skillMatchScore;
+  }
+
+  // Evaluar habilidades específicas para estudiantes de segundo
+  private evaluateSegundoSkills(otherUserData: any, otherUserCarrera: string): number {
+    if (!this.formData) return 0;
+
+    let skillMatchScore = 0;
+    const valorHabilidad = { 'Alto': 3, 'Medio': 2, 'Bajo': 1 };
+
+    // Según la carrera, verificar las habilidades correspondientes
+    switch (otherUserCarrera) {
+      case 'Informatica':
+        if (this.formData.habilidad_buscada_seg?.informatica_seg && otherUserData.habilidad_ofrecida_seg?.informatica_seg_of) {
+          console.log('Evaluando habilidades de Informática (Segundo)');
+          const habilidades = ['programacion', 'soporte', 'web', 'redes'];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_seg.informatica_seg[hab as keyof typeof this.formData.habilidad_buscada_seg.informatica_seg];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_seg.informatica_seg_of[hab as keyof typeof otherUserData.habilidad_ofrecida_seg.informatica_seg_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para Informática (Segundo)');
+        }
+        break;
+
+      case 'IEME':
+        if (this.formData.habilidad_buscada_seg?.ieme_seg && otherUserData.habilidad_ofrecida_seg?.ieme_seg_of) {
+          console.log('Evaluando habilidades de IEME (Segundo)');
+          const habilidades = [
+            'instalacionesSeg', 'electricidadSeg', 'electronicaSeg', 'automatizacionSeg'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_seg.ieme_seg[hab as keyof typeof this.formData.habilidad_buscada_seg.ieme_seg];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_seg.ieme_seg_of[hab as keyof typeof otherUserData.habilidad_ofrecida_seg.ieme_seg_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para IEME (Segundo)');
+        }
+        break;
+
+      case 'MCM':
+        if (this.formData.habilidad_buscada_seg?.mcm_seg && otherUserData.habilidad_ofrecida_seg?.mcm_seg_of) {
+          console.log('Evaluando habilidades de MCM (Segundo)');
+          const habilidades = [
+            'soldaduraMcmSeg', 'fresadoraSeg', 'tornoSeg', 'dibujoMcmSeg'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_seg.mcm_seg[hab as keyof typeof this.formData.habilidad_buscada_seg.mcm_seg];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_seg.mcm_seg_of[hab as keyof typeof otherUserData.habilidad_ofrecida_seg.mcm_seg_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para MCM (Segundo)');
+        }
+        break;
+
+      case 'EMA':
+        if (this.formData.habilidad_buscada_seg?.ema_seg && otherUserData.habilidad_ofrecida_seg?.ema_seg_of) {
+          console.log('Evaluando habilidades de EMA (Segundo)');
+          const habilidades = [
+            'sistemasSeg', 'electronicaSeg', 'mantenimientoSeg'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_seg.ema_seg[hab as keyof typeof this.formData.habilidad_buscada_seg.ema_seg];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_seg.ema_seg_of[hab as keyof typeof otherUserData.habilidad_ofrecida_seg.ema_seg_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para EMA (Segundo)');
+        }
+        break;
+
+      case 'Mecatronica':
+        if (this.formData.habilidad_buscada_seg?.mec_seg && otherUserData.habilidad_ofrecida_seg?.mec_seg_of) {
+          console.log('Evaluando habilidades de Mecatrónica (Segundo)');
+          const habilidades = [
+            'electronicaDigital', 'cncMecSeg', 'manufacturaMecSeg', 'automatizacionMecSeg'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_seg.mec_seg[hab as keyof typeof this.formData.habilidad_buscada_seg.mec_seg];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_seg.mec_seg_of[hab as keyof typeof otherUserData.habilidad_ofrecida_seg.mec_seg_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para Mecatrónica (Segundo)');
+        }
+        break;
+
+      case 'Ciencias':
+        if (this.formData.habilidad_buscada_seg?.ciencias_seg && otherUserData.habilidad_ofrecida_seg?.ciencias_seg_of) {
+          console.log('Evaluando habilidades de Ciencias (Segundo)');
+          const habilidades = [
+            'laboratorio', 'psicologia', 'redaccionCreativaSeg'
+          ];
+
+          for (const hab of habilidades) {
+            const valorBuscado = this.formData.habilidad_buscada_seg.ciencias_seg[hab as keyof typeof this.formData.habilidad_buscada_seg.ciencias_seg];
+            const valorOfrecido = otherUserData.habilidad_ofrecida_seg.ciencias_seg_of[hab as keyof typeof otherUserData.habilidad_ofrecida_seg.ciencias_seg_of];
+
+            if (valorBuscado && valorOfrecido) {
+              console.log(`Habilidad ${hab}: Buscado=${valorBuscado}, Ofrecido=${valorOfrecido}`);
+              if (valorHabilidad[valorOfrecido as keyof typeof valorHabilidad] >=
+                valorHabilidad[valorBuscado as keyof typeof valorHabilidad]) {
+                skillMatchScore += 5;
+                console.log(`¡Match! +5 puntos para ${hab}`);
+              }
+            }
+          }
+        } else {
+          console.log('Faltan datos de habilidades para Ciencias (Segundo)');
+        }
+        break;
+    }
+
+    console.log(`Puntuación final de habilidades para Segundo: ${skillMatchScore}`);
+    return skillMatchScore;
+  }
+
 }

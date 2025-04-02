@@ -1,11 +1,17 @@
--Arreglado el bug de los chat eliminados y duplicados
-
--Arreglado Falta arreglar las habilidades en las personas recomendadas
-
 Terminar el algoritmo
 
 Implementar el subir fotos de perfil a la base de datos
 
 
 Contexto
-El código ahora está funcionando correctamente implementando un algoritmo de recomendación enfocado en conectar estudiantes del mismo año lectivo (Segundo o Tercero). La estructura de la base de datos tiene dos niveles: una colección "usuarios" que contiene información básica (carrera, formCompleted, uid) y colecciones específicas para cada carrera (como "Informatica", "IEME", "Ciencias", etc.) donde se almacenan los detalles completos de las preferencias, habilidades y año lectivo. El algoritmo primero recupera los usuarios de las carreras buscadas, filtra estrictamente por año lectivo, y luego calcula puntuaciones de compatibilidad basadas en horarios, métodos de trabajo, y especialmente en la correspondencia entre habilidades buscadas y ofrecidas. El sistema utiliza TypeScript con verificación de tipos avanzada para acceder dinámicamente a las propiedades de habilidades, evaluando cada carrera por separado con lógica específica para estudiantes de segundo y tercer año.
+
+Estamos trabajando en un algoritmo de recomendación para una aplicación educativa que conecta estudiantes universitarios para colaboraciones académicas. La estructura incluye colecciones generales de usuarios y colecciones específicas por carrera (Informatica, IEME, MCM, EMA, Mecatronica, Ciencias).
+Hemos implementado cuatro condiciones principales para las recomendaciones:
+
+Los usuarios recomendados deben ser del mismo año lectivo que el usuario actual (Segundo o Tercero).
+El algoritmo busca en todas las colecciones de carreras disponibles, no solo en la del usuario actual.
+Las recomendaciones se limitan a usuarios de las carreras específicamente buscadas por el usuario actual, definidas en su campo carrera_buscada.
+Las recomendaciones priorizan la coincidencia de habilidades específicas de las carreras buscadas. Los usuarios con mayor coincidencia de habilidades aparecen primero, y mientras el usuario desliza verá recomendaciones con menos coincidencias.
+
+El algoritmo usa dos puntuaciones separadas: una para habilidades específicas (skillScore) y otra para factores generales como compatibilidad de horarios o métodos de trabajo (otherScore), ordenando primero por skillScore y luego por totalScore.
+La base de datos usa campos en español, y cada carrera tiene conjuntos específicos de habilidades según el año lectivo (segundo o tercero) que se evalúan independientemente en la función evaluateSkillsMatch().

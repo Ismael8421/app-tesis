@@ -143,84 +143,87 @@ export class SearchComponent {
   //Algoritmo de recomendaciones
   async loadRecommendations() {
     console.log("Comenzando búsqueda de recomendaciones para usuario:", this.userData);
-  
+
     try {
       if (!this.formData || !this.userData) {
         console.error('Faltan datos del usuario o del formulario');
         return;
       }
-  
+
       const allPotentialMatches: any[] = [];
       const currentUserId = this.auth.currentUser?.uid;
-  
+
       // Solo proceder si tenemos el año lectivo del usuario actual
       if (!this.userData.anioLectivo) {
         console.error('Falta año lectivo del usuario actual');
         return;
       }
-  
+
       const userAnioLectivo = this.userData.anioLectivo; // 'Segundo' o 'Tercero'
       console.log('Año lectivo del usuario actual:', userAnioLectivo);
-  
+
       // Obtener carreras buscadas por el usuario
       const carrerasBuscadas = this.formData.carrera_buscada || [];
       console.log('Carreras buscadas:', carrerasBuscadas);
-  
+
       // Si no hay carreras buscadas, no mostrar recomendaciones
       if (carrerasBuscadas.length === 0) {
         console.log('El usuario no ha seleccionado carreras para buscar');
         return;
       }
-  
+
       // Convertir las carreras buscadas a sus nombres normalizados para la colección
       const collectionsToSearch = carrerasBuscadas.map(carrera => this.normalizeCarreraName(carrera));
       console.log('Colecciones a buscar:', collectionsToSearch);
-  
+
       // Buscar en cada colección correspondiente a las carreras buscadas
       for (const collectionName of collectionsToSearch) {
         console.log(`Buscando en colección: ${collectionName}`);
         const carreraCollection = collection(this.firestore, collectionName);
-  
+
         // Obtenemos todos los usuarios que no sean el usuario actual
         const q = query(carreraCollection, where('uid', '!=', currentUserId));
         const querySnapshot = await getDocs(q);
-  
+
         console.log(`Encontrados ${querySnapshot.docs.length} documentos en ${collectionName}`);
-  
+
         // Para cada usuario en la colección
         for (const docSnap of querySnapshot.docs) {
           // Obtener la información general del usuario
           const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
           const userData = userGeneralDoc.data();
-  
+
           if (!userData) {
             console.log(`Sin datos para usuario ${docSnap.id}`);
             continue;
           }
-  
+
           const formCompleted = userData['formCompleted'] ?? false;
-  
+
           // Solo considerar usuarios que hayan completado el formulario
           if (formCompleted) {
             const userFormData = docSnap.data();
-  
+
             // Obtener el año lectivo y la carrera
             const otherUserData = await this.registerService.getUserData(docSnap.id);
             const otherUserYear = otherUserData?.anioLectivo;
             const userCarrera = userData['carrera'];
-  
+
             console.log(`Usuario ${userFormData['nombreUsuario'] || 'sin nombre'}, Año: ${otherUserYear}, Carrera: ${userCarrera}`);
-  
+
             // FILTRO CRÍTICO: Verificar que sean del mismo año lectivo
             if (otherUserYear !== userAnioLectivo) {
               console.log(`Descartando - Año diferente: ${otherUserYear} vs ${userAnioLectivo}`);
               continue; // Si no son del mismo año, saltar este usuario
             }
-  
-            // Calcular puntuación de compatibilidad
-            const matchScore = this.calculateMatchScore(userFormData, userCarrera);
-            console.log(`Match score para ${userFormData['nombreUsuario'] || 'sin nombre'}: ${matchScore}`);
-  
+
+            // Calcular puntuación de compatibilidad con énfasis en habilidades
+            const matchDetails = this.calculateDetailedMatchScore(userFormData, userCarrera);
+            console.log(`Match score para ${userFormData['nombreUsuario'] || 'sin nombre'}: 
+              Total: ${matchDetails.totalScore}, 
+              Habilidades: ${matchDetails.skillScore}, 
+              Otros: ${matchDetails.otherScore}`);
+
             allPotentialMatches.push({
               uid: docSnap.id,
               nombreUsuario: userFormData['nombreUsuario'] || 'Usuario',
@@ -230,30 +233,40 @@ export class SearchComponent {
               anioLectivo: otherUserYear || '',
               mencion: userFormData['mencion'] || '',
               ...userFormData,
-              matchScore: matchScore
+              matchScore: matchDetails.totalScore,
+              skillScore: matchDetails.skillScore,
+              otherScore: matchDetails.otherScore
             });
           } else {
             console.log(`Descartando - Formulario no completado`);
           }
         }
       }
-  
+
       console.log(`Total de matches potenciales: ${allPotentialMatches.length}`);
-  
+
       console.log("Matches potenciales (sin filtrar):", allPotentialMatches.map(u => ({
         nombre: u.nombreUsuario,
         anio: u.anioLectivo,
         carrera: u.carrera,
-        score: u.matchScore
+        totalScore: u.matchScore,
+        skillScore: u.skillScore
       })));
-  
-      // Ordenar por puntuación de compatibilidad (mayor a menor)
+
+      // Ordenar primero por puntuación de habilidades (mayor a menor) y luego por puntuación total
       this.recommendedUsers = allPotentialMatches
-        .sort((a, b) => b.matchScore - a.matchScore)
-        .slice(0, 10); // Limitar a 10 recomendaciones
-  
+        .sort((a, b) => {
+          // Primero ordenar por coincidencia de habilidades
+          if (b.skillScore !== a.skillScore) {
+            return b.skillScore - a.skillScore;
+          }
+          // En caso de empate, usar la puntuación total
+          return b.matchScore - a.matchScore;
+        })
+        .slice(0, 20); // Aumentar a 20 para tener más variedad de recomendaciones
+
       console.log(`Recomendaciones finales: ${this.recommendedUsers.length}`);
-  
+
     } catch (error) {
       console.error('Error al cargar recomendaciones:', error);
     }
@@ -713,4 +726,81 @@ export class SearchComponent {
     return skillMatchScore;
   }
 
+  private calculateDetailedMatchScore(otherUserData: any, otherUserCarrera: string): { 
+    totalScore: number, 
+    skillScore: number, 
+    otherScore: number 
+  } {
+    if (!this.formData || !otherUserData) return { totalScore: 0, skillScore: 0, otherScore: 0 };
+  
+    let otherScore = 0;
+    console.log(`Calculando puntuación para usuario con carrera: ${otherUserCarrera}`);
+  
+    // 1. Verificar si la carrera del otro usuario está entre las buscadas por el usuario actual
+    const carreraAlias = {
+      'Informatica': 'informatica',
+      'IEME': 'ieme',
+      'MCM': 'mcm',
+      'EMA': 'ema',
+      'Mecatronica': 'mecatronica',
+      'Ciencias': 'ciencias'
+    };
+  
+    const normalizedCarrera = carreraAlias[otherUserCarrera as keyof typeof carreraAlias] || '';
+  
+    if (this.formData.carrera_buscada.includes(normalizedCarrera)) {
+      otherScore += 30; // Gran peso a coincidir con carreras buscadas
+      console.log(`+30 puntos por carrera buscada: ${normalizedCarrera}`);
+    } else {
+      console.log(`Carrera no está entre las buscadas: ${normalizedCarrera}`);
+    }
+  
+    // 2. Compatibilidad de horarios
+    if (this.formData.horario && otherUserData.horario) {
+      const commonSchedules = this.formData.horario.filter(
+        horario => otherUserData.horario?.includes(horario)
+      );
+      otherScore += commonSchedules.length * 5;
+      console.log(`+${commonSchedules.length * 5} puntos por ${commonSchedules.length} horarios compatibles`);
+    } else {
+      console.log('No se pudo evaluar compatibilidad de horarios');
+    }
+  
+    // 3. Compatibilidad de método de trabajo
+    if (this.formData.metodo && otherUserData.metodo) {
+      if (this.formData.metodo === otherUserData.metodo ||
+        this.formData.metodo === 'ambos' ||
+        otherUserData.metodo === 'ambos') {
+        otherScore += 10;
+        console.log(`+10 puntos por método de trabajo compatible: ${this.formData.metodo} vs ${otherUserData.metodo}`);
+      } else {
+        console.log(`Métodos de trabajo incompatibles: ${this.formData.metodo} vs ${otherUserData.metodo}`);
+      }
+    } else {
+      console.log('No se pudo evaluar compatibilidad de método de trabajo');
+    }
+  
+    // 4. Compatibilidad de horas
+    if (this.formData.horas && otherUserData.horas) {
+      if (this.formData.horas === otherUserData.horas ||
+        this.formData.horas === 'flexible' ||
+        otherUserData.horas === 'flexible') {
+        otherScore += 5;
+        console.log(`+5 puntos por horas compatibles: ${this.formData.horas} vs ${otherUserData.horas}`);
+      } else {
+        console.log(`Horas incompatibles: ${this.formData.horas} vs ${otherUserData.horas}`);
+      }
+    } else {
+      console.log('No se pudo evaluar compatibilidad de horas');
+    }
+  
+    // 5. Evaluar match de habilidades (lo más importante)
+    const skillScore = this.evaluateSkillsMatch(otherUserData, otherUserCarrera);
+  
+    // Calcular puntuación total
+    const totalScore = otherScore + skillScore;
+  
+    console.log(`Puntuación detallada: Total=${totalScore}, Habilidades=${skillScore}, Otros=${otherScore}`);
+    return { totalScore, skillScore, otherScore };
+  }
 }

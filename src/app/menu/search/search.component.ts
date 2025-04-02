@@ -162,11 +162,21 @@ export class SearchComponent {
       const userAnioLectivo = this.userData.anioLectivo; // 'Segundo' o 'Tercero'
       console.log('Año lectivo del usuario actual:', userAnioLectivo);
   
-      // Buscar en TODAS las colecciones, independientemente de las carreras buscadas
-      const collectionsToSearch = this.carreraCollections;
+      // Obtener carreras buscadas por el usuario
+      const carrerasBuscadas = this.formData.carrera_buscada || [];
+      console.log('Carreras buscadas:', carrerasBuscadas);
+  
+      // Si no hay carreras buscadas, no mostrar recomendaciones
+      if (carrerasBuscadas.length === 0) {
+        console.log('El usuario no ha seleccionado carreras para buscar');
+        return;
+      }
+  
+      // Convertir las carreras buscadas a sus nombres normalizados para la colección
+      const collectionsToSearch = carrerasBuscadas.map(carrera => this.normalizeCarreraName(carrera));
       console.log('Colecciones a buscar:', collectionsToSearch);
   
-      // Buscar en cada colección
+      // Buscar en cada colección correspondiente a las carreras buscadas
       for (const collectionName of collectionsToSearch) {
         console.log(`Buscando en colección: ${collectionName}`);
         const carreraCollection = collection(this.firestore, collectionName);

@@ -143,81 +143,74 @@ export class SearchComponent {
   //Algoritmo de recomendaciones
   async loadRecommendations() {
     console.log("Comenzando búsqueda de recomendaciones para usuario:", this.userData);
-
+  
     try {
       if (!this.formData || !this.userData) {
         console.error('Faltan datos del usuario o del formulario');
         return;
       }
-
+  
       const allPotentialMatches: any[] = [];
       const currentUserId = this.auth.currentUser?.uid;
-
+  
       // Solo proceder si tenemos el año lectivo del usuario actual
       if (!this.userData.anioLectivo) {
         console.error('Falta año lectivo del usuario actual');
         return;
       }
-
+  
       const userAnioLectivo = this.userData.anioLectivo; // 'Segundo' o 'Tercero'
       console.log('Año lectivo del usuario actual:', userAnioLectivo);
-
-      // Obtener carreras buscadas por el usuario
-      const carrerasBuscadas = this.formData.carrera_buscada || [];
-      console.log('Carreras buscadas:', carrerasBuscadas);
-
-      // Si no hay carreras buscadas, buscar en todas las colecciones
-      const collectionsToSearch = carrerasBuscadas.length > 0
-        ? carrerasBuscadas.map(carrera => this.normalizeCarreraName(carrera))
-        : this.carreraCollections;
-
+  
+      // Buscar en TODAS las colecciones, independientemente de las carreras buscadas
+      const collectionsToSearch = this.carreraCollections;
       console.log('Colecciones a buscar:', collectionsToSearch);
-
-      // Buscar en cada colección correspondiente
+  
+      // Buscar en cada colección
       for (const collectionName of collectionsToSearch) {
         console.log(`Buscando en colección: ${collectionName}`);
         const carreraCollection = collection(this.firestore, collectionName);
-
-        // Primero obtenemos todos los usuarios que no sean el usuario actual
+  
+        // Obtenemos todos los usuarios que no sean el usuario actual
         const q = query(carreraCollection, where('uid', '!=', currentUserId));
         const querySnapshot = await getDocs(q);
-
+  
         console.log(`Encontrados ${querySnapshot.docs.length} documentos en ${collectionName}`);
-
-        // Para cada usuario en la colección
+  
         // Para cada usuario en la colección
         for (const docSnap of querySnapshot.docs) {
           // Obtener la información general del usuario
           const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
           const userData = userGeneralDoc.data();
-
+  
           if (!userData) {
             console.log(`Sin datos para usuario ${docSnap.id}`);
             continue;
           }
-
+  
           const formCompleted = userData['formCompleted'] ?? false;
-
+  
           // Solo considerar usuarios que hayan completado el formulario
           if (formCompleted) {
             const userFormData = docSnap.data();
-
-            // Leer el año lectivo desde el documento de la colección específica
-            const otherUserYear = userFormData['anioLectivo']; // Cambiado: leer de userFormData
+  
+            // Obtener el año lectivo y la carrera
+            const otherUserData = await this.registerService.getUserData(docSnap.id);
+            const otherUserYear = otherUserData?.anioLectivo;
             const userCarrera = userData['carrera'];
-
+  
             console.log(`Usuario ${userFormData['nombreUsuario'] || 'sin nombre'}, Año: ${otherUserYear}, Carrera: ${userCarrera}`);
-
+  
             // FILTRO CRÍTICO: Verificar que sean del mismo año lectivo
             if (otherUserYear !== userAnioLectivo) {
               console.log(`Descartando - Año diferente: ${otherUserYear} vs ${userAnioLectivo}`);
               continue; // Si no son del mismo año, saltar este usuario
             }
-
+  
             // Calcular puntuación de compatibilidad
             const matchScore = this.calculateMatchScore(userFormData, userCarrera);
             console.log(`Match score para ${userFormData['nombreUsuario'] || 'sin nombre'}: ${matchScore}`);
-
+  
             allPotentialMatches.push({
               uid: docSnap.id,
               nombreUsuario: userFormData['nombreUsuario'] || 'Usuario',
@@ -234,23 +227,23 @@ export class SearchComponent {
           }
         }
       }
-
+  
       console.log(`Total de matches potenciales: ${allPotentialMatches.length}`);
-
+  
       console.log("Matches potenciales (sin filtrar):", allPotentialMatches.map(u => ({
         nombre: u.nombreUsuario,
         anio: u.anioLectivo,
         carrera: u.carrera,
         score: u.matchScore
       })));
-
+  
       // Ordenar por puntuación de compatibilidad (mayor a menor)
       this.recommendedUsers = allPotentialMatches
         .sort((a, b) => b.matchScore - a.matchScore)
         .slice(0, 10); // Limitar a 10 recomendaciones
-
+  
       console.log(`Recomendaciones finales: ${this.recommendedUsers.length}`);
-
+  
     } catch (error) {
       console.error('Error al cargar recomendaciones:', error);
     }

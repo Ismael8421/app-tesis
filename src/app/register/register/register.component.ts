@@ -62,6 +62,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       name: new FormControl('', Validators.required),
       lastName: new FormControl('', Validators.required),
       course: new FormControl('', Validators.required),
+      paralelo: new FormControl('', Validators.required),
       profession: new FormControl('', Validators.required),
       mencion: new FormControl('') 
     });
@@ -119,6 +120,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       nombre: this.form.get('name')?.value || '',
       apellido: this.form.get('lastName')?.value || '',
       anioLectivo: this.form.get('course')?.value || '',
+      paralelo: this.form.get('paralelo')?.value || '',
       carrera: this.form.get('profession')?.value || '',
       mencion: this.form.get('mencion')?.value || ''
     };
@@ -132,6 +134,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     if (data.nombre) this.form.get('name')?.setValue(data.nombre);
     if (data.apellido) this.form.get('lastName')?.setValue(data.apellido);
     if (data.anioLectivo) this.form.get('course')?.setValue(data.anioLectivo);
+    if (data.paralelo) this.form.get('paralelo')?.setValue(data.paralelo);
     if (data.carrera) this.form.get('profession')?.setValue(data.carrera);
     if (data.mencion) this.form.get('mencion')?.setValue(data.mencion);
   }
@@ -177,13 +180,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
       }
   
       const uid = user.uid;
-      const { username, name, lastName, course, profession, mencion } = this.form.value;
+      const { username, name, lastName, course, paralelo, profession, mencion } = this.form.value;
   
       const userData: userCreate = {
         nombreUsuario: username || '',
         nombre: name || '',
         apellido: lastName || '',
         anioLectivo: course || '',
+        paralelo: paralelo || '',
         carrera: profession || '',
         mencion: mencion || '' // Si no hay mención, será string vacío
       };

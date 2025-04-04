@@ -865,6 +865,7 @@ export class ProfileComponent implements OnInit {
       nombre: [this.userData.nombre, Validators.required],
       apellido: [this.userData.apellido, Validators.required],
       anioLectivo: [this.userData.anioLectivo, Validators.required],
+      paralelo: [this.userData.paralelo, Validators.required],
       carrera: [this.userData.carrera, Validators.required]
     };
 
@@ -974,6 +975,7 @@ export class ProfileComponent implements OnInit {
         nombre: formData.nombre,
         apellido: formData.apellido,
         anioLectivo: formData.anioLectivo,
+        paralelo: formData.paralelo,
         carrera: formData.carrera
       };
 

@@ -56,6 +56,17 @@
       </ion-text>
     </div>
 
+    <!-- Paralelo (nuevo campo) -->
+    <ion-item>
+      <ion-label position="floating">Paralelo</ion-label>
+      <ion-input id="paralelo" type="text" formControlName="paralelo"></ion-input>
+    </ion-item>
+    <div *ngIf="form.controls['paralelo'].invalid && form.controls['paralelo'].touched">
+      <ion-text color="danger">
+        <small>Este campo es obligatorio</small>
+      </ion-text>
+    </div>
+
     <!-- Profession -->
     <ion-item>
       <ion-label position="floating">Carrera</ion-label>

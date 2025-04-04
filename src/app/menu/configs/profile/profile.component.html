@@ -34,15 +34,14 @@
             <div class="circular-image-container">
               <ion-img
                 [src]="profileImagePreview || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg'"
-                alt="Foto de perfil"
-              ></ion-img>
+                alt="Foto de perfil"></ion-img>
             </div>
           </ion-avatar>
           <ion-button class="change-photo-btn" fill="clear" (click)="presentPhotoOptions()">
             <ion-icon name="camera"></ion-icon>
           </ion-button>
         </div>
-        
+
         <!-- Botón emergencia para abrir el modal de recorte (solo visible cuando hay una imagen temporal) -->
         <div *ngIf="tempImageUrl && !isCropModalOpen" class="emergency-btn-container">
           <ion-button color="warning" (click)="openCropModal()">
@@ -68,6 +67,11 @@
             </ion-item>
 
             <ion-item>
+              <ion-label>Paralelo</ion-label>
+              <ion-note slot="end">{{ userData.paralelo }}</ion-note>
+            </ion-item>
+
+            <ion-item>
               <ion-label>Carrera:</ion-label>
               <ion-note slot="end">{{ userData.carrera }}</ion-note>
             </ion-item>
@@ -78,11 +82,8 @@
               <ion-icon name="create-outline" slot="start"></ion-icon>
               Editar perfil
             </ion-button>
-            
-            <ion-button expand="block" 
-                       fill="outline" 
-                       class="reset-preferences-btn" 
-                       (click)="resetPreferencesForm()">
+
+            <ion-button expand="block" fill="outline" class="reset-preferences-btn" (click)="resetPreferencesForm()">
               <ion-icon name="refresh-outline" slot="start"></ion-icon>
               Reiniciar preferencias
             </ion-button>
@@ -113,45 +114,28 @@
     <ion-content class="crop-modal-content">
       <div class="crop-container">
         <div class="image-container" *ngIf="tempImageUrl">
-          <img 
-            #cropImage
-            [src]="tempImageUrl" 
-            alt="Imagen para recortar"
-            class="crop-image"
-            [style.transform]="'rotate(' + imageRotation + 'deg)'"
-            (load)="handleImageLoad()"
-          >
-          
-          <div class="crop-frame"
-            #cropFrame
-            [style.width]="cropFrameSize + 'px'"
-            [style.height]="cropFrameSize + 'px'"
+          <img #cropImage [src]="tempImageUrl" alt="Imagen para recortar" class="crop-image"
+            [style.transform]="'rotate(' + imageRotation + 'deg)'" (load)="handleImageLoad()">
+
+          <div class="crop-frame" #cropFrame [style.width]="cropFrameSize + 'px'" [style.height]="cropFrameSize + 'px'"
             [style.transform]="'translate(' + cropFrameX + 'px, ' + cropFrameY + 'px)'"
-            (touchstart)="onFrameTouchStart($event)"
-            (touchmove)="onFrameTouchMove($event)"
-            (touchend)="onFrameTouchEnd()"
-            (mousedown)="onFrameMouseDown($event)"
-            (mousemove)="onFrameMouseMove($event)"
+            (touchstart)="onFrameTouchStart($event)" (touchmove)="onFrameTouchMove($event)"
+            (touchend)="onFrameTouchEnd()" (mousedown)="onFrameMouseDown($event)" (mousemove)="onFrameMouseMove($event)"
             (mouseup)="onFrameMouseUp()">
           </div>
         </div>
-        
+
         <!-- Controles para zoom y rotación -->
         <div class="edit-controls">
           <div class="control-group">
             <ion-label>Tamaño del recorte</ion-label>
-            <ion-range
-              min="30"
-              max="90"
-              step="1"
-              [value]="frameScalePercent"
-              (ionChange)="onFrameSizeChange($event)"
+            <ion-range min="30" max="90" step="1" [value]="frameScalePercent" (ionChange)="onFrameSizeChange($event)"
               aria-label="Tamaño del recorte">
               <ion-icon name="remove-outline" slot="start"></ion-icon>
               <ion-icon name="add-outline" slot="end"></ion-icon>
             </ion-range>
           </div>
-          
+
           <!-- <div class="rotate-control">
             <ion-button (click)="rotateImage(-90)">
               <ion-icon name="refresh-outline" class="rotate-left"></ion-icon>
@@ -182,11 +166,7 @@
     <ion-content class="fullscreen-image-content">
       <div class="fullscreen-image-container">
         <div class="square-image-wrapper">
-          <img 
-            [src]="profileImagePreview || 'icons/logo_tesis.png'" 
-            alt="Foto de perfil"
-            class="fullscreen-image"
-          >
+          <img [src]="profileImagePreview || 'icons/logo_tesis.png'" alt="Foto de perfil" class="fullscreen-image">
         </div>
       </div>
     </ion-content>
@@ -214,38 +194,48 @@
           <ion-item>
             <ion-label position="stacked">Nombre de usuario</ion-label>
             <ion-input formControlName="nombreUsuario" placeholder="Nombre de usuario"></ion-input>
-            <ion-note slot="error" *ngIf="profileForm.get('nombreUsuario')?.hasError('required') && profileForm.get('nombreUsuario')?.touched">
+            <ion-note slot="error"
+              *ngIf="profileForm.get('nombreUsuario')?.hasError('required') && profileForm.get('nombreUsuario')?.touched">
               El nombre de usuario es obligatorio
             </ion-note>
           </ion-item>
-          
+
           <ion-item>
             <ion-label position="stacked">Nombre</ion-label>
             <ion-input formControlName="nombre" placeholder="Nombre"></ion-input>
-            <ion-note slot="error" *ngIf="profileForm.get('nombre')?.hasError('required') && profileForm.get('nombre')?.touched">
+            <ion-note slot="error"
+              *ngIf="profileForm.get('nombre')?.hasError('required') && profileForm.get('nombre')?.touched">
               El nombre es obligatorio
             </ion-note>
           </ion-item>
-          
+
           <ion-item>
             <ion-label position="stacked">Apellido</ion-label>
             <ion-input formControlName="apellido" placeholder="Apellido"></ion-input>
-            <ion-note slot="error" *ngIf="profileForm.get('apellido')?.hasError('required') && profileForm.get('apellido')?.touched">
+            <ion-note slot="error"
+              *ngIf="profileForm.get('apellido')?.hasError('required') && profileForm.get('apellido')?.touched">
               El apellido es obligatorio
             </ion-note>
           </ion-item>
-          
+
           <ion-item>
             <ion-label position="stacked">Año Lectivo</ion-label>
             <ion-select formControlName="anioLectivo" placeholder="Seleccionar año lectivo">
               <ion-select-option value="Segundo">Segundo</ion-select-option>
               <ion-select-option value="Tercero">Tercero</ion-select-option>
             </ion-select>
-            <ion-note slot="error" *ngIf="profileForm.get('anioLectivo')?.hasError('required') && profileForm.get('anioLectivo')?.touched">
+            <ion-note slot="error"
+              *ngIf="profileForm.get('anioLectivo')?.hasError('required') && profileForm.get('anioLectivo')?.touched">
               El año lectivo es obligatorio
             </ion-note>
           </ion-item>
-          
+
+          <!-- Paralelo -->
+          <ion-item>
+            <ion-label position="stacked">Paralelo</ion-label>
+            <ion-input formControlName="paralelo" placeholder="Ingrese su paralelo"></ion-input>
+          </ion-item>
+
           <ion-item>
             <ion-label position="stacked">Carrera</ion-label>
             <ion-select formControlName="carrera" placeholder="Seleccionar carrera">
@@ -253,11 +243,12 @@
                 {{carrera.display}}
               </ion-select-option>
             </ion-select>
-            <ion-note slot="error" *ngIf="profileForm.get('carrera')?.hasError('required') && profileForm.get('carrera')?.touched">
+            <ion-note slot="error"
+              *ngIf="profileForm.get('carrera')?.hasError('required') && profileForm.get('carrera')?.touched">
               La carrera es obligatoria
             </ion-note>
           </ion-item>
-          
+
           <!-- Campo de mención solo si existe -->
           <ion-item *ngIf="hasMencion">
             <ion-label position="stacked">Mención</ion-label>

@@ -77,6 +77,17 @@ export class SearchComponent {
     return this.auth.onAuthStateChanged(observer);
   });
 
+  formatHorario(horario: string): string {
+    const horarioMap: { [key: string]: string } = {
+      'durante_almuerzo': 'Durante el almuerzo',
+      'despues_clases': 'Después de clases',
+      'manana_fines': 'Mañanas en fin de semana',
+      'tarde_fines': 'Tardes en fin de semana'
+    };
+    
+    return horarioMap[horario] || horario;
+  }
+
   async ngOnInit() {
     setTimeout(async () => {
       try {

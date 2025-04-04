@@ -1,7 +1,6 @@
-Terminar el algoritmo
-
 Implementar el subir fotos de perfil a la base de datos
-
+Tutorial de uso de las recomendaciones
+Carga previa de recomendaciones
 
 Contexto
 

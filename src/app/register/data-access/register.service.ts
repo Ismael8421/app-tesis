@@ -9,6 +9,7 @@ export interface userCreate {
   nombre: string;
   apellido: string;
   anioLectivo: string;
+  paralelo: string;
   carrera: string;
   mencion?: string;
   uid?: string;

@@ -1,4 +1,12 @@
+<ion-content class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+
 <div class="page-container">
+
+
   <div class="loading-container" *ngIf="loading">
     <ion-spinner></ion-spinner>
     <p>Cargando recomendaciones...</p>
@@ -406,3 +414,5 @@
     [buttons]="alertButtons" (didDismiss)="isFormComplete = true">
   </ion-alert>
 </div>
+
+</ion-content>

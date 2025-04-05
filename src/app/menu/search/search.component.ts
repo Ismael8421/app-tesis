@@ -13,7 +13,7 @@ import { MessagesIconComponent } from '../../UI/messages-icon/messages-icon.comp
 import { HeartIconComponent } from '../../UI/heart-icon/heart-icon.component';
 import { RegisterService, userCreate } from '../../register/data-access/register.service';
 import { FormService, formCreate } from '../../form/data-access/form.service';
-import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonImg, IonSpinner, IonText } from '@ionic/angular/standalone';
+import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonContent, IonImg, IonRefresher, IonRefresherContent, IonSpinner, IonText } from '@ionic/angular/standalone';
 import { Firestore, collection, doc, getDoc, getDocs, query, where, limit } from '@angular/fire/firestore';
 
 register();
@@ -29,7 +29,7 @@ register();
     CheckIconComponent,
     MessagesIconComponent,
     HeartIconComponent,
-    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert, IonSpinner
+    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert, IonSpinner, IonRefresher, IonRefresherContent, IonContent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',
@@ -813,5 +813,40 @@ export class SearchComponent {
   
     console.log(`Puntuación detallada: Total=${totalScore}, Habilidades=${skillScore}, Otros=${otherScore}`);
     return { totalScore, skillScore, otherScore };
+  }
+
+  async handleRefresh(event: any) {
+    console.log('Comenzando operación de actualización');
+    
+    try {
+      // Reiniciar estados
+      this.loading = true;
+      this.recommendedUsers = [];
+      
+      const user = this.auth.currentUser;
+      if (user) {
+        // Recargar datos de ambos servicios
+        const [registerData, formData, formCompleted] = await Promise.all([
+          this.registerService.getUserData(user.uid),
+          this.formService.getFormData(user.uid),
+          this.formStateService.checkFormCompletion(user.uid)
+        ]);
+  
+        this.userData = registerData;
+        this.formData = formData;
+        this.isFormComplete = formCompleted;
+        
+        // Cargar recomendaciones solo si el formulario está completo
+        if (formCompleted && this.userData && this.formData) {
+          await this.loadRecommendations();
+        }
+      }
+    } catch (error) {
+      console.error('Error al actualizar datos:', error);
+    } finally {
+      // Completar el evento de actualización para ocultar el spinner
+      event.target.complete();
+      this.loading = false;
+    }
   }
 }

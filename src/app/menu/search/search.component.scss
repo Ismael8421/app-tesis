@@ -3,6 +3,28 @@ $dark-accent: #FCFF8B;
 $blue-accent: #5A7F94;
 $dark-secondary: #A3A9B0;
 
+@keyframes swipeRight {
+  0% {
+    transform: translateX(0) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100vw) rotate(5deg);
+    opacity: 0;
+  }
+}
+
+.profile-liked {
+  animation: swipeRight 0.5s ease-in-out forwards;
+  pointer-events: none; /* Evitar interacciones durante la animación */
+}
+
+/* Los estilos para el toast de like */
+:host ::ng-deep .like-toast {
+  --background: var(--ion-color-success);
+  --color: var(--ion-color-success-contrast);
+}
+
 @keyframes swipeLeft {
   0% {
     transform: translateX(0) rotate(0);

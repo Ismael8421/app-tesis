@@ -2,6 +2,7 @@ Implementar el subir fotos de perfil a la base de datos
 Tutorial de uso de las recomendaciones
 
 Funcionando el botón de rechazar, se guarda en la base de datos y local
+Funcionando el botón de like, se guarda en la base de datos y local
 
 Contexto
 

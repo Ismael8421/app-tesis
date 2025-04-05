@@ -15,6 +15,7 @@ import { FormService, formCreate } from '../../form/data-access/form.service';
 import { AlertController, IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonContent, IonIcon, IonImg, IonRefresher, IonRefresherContent, IonSpinner, IonText, ToastController } from '@ionic/angular/standalone';
 import { Firestore, collection, doc, getDoc, getDocs, query, where, limit } from '@angular/fire/firestore';
 import { RejectedProfilesService } from './data-access/rejected-profiles.service';
+import { LikedProfilesService } from './data-access/iked-profiles.service';
 
 register();
 
@@ -46,6 +47,7 @@ export class SearchComponent {
   private rejectedProfilesService = inject(RejectedProfilesService);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
+  private likedProfilesService = inject(LikedProfilesService);
 
   recommendedUsers: any[] = [];
   loading = true;
@@ -63,6 +65,7 @@ export class SearchComponent {
   pendingCollections: string[] = []; // Colecciones pendientes de procesar
 
   rejectedProfiles: string[] = []; // IDs de perfiles rechazados
+  likedProfiles: string[] = []; // IDs de perfiles con like
 
   // Colecciones para las diferentes carreras
   private carreraCollections = [
@@ -122,6 +125,14 @@ export class SearchComponent {
             profiles => {
               this.rejectedProfiles = profiles;
               console.log('Perfiles rechazados cargados:', this.rejectedProfiles.length);
+            }
+          );
+          
+          // Suscribirse a los perfiles con like
+          this.likedProfilesService.getLikedProfiles().subscribe(
+            profiles => {
+              this.likedProfiles = profiles;
+              console.log('Perfiles con like cargados:', this.likedProfiles.length);
             }
           );
   
@@ -299,8 +310,8 @@ export class SearchComponent {
         }
   
         // Verificar si este perfil ya ha sido rechazado
-        if (this.rejectedProfiles.includes(docSnap.id)) {
-          console.log(`Descartando - Perfil rechazado: ${docSnap.id}`);
+        if (this.rejectedProfiles.includes(docSnap.id) || this.likedProfiles.includes(docSnap.id)) {
+          console.log(`Descartando - Perfil rechazado o con like: ${docSnap.id}`);
           continue;
         }
   
@@ -1152,5 +1163,70 @@ export class SearchComponent {
     });
   
     await toast.present();
+  }
+
+  async likeProfile(user: any) {
+    if (!user || !user.uid) {
+      console.error('ID de usuario no válido para dar like');
+      return;
+    }
+  
+    try {
+      // 1. Obtener la tarjeta actual para animar
+      const swiperEl = document.querySelector('swiper-container');
+      if (!swiperEl || !swiperEl.swiper) return;
+      
+      const activeIndex = swiperEl.swiper.activeIndex;
+      const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
+      if (!activeSlide) return;
+      
+      const card = activeSlide.querySelector('ion-card');
+      if (!card) return;
+      
+      // 2. Aplicar clase de animación (opcional: puedes crear una animación específica para likes)
+      activeSlide.classList.add('animating');
+      card.classList.add('profile-liked');
+      
+      // 3. Registrar el like en Firebase mientras se reproduce la animación
+      this.likedProfilesService.likeProfile(user.uid);
+      
+      // 4. Esperar a que termine la animación
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // 5. Eliminar el usuario de las recomendaciones
+      this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
+      this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
+      
+      // 6. Gestionar el estado después de eliminar
+      if (this.recommendedUsers.length === 0 && this.allPotentialMatches.length > 0) {
+        // Si no quedan recomendaciones mostradas pero hay más disponibles
+        await this.loadNextBatch();
+      } else if (this.recommendedUsers.length === 0) {
+        // Si no hay más recomendaciones en absoluto
+        this.loading = false;
+      } else {
+        // Ajustar el swiper si es necesario
+        if (swiperEl.swiper.activeIndex >= this.recommendedUsers.length) {
+          swiperEl.swiper.slideTo(this.recommendedUsers.length - 1);
+        } else {
+          // Forzar actualización del swiper
+          swiperEl.swiper.update();
+        }
+      }
+      
+      // Mostrar un toast breve
+      const toast = await this.toastController.create({
+        message: 'Perfil añadido a favoritos',
+        duration: 1000,
+        position: 'bottom',
+        color: 'success',
+        cssClass: 'like-toast'
+      });
+      await toast.present();
+      
+    } catch (error) {
+      console.error('Error al dar like al perfil:', error);
+      this.presentToast('Error al añadir perfil a favoritos', 'danger');
+    }
   }
 }

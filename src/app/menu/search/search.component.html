@@ -3,16 +3,15 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-
   <div class="page-container">
 
-
-    <div class="loading-container" *ngIf="loading">
+    <div class="loading-container" *ngIf="loading && recommendedUsers.length === 0">
       <ion-spinner></ion-spinner>
       <p>Cargando recomendaciones...</p>
     </div>
 
-    <swiper-container (swiperslidechange)="onSlideChange($event)">
+    <swiper-container *ngIf="!loading || recommendedUsers.length > 0" (swiperslidechange)="onSlideChange($event)"
+      initial-slide="0" slides-per-view="1" centered-slides="true" grab-cursor="true" threshold="5">
       <swiper-slide *ngFor="let user of recommendedUsers">
         <ion-card class="content-container ion-no-margin">
           <ion-card-content class="profile-section">
@@ -409,8 +408,20 @@
         </ion-card>
       </swiper-slide>
 
-      <!-- Tarjeta final -->
-      <swiper-slide *ngIf="recommendedUsers.length > 0">
+      <!-- Diapositiva de "Cargando más" que se mostrará cuando se están cargando más recomendaciones -->
+      <swiper-slide *ngIf="isLoadingMore">
+        <ion-card class="content-container ion-no-margin loading-more-card">
+          <ion-card-content class="profile-section">
+            <div class="loading-container">
+              <ion-spinner></ion-spinner>
+              <p>Cargando más recomendaciones...</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </swiper-slide>
+
+      <!-- Tarjeta final - solo mostrar cuando se han cargado todas las posibles recomendaciones -->
+      <swiper-slide *ngIf="recommendedUsers.length > 0 && recommendedUsers.length >= allPotentialMatches.length">
         <ion-card class="content-container ion-no-margin end-card">
           <ion-card-content class="profile-section">
             <div class="end-recommendations">
@@ -435,6 +446,16 @@
         </ion-button>
       </div>
     </swiper-container>
+
+    <!-- Mensaje cuando no hay recomendaciones después de cargar -->
+    <div *ngIf="!loading && recommendedUsers.length === 0" class="no-recommendations">
+      <ion-icon name="search-outline" size="large"></ion-icon>
+      <h2>No hay recomendaciones disponibles</h2>
+      <p>En este momento no hay estudiantes que coincidan con tus criterios de búsqueda.</p>
+      <ion-button expand="block" (click)="navegateToForm()">
+        Modificar preferencias
+      </ion-button>
+    </div>
 
     <ion-alert [isOpen]="!isFormComplete"
       message="Para personalizar tus recomendaciones, necesitamos conocerte mejor a través de un breve formulario"

@@ -51,6 +51,13 @@ export class SearchComponent {
   formData: formCreate | null = null;
   isFormComplete: boolean = true;
   showAlert: boolean = false;
+  allPotentialMatches: any[] = []; // Almacenará todas las coincidencias potenciales
+  batchSize: number = 5; // Número de recomendaciones a cargar por lote
+  currentBatch: number = 1; // Control del lote actual
+  isLoadingMore: boolean = false; // Control de estado de carga de más recomendaciones
+  searchLimit: number = 5; // Cantidad de usuarios a buscar por colección en cada carga
+  collectionsProcessed: number = 0; // Control de colecciones procesadas
+  pendingCollections: string[] = []; // Colecciones pendientes de procesar
 
   // Colecciones para las diferentes carreras
   private carreraCollections = [
@@ -84,7 +91,7 @@ export class SearchComponent {
       'manana_fines': 'Mañanas en fin de semana',
       'tarde_fines': 'Tardes en fin de semana'
     };
-    
+
     return horarioMap[horario] || horario;
   }
 
@@ -156,21 +163,29 @@ export class SearchComponent {
     console.log("Comenzando búsqueda de recomendaciones para usuario:", this.userData);
 
     try {
+      // Establecer a true solo aquí, al inicio del proceso
+      this.loading = true;
+
       if (!this.formData || !this.userData) {
         console.error('Faltan datos del usuario o del formulario');
+        this.loading = false;
         return;
       }
 
-      const allPotentialMatches: any[] = [];
-      const currentUserId = this.auth.currentUser?.uid;
+      // Limpiar datos existentes
+      this.recommendedUsers = [];
+      this.allPotentialMatches = [];
+      this.currentBatch = 1;
+      this.collectionsProcessed = 0;
 
-      // Solo proceder si tenemos el año lectivo del usuario actual
+      // Verificar que el año lectivo está disponible
       if (!this.userData.anioLectivo) {
         console.error('Falta año lectivo del usuario actual');
+        this.loading = false;
         return;
       }
 
-      const userAnioLectivo = this.userData.anioLectivo; // 'Segundo' o 'Tercero'
+      const userAnioLectivo = this.userData.anioLectivo;
       console.log('Año lectivo del usuario actual:', userAnioLectivo);
 
       // Obtener carreras buscadas por el usuario
@@ -180,62 +195,118 @@ export class SearchComponent {
       // Si no hay carreras buscadas, no mostrar recomendaciones
       if (carrerasBuscadas.length === 0) {
         console.log('El usuario no ha seleccionado carreras para buscar');
+        this.loading = false;
         return;
       }
 
-      // Convertir las carreras buscadas a sus nombres normalizados para la colección
+      // Convertir las carreras buscadas a sus nombres normalizados
       const collectionsToSearch = carrerasBuscadas.map(carrera => this.normalizeCarreraName(carrera));
       console.log('Colecciones a buscar:', collectionsToSearch);
 
-      // Buscar en cada colección correspondiente a las carreras buscadas
-      for (const collectionName of collectionsToSearch) {
-        console.log(`Buscando en colección: ${collectionName}`);
-        const carreraCollection = collection(this.firestore, collectionName);
+      // Guardar colecciones pendientes
+      this.pendingCollections = [...collectionsToSearch];
 
-        // Obtenemos todos los usuarios que no sean el usuario actual
-        const q = query(carreraCollection, where('uid', '!=', currentUserId));
-        const querySnapshot = await getDocs(q);
+      // Cargar el primer lote de colecciones
+      // loadMoreCandidates se encargará de establecer loading = false
+      await this.loadMoreCandidates();
 
-        console.log(`Encontrados ${querySnapshot.docs.length} documentos en ${collectionName}`);
+    } catch (error) {
+      console.error('Error al iniciar carga de recomendaciones:', error);
+      this.loading = false;
+    }
+  }
 
-        // Para cada usuario en la colección
-        for (const docSnap of querySnapshot.docs) {
-          // Obtener la información general del usuario
-          const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
-          const userData = userGeneralDoc.data();
+  // Método para cargar candidatos por lotes (versión completa y corregida)
+  async loadMoreCandidates() {
+    if (this.pendingCollections.length === 0) {
+      console.log('No hay más colecciones para buscar');
+      this.loading = false; // Asegurar que se oculta el spinner
+      return;
+    }
 
-          if (!userData) {
-            console.log(`Sin datos para usuario ${docSnap.id}`);
+    try {
+      // Solo mostrar indicador de carga si no hay recomendaciones aún
+      if (this.recommendedUsers.length === 0) {
+        this.loading = true;
+      }
+
+      // Verificar usuario actual
+      const currentUser = this.auth.currentUser;
+      if (!currentUser) {
+        console.error('No hay usuario autenticado');
+        this.loading = false;
+        return;
+      }
+
+      const currentUserId = currentUser.uid;
+
+      // Verificar que userData existe
+      if (!this.userData || !this.userData.anioLectivo) {
+        console.error('Datos de usuario no disponibles');
+        this.loading = false;
+        return;
+      }
+
+      const userAnioLectivo = this.userData.anioLectivo;
+
+      // Procesar una colección a la vez para mejor control
+      const collectionName = this.pendingCollections.shift();
+      if (!collectionName) {
+        console.log('Nombre de colección no disponible');
+        this.loading = false;
+        return;
+      }
+
+      console.log(`Procesando colección: ${collectionName}`);
+
+      const carreraCollection = collection(this.firestore, collectionName);
+
+      // Consulta limitada para mejor rendimiento
+      const q = query(
+        carreraCollection,
+        where('uid', '!=', currentUserId),
+        limit(this.searchLimit)
+      );
+
+      const querySnapshot = await getDocs(q);
+      console.log(`Encontrados ${querySnapshot.docs.length} documentos en ${collectionName}`);
+
+      // Procesar los documentos encontrados
+      let newCandidatesCount = 0;
+      const candidatesInCollection: any[] = [];
+
+      for (const docSnap of querySnapshot.docs) {
+        // Obtener la información general del usuario
+        const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
+        const userData = userGeneralDoc.data();
+
+        if (!userData) {
+          console.log(`Sin datos para usuario ${docSnap.id}`);
+          continue;
+        }
+
+        const formCompleted = userData['formCompleted'] ?? false;
+
+        // Solo considerar usuarios que hayan completado el formulario
+        if (formCompleted) {
+          const userFormData = docSnap.data();
+
+          // Obtener el año lectivo y la carrera
+          const otherUserData = await this.registerService.getUserData(docSnap.id);
+          const otherUserYear = otherUserData?.anioLectivo;
+          const userCarrera = userData['carrera'];
+
+          // FILTRO CRÍTICO: Verificar que sean del mismo año lectivo
+          if (otherUserYear !== userAnioLectivo) {
+            console.log(`Descartando - Año diferente: ${otherUserYear} vs ${userAnioLectivo}`);
             continue;
           }
 
-          const formCompleted = userData['formCompleted'] ?? false;
-
-          // Solo considerar usuarios que hayan completado el formulario
-          if (formCompleted) {
-            const userFormData = docSnap.data();
-
-            // Obtener el año lectivo y la carrera
-            const otherUserData = await this.registerService.getUserData(docSnap.id);
-            const otherUserYear = otherUserData?.anioLectivo;
-            const userCarrera = userData['carrera'];
-
-            console.log(`Usuario ${userFormData['nombreUsuario'] || 'sin nombre'}, Año: ${otherUserYear}, Carrera: ${userCarrera}`);
-
-            // FILTRO CRÍTICO: Verificar que sean del mismo año lectivo
-            if (otherUserYear !== userAnioLectivo) {
-              console.log(`Descartando - Año diferente: ${otherUserYear} vs ${userAnioLectivo}`);
-              continue; // Si no son del mismo año, saltar este usuario
-            }
-
-            // Calcular puntuación de compatibilidad con énfasis en habilidades
+          // Calcular puntuación para poder ordenar por calidad
+          if (userFormData && userCarrera) {
             const matchDetails = this.calculateDetailedMatchScore(userFormData, userCarrera);
-            console.log(`Match score para ${userFormData['nombreUsuario'] || 'sin nombre'}: 
-              Total: ${matchDetails.totalScore}, 
-              Habilidades: ${matchDetails.skillScore}, 
-              Otros: ${matchDetails.otherScore}`);
 
-            allPotentialMatches.push({
+            candidatesInCollection.push({
               uid: docSnap.id,
               nombreUsuario: userFormData['nombreUsuario'] || 'Usuario',
               nombre: userFormData['nombre'] || '',
@@ -243,43 +314,59 @@ export class SearchComponent {
               carrera: userCarrera || '',
               anioLectivo: otherUserYear || '',
               mencion: userFormData['mencion'] || '',
+              paralelo: userFormData['paralelo'] || '',
               ...userFormData,
               matchScore: matchDetails.totalScore,
               skillScore: matchDetails.skillScore,
               otherScore: matchDetails.otherScore
             });
-          } else {
-            console.log(`Descartando - Formulario no completado`);
+
+            newCandidatesCount++;
           }
+        } else {
+          console.log(`Descartando - Formulario no completado`);
         }
       }
 
-      console.log(`Total de matches potenciales: ${allPotentialMatches.length}`);
+      // Agregar al pool de candidatos potenciales
+      this.allPotentialMatches = [...this.allPotentialMatches, ...candidatesInCollection];
+      this.collectionsProcessed++;
 
-      console.log("Matches potenciales (sin filtrar):", allPotentialMatches.map(u => ({
-        nombre: u.nombreUsuario,
-        anio: u.anioLectivo,
-        carrera: u.carrera,
-        totalScore: u.matchScore,
-        skillScore: u.skillScore
-      })));
+      console.log(`Procesados ${newCandidatesCount} nuevos candidatos de ${collectionName}`);
+      console.log(`Total de candidatos acumulados: ${this.allPotentialMatches.length}`);
 
-      // Ordenar primero por puntuación de habilidades (mayor a menor) y luego por puntuación total
-      this.recommendedUsers = allPotentialMatches
-        .sort((a, b) => {
-          // Primero ordenar por coincidencia de habilidades
-          if (b.skillScore !== a.skillScore) {
-            return b.skillScore - a.skillScore;
-          }
-          // En caso de empate, usar la puntuación total
-          return b.matchScore - a.matchScore;
-        })
-        .slice(0, 20); // Aumentar a 20 para tener más variedad de recomendaciones
+      // Ordenar todos los candidatos por puntuación
+      this.allPotentialMatches.sort((a, b) => {
+        // Primero ordenar por coincidencia de habilidades
+        if (b.skillScore !== a.skillScore) {
+          return b.skillScore - a.skillScore;
+        }
+        // En caso de empate, usar la puntuación total
+        return b.matchScore - a.matchScore;
+      });
 
-      console.log(`Recomendaciones finales: ${this.recommendedUsers.length}`);
+      // Si no hay recomendaciones cargadas aún, cargar el primer lote visual
+      if (this.recommendedUsers.length === 0) {
+        await this.loadNextBatch();
+        // Ocultar el spinner principal después de cargar el primer lote
+        this.loading = false;
+      }
+
+      // Si los candidatos son pocos, cargar más automáticamente
+      if (this.allPotentialMatches.length < 10 && this.pendingCollections.length > 0) {
+        console.log('Pocos candidatos, buscando en más colecciones...');
+        // No activar el spinner principal para cargas adicionales
+        const wasLoading = this.loading;
+        this.loading = false; // Asegurar que el spinner principal está oculto
+        await this.loadMoreCandidates();
+      }
 
     } catch (error) {
-      console.error('Error al cargar recomendaciones:', error);
+      console.error('Error al cargar candidatos:', error);
+      this.loading = false;
+    } finally {
+      // Ocultar el spinner al finalizar
+      this.loading = false;
     }
   }
 
@@ -737,16 +824,16 @@ export class SearchComponent {
     return skillMatchScore;
   }
 
-  private calculateDetailedMatchScore(otherUserData: any, otherUserCarrera: string): { 
-    totalScore: number, 
-    skillScore: number, 
-    otherScore: number 
+  private calculateDetailedMatchScore(otherUserData: any, otherUserCarrera: string): {
+    totalScore: number,
+    skillScore: number,
+    otherScore: number
   } {
     if (!this.formData || !otherUserData) return { totalScore: 0, skillScore: 0, otherScore: 0 };
-  
+
     let otherScore = 0;
     console.log(`Calculando puntuación para usuario con carrera: ${otherUserCarrera}`);
-  
+
     // 1. Verificar si la carrera del otro usuario está entre las buscadas por el usuario actual
     const carreraAlias = {
       'Informatica': 'informatica',
@@ -756,16 +843,16 @@ export class SearchComponent {
       'Mecatronica': 'mecatronica',
       'Ciencias': 'ciencias'
     };
-  
+
     const normalizedCarrera = carreraAlias[otherUserCarrera as keyof typeof carreraAlias] || '';
-  
+
     if (this.formData.carrera_buscada.includes(normalizedCarrera)) {
       otherScore += 30; // Gran peso a coincidir con carreras buscadas
       console.log(`+30 puntos por carrera buscada: ${normalizedCarrera}`);
     } else {
       console.log(`Carrera no está entre las buscadas: ${normalizedCarrera}`);
     }
-  
+
     // 2. Compatibilidad de horarios
     if (this.formData.horario && otherUserData.horario) {
       const commonSchedules = this.formData.horario.filter(
@@ -776,7 +863,7 @@ export class SearchComponent {
     } else {
       console.log('No se pudo evaluar compatibilidad de horarios');
     }
-  
+
     // 3. Compatibilidad de método de trabajo
     if (this.formData.metodo && otherUserData.metodo) {
       if (this.formData.metodo === otherUserData.metodo ||
@@ -790,7 +877,7 @@ export class SearchComponent {
     } else {
       console.log('No se pudo evaluar compatibilidad de método de trabajo');
     }
-  
+
     // 4. Compatibilidad de horas
     if (this.formData.horas && otherUserData.horas) {
       if (this.formData.horas === otherUserData.horas ||
@@ -804,25 +891,29 @@ export class SearchComponent {
     } else {
       console.log('No se pudo evaluar compatibilidad de horas');
     }
-  
+
     // 5. Evaluar match de habilidades (lo más importante)
     const skillScore = this.evaluateSkillsMatch(otherUserData, otherUserCarrera);
-  
+
     // Calcular puntuación total
     const totalScore = otherScore + skillScore;
-  
+
     console.log(`Puntuación detallada: Total=${totalScore}, Habilidades=${skillScore}, Otros=${otherScore}`);
     return { totalScore, skillScore, otherScore };
   }
 
   async handleRefresh(event?: any) {
     console.log('Comenzando operación de actualización');
-    
+
     try {
       // Reiniciar estados
       this.loading = true;
       this.recommendedUsers = [];
-      
+      this.allPotentialMatches = [];
+      this.currentBatch = 1;
+      this.collectionsProcessed = 0;
+      this.pendingCollections = [];
+
       const user = this.auth.currentUser;
       if (user) {
         // Recargar datos de ambos servicios
@@ -831,22 +922,22 @@ export class SearchComponent {
           this.formService.getFormData(user.uid),
           this.formStateService.checkFormCompletion(user.uid)
         ]);
-  
+
         this.userData = registerData;
         this.formData = formData;
         this.isFormComplete = formCompleted;
-        
+
         // Cargar recomendaciones solo si el formulario está completo
         if (formCompleted && this.userData && this.formData) {
           await this.loadRecommendations();
-          
+
           // Después de cargar las recomendaciones, reiniciar el swiper a la primera diapositiva
           setTimeout(() => {
             const swiperEl = document.querySelector('swiper-container');
             if (swiperEl && swiperEl.swiper) {
               swiperEl.swiper.slideTo(0, 0); // Ir a la primera diapositiva sin animación
             }
-          }, 100); // Pequeño retraso para asegurar que el swiper está listo
+          }, 100);
         }
       }
     } catch (error) {
@@ -860,15 +951,105 @@ export class SearchComponent {
     }
   }
 
+  // Método para detectar cambios de diapositiva
   onSlideChange(event: any) {
-    // Obtener el índice de la diapositiva actual
+    // Comprobar que el evento es válido
+    if (!event || !event.target) return;
+
+    // Obtener el swiper
     const swiperEl = event.target;
+    if (!swiperEl || !swiperEl.swiper) return;
+
+    // Obtener el índice de la diapositiva actual
     const currentIndex = swiperEl.swiper.realIndex;
-    
-    // Comprobar si es la última diapositiva (la tarjeta final)
-    if (currentIndex === this.recommendedUsers.length) {
-      console.log('Usuario ha llegado al final de las recomendaciones');
-      // Puedes añadir lógica adicional aquí si lo necesitas
+    if (typeof currentIndex !== 'number') return;
+
+    const totalSlides = this.recommendedUsers.length;
+
+    console.log(`Cambio de slide: ${currentIndex}/${totalSlides}, candidatos disponibles: ${this.allPotentialMatches.length}, colecciones pendientes: ${this.pendingCollections.length}`);
+
+    // Si el usuario está cerca del final, cargar el siguiente lote visual
+    if (currentIndex >= totalSlides - 2 && !this.isLoadingMore &&
+      this.allPotentialMatches.length > this.recommendedUsers.length) {
+      console.log('Usuario cerca del final, cargando más tarjetas...');
+      this.loadNextBatch();
+    }
+
+    // Si estamos llegando al final de los candidatos disponibles y hay más colecciones,
+    // comenzar a cargar más candidatos en segundo plano
+    if (currentIndex >= totalSlides - 3 &&
+      this.allPotentialMatches.length - this.recommendedUsers.length < this.batchSize &&
+      this.pendingCollections.length > 0 && !this.loading) {
+      console.log('Anticipando necesidad de más candidatos, cargando en segundo plano...');
+      setTimeout(() => {
+        this.loadMoreCandidates();
+      }, 200);
+    }
+
+    // Comprobar si es la última diapositiva disponible actualmente
+    if (currentIndex === totalSlides - 1) {
+      console.log('Usuario ha llegado al final de las recomendaciones cargadas');
+    }
+  }
+
+  async loadNextBatch() {
+    try {
+      if (this.isLoadingMore) return;
+      this.isLoadingMore = true;
+
+      console.log(`Cargando lote ${this.currentBatch} de recomendaciones...`);
+
+      // Verificar si hay suficientes candidatos, si no, cargar más
+      if (this.allPotentialMatches.length <= this.recommendedUsers.length + this.batchSize / 2 &&
+        this.pendingCollections.length > 0) {
+        console.log('Buscando más candidatos para futuros lotes...');
+        // Ocultar el spinner principal mientras cargamos más candidatos
+        this.loading = false;
+        setTimeout(() => {
+          this.loadMoreCandidates();
+        }, 100);
+      }
+
+      // Calcular el índice de inicio para el lote actual
+      const startIndex = this.recommendedUsers.length;
+
+      // Si ya hemos cargado todas las recomendaciones, no hacer nada
+      if (startIndex >= this.allPotentialMatches.length) {
+        console.log('No quedan más recomendaciones para mostrar');
+        this.isLoadingMore = false;
+        this.loading = false; // Asegurar que el spinner principal está oculto
+        return;
+      }
+
+      // Dar tiempo para que se muestre el indicador de carga
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Obtener el siguiente lote
+      const endIndex = Math.min(startIndex + this.batchSize, this.allPotentialMatches.length);
+      const nextBatch = this.allPotentialMatches.slice(startIndex, endIndex);
+
+      console.log(`Añadiendo lote visual desde índice ${startIndex} hasta ${endIndex - 1}`);
+      console.log(`Tamaño del lote: ${nextBatch.length}`);
+
+      // Añadir el nuevo lote a las recomendaciones mostradas
+      this.recommendedUsers = [...this.recommendedUsers, ...nextBatch];
+
+      // Incrementar el contador de lotes
+      this.currentBatch++;
+
+      console.log(`Recomendaciones mostradas: ${this.recommendedUsers.length} de ${this.allPotentialMatches.length} disponibles`);
+
+      // Si ya tenemos recomendaciones, ocultar el spinner principal
+      if (this.recommendedUsers.length > 0) {
+        this.loading = false;
+      }
+    } catch (error) {
+      console.error('Error al cargar el siguiente lote visual:', error);
+    } finally {
+      setTimeout(() => {
+        this.isLoadingMore = false;
+        this.loading = false; // Asegurar que el spinner principal está oculto
+      }, 500);
     }
   }
 }

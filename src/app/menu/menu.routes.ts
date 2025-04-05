@@ -25,6 +25,10 @@ export default [
                 loadComponent: () => import('./search/search.component').then(m => m.SearchComponent)
             },
             {
+                path: 'favoritos',
+                loadChildren: () => import('./favoritos/favoritos.routes')
+            },
+            {
                 path: 'configuraciones',
                 loadComponent: () => import('./configs/settings/settings.component').then(m => m.SettingsComponent)
             }

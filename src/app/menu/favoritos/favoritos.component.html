@@ -1,0 +1,114 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="likes">
+        <ion-label>Favoritos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="rejected">
+        <ion-label>Rechazados</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  
+  <!-- Sección de Favoritos -->
+  <div *ngIf="selectedSegment === 'likes'" class="ion-padding">
+    <div *ngIf="isLikedLoading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Cargando favoritos...</p>
+    </div>
+    
+    <ng-container *ngIf="!isLikedLoading">
+      <ion-list *ngIf="likedProfiles.length > 0">
+        <ion-item *ngFor="let profile of likedProfiles" lines="full" class="profile-item">
+          <ion-avatar slot="start">
+            <img src="icons/logo_tesis.png" alt="Perfil">
+          </ion-avatar>
+          <ion-label>
+            <h2>{{profile.nombreUsuario}}</h2>
+            <p>{{profile.nombre}} {{profile.apellido}}</p>
+            <p class="career-info">{{profile.carrera}} - {{profile.anioLectivo}}</p>
+          </ion-label>
+          <ion-button slot="end" fill="clear" color="primary" (click)="startChat(profile.uid, profile.nombreUsuario)">
+            <ion-icon slot="icon-only" name="chatbubble-ellipses-outline"></ion-icon>
+          </ion-button>
+          <ion-button slot="end" fill="clear" color="danger" (click)="confirmRemoveLike(profile)">
+            <app-star-icon></app-star-icon>
+          </ion-button>
+        </ion-item>
+      </ion-list>
+      
+      <div *ngIf="likedProfiles.length === 0" class="empty-list-message">
+        <ion-icon name="heart-outline" size="large"></ion-icon>
+        <h2>Sin perfiles favoritos</h2>
+        <p>Aún no has marcado ningún perfil como favorito.</p>
+        <ion-button expand="block" routerLink="/menu/recomendados">
+          Descubrir perfiles
+        </ion-button>
+      </div>
+    </ng-container>
+  </div>
+  
+  <!-- Sección de Rechazados -->
+  <div *ngIf="selectedSegment === 'rejected'" class="ion-padding">
+    <div *ngIf="isRejectedLoading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Cargando rechazados...</p>
+    </div>
+    
+    <ng-container *ngIf="!isRejectedLoading">
+      <ion-list *ngIf="rejectedProfiles.length > 0">
+        <ion-item *ngFor="let profile of rejectedProfiles" lines="full" class="profile-item">
+          <ion-avatar slot="start">
+            <img src="icons/logo_tesis.png" alt="Perfil">
+          </ion-avatar>
+          <ion-label>
+            <h2>{{profile.nombreUsuario}}</h2>
+            <p>{{profile.nombre}} {{profile.apellido}}</p>
+            <p class="career-info">{{profile.carrera}} - {{profile.anioLectivo}}</p>
+          </ion-label>
+          <ion-button slot="end" fill="clear" color="success" (click)="unrejectProfile(profile)">
+            <ion-icon slot="icon-only" name="arrow-undo-outline"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-list>
+      
+      <div *ngIf="rejectedProfiles.length === 0" class="empty-list-message">
+        <ion-icon name="checkmark-circle-outline" size="large"></ion-icon>
+        <h2>Sin perfiles rechazados</h2>
+        <p>No hay perfiles en tu lista de rechazados.</p>
+        <ion-button expand="block" routerLink="/menu/recomendados">
+          Descubrir perfiles
+        </ion-button>
+      </div>
+    </ng-container>
+  </div>
+  
+  <!-- Alerta para confirmar eliminación de favorito -->
+  <ion-alert
+    [isOpen]="showConfirmation"
+    header="¿Quitar de favoritos?"
+    message="¿Estás seguro de que quieres quitar este perfil de tus favoritos?"
+    [buttons]="[
+      {
+        text: 'Cancelar',
+        role: 'cancel',
+        handler: () => {
+          this.showConfirmation = false;
+        }
+      },
+      {
+        text: 'Confirmar',
+        handler: () => {
+          this.unlikeProfile();
+        }
+      }
+    ]"
+    (didDismiss)="showConfirmation = false"
+  ></ion-alert>
+</ion-content>

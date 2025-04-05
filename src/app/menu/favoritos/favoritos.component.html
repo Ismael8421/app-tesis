@@ -35,7 +35,7 @@
             <p class="career-info">{{profile.carrera}} - {{profile.anioLectivo}}</p>
           </ion-label>
           <ion-button slot="end" fill="clear" color="primary" (click)="startChat(profile.uid, profile.nombreUsuario)">
-            <ion-icon slot="icon-only" name="chatbubble-ellipses-outline"></ion-icon>
+            <app-messages-icon></app-messages-icon>
           </ion-button>
           <ion-button slot="end" fill="clear" color="danger" (click)="confirmRemoveLike(profile)">
             <app-star-icon></app-star-icon>
@@ -94,21 +94,7 @@
     [isOpen]="showConfirmation"
     header="¿Quitar de favoritos?"
     message="¿Estás seguro de que quieres quitar este perfil de tus favoritos?"
-    [buttons]="[
-      {
-        text: 'Cancelar',
-        role: 'cancel',
-        handler: () => {
-          this.showConfirmation = false;
-        }
-      },
-      {
-        text: 'Confirmar',
-        handler: () => {
-          this.unlikeProfile();
-        }
-      }
-    ]"
+    [buttons]="alertButtons"
     (didDismiss)="showConfirmation = false"
   ></ion-alert>
 </ion-content>

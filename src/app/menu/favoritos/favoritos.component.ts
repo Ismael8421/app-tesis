@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, IonAvatar, IonLabel, IonButton, IonSegment, IonSegmentButton, IonIcon, IonSpinner, IonRefresher, IonRefresherContent, IonAlert, ToastController } from '@ionic/angular/standalone';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LikedProfilesService } from '../search/data-access/iked-profiles.service';
@@ -10,7 +11,7 @@ import { ChatService } from '../chats/data-access/chat.service';
 import { MessagesIconComponent } from '../../UI/messages-icon/messages-icon.component';
 import { CheckIconComponent } from '../../UI/check-icon/check-icon.component';
 import { addIcons } from 'ionicons';
-import { refreshOutline, arrowUndoOutline, chatbubbleEllipsesOutline } from 'ionicons/icons';
+import { refreshOutline, arrowUndoOutline, chatbubbleEllipsesOutline, heartOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { StarIconComponent } from '../../UI/star-icon/star-icon.component';
 
 
@@ -19,6 +20,8 @@ import { StarIconComponent } from '../../UI/star-icon/star-icon.component';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
+    RouterLink,
     IonContent,
     IonHeader,
     IonToolbar,
@@ -58,9 +61,32 @@ export class FavoritosComponent implements OnInit {
   isRejectedLoading = true;
   showConfirmation = false;
   profileToUnlike: any = null;
+  
+  // Definir los botones para la alerta
+  alertButtons = [
+    {
+      text: 'Cancelar',
+      role: 'cancel',
+      handler: () => {
+        this.showConfirmation = false;
+      }
+    },
+    {
+      text: 'Confirmar',
+      handler: () => {
+        this.unlikeProfile();
+      }
+    }
+  ];
 
   constructor() {
-    addIcons({ refreshOutline, arrowUndoOutline, chatbubbleEllipsesOutline });
+    addIcons({ 
+      refreshOutline, 
+      arrowUndoOutline, 
+      chatbubbleEllipsesOutline,
+      heartOutline,
+      checkmarkCircleOutline
+    });
   }
 
   ngOnInit() {

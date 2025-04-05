@@ -1,6 +1,7 @@
 Implementar el subir fotos de perfil a la base de datos
 Tutorial de uso de las recomendaciones
-Carga previa de recomendaciones
+
+Funcionando el botón de rechazar, se guarda en la base de datos y local
 
 Contexto
 

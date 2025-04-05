@@ -13,7 +13,7 @@ import { MessagesIconComponent } from '../../UI/messages-icon/messages-icon.comp
 import { HeartIconComponent } from '../../UI/heart-icon/heart-icon.component';
 import { RegisterService, userCreate } from '../../register/data-access/register.service';
 import { FormService, formCreate } from '../../form/data-access/form.service';
-import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonContent, IonImg, IonRefresher, IonRefresherContent, IonSpinner, IonText } from '@ionic/angular/standalone';
+import { IonAlert, IonAvatar, IonButton, IonCard, IonCardContent, IonContent, IonIcon, IonImg, IonRefresher, IonRefresherContent, IonSpinner, IonText } from '@ionic/angular/standalone';
 import { Firestore, collection, doc, getDoc, getDocs, query, where, limit } from '@angular/fire/firestore';
 
 register();
@@ -29,7 +29,7 @@ register();
     CheckIconComponent,
     MessagesIconComponent,
     HeartIconComponent,
-    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert, IonSpinner, IonRefresher, IonRefresherContent, IonContent
+    IonCard, IonCardContent, IonAvatar, IonImg, IonText, IonButton, IonAlert, IonSpinner, IonRefresher, IonRefresherContent, IonContent, IonIcon
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './search.component.html',
@@ -815,7 +815,7 @@ export class SearchComponent {
     return { totalScore, skillScore, otherScore };
   }
 
-  async handleRefresh(event: any) {
+  async handleRefresh(event?: any) {
     console.log('Comenzando operación de actualización');
     
     try {
@@ -839,14 +839,36 @@ export class SearchComponent {
         // Cargar recomendaciones solo si el formulario está completo
         if (formCompleted && this.userData && this.formData) {
           await this.loadRecommendations();
+          
+          // Después de cargar las recomendaciones, reiniciar el swiper a la primera diapositiva
+          setTimeout(() => {
+            const swiperEl = document.querySelector('swiper-container');
+            if (swiperEl && swiperEl.swiper) {
+              swiperEl.swiper.slideTo(0, 0); // Ir a la primera diapositiva sin animación
+            }
+          }, 100); // Pequeño retraso para asegurar que el swiper está listo
         }
       }
     } catch (error) {
       console.error('Error al actualizar datos:', error);
     } finally {
-      // Completar el evento de actualización para ocultar el spinner
-      event.target.complete();
+      // Completar el evento de actualización si existe
+      if (event && event.target && event.target.complete) {
+        event.target.complete();
+      }
       this.loading = false;
+    }
+  }
+
+  onSlideChange(event: any) {
+    // Obtener el índice de la diapositiva actual
+    const swiperEl = event.target;
+    const currentIndex = swiperEl.swiper.realIndex;
+    
+    // Comprobar si es la última diapositiva (la tarjeta final)
+    if (currentIndex === this.recommendedUsers.length) {
+      console.log('Usuario ha llegado al final de las recomendaciones');
+      // Puedes añadir lógica adicional aquí si lo necesitas
     }
   }
 }

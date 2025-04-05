@@ -4,6 +4,60 @@ $blue-accent: #5A7F94;
 $dark-secondary: #A3A9B0;
 
 :host {
+  .end-card {
+    .end-recommendations {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      
+      ion-icon {
+        font-size: 64px;
+        margin-bottom: 1rem;
+        color: var(--ion-color-success);
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      p {
+        color: var(--ion-color-medium);
+        margin-bottom: 2rem;
+      }
+    }
+  }
+  
+  .no-recommendations {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    padding: 2rem;
+    
+    ion-icon {
+      font-size: 64px;
+      margin-bottom: 1rem;
+      color: var(--ion-color-medium);
+    }
+    
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      color: var(--ion-color-medium);
+      margin-bottom: 2rem;
+    }
+  }
+
   .page-container {
     height: calc(100vh - 56px);
     overflow: hidden;

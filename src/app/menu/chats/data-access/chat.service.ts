@@ -44,89 +44,6 @@ export class ChatService {
     private networkService: NetworkService
   ) { }
 
-  private async sendNotificationForNewMessage(chatId: string, senderId: string, message: string): Promise<void> {
-    try {
-      // Obtener información del chat
-      const chatRef = ref(this.db, `chats/${chatId}`);
-      const chatSnapshot = await get(chatRef);
-
-      if (!chatSnapshot.exists()) return;
-
-      const chat = chatSnapshot.val();
-
-      // Obtener los IDs de los otros participantes (que no son el remitente)
-      const recipients = chat.participants.filter((participantId: string) => participantId !== senderId);
-
-      // Para cada destinatario, enviar una notificación
-      for (const recipientId of recipients) {
-        // Verificar si el usuario está en línea y en este chat
-        const userStatusRef = ref(this.db, `userStatus/${recipientId}`);
-        const userStatusSnapshot = await get(userStatusRef);
-        const userIsOnline = userStatusSnapshot.exists() &&
-          userStatusSnapshot.val().status === 'online' &&
-          userStatusSnapshot.val().currentChatId === chatId;
-
-        // Si el usuario está activo en este chat, no enviamos notificación push
-        if (userIsOnline) {
-          console.log(`Usuario ${recipientId} está activo en este chat, omitiendo notificación push`);
-          continue;
-        }
-
-        // Obtener el token del dispositivo del destinatario
-        const tokenRef = ref(this.db, `deviceTokens/${recipientId}`);
-        const tokenSnapshot = await get(tokenRef);
-
-        if (!tokenSnapshot.exists()) {
-          console.log(`No se encontró token para el usuario ${recipientId}`);
-          continue;
-        }
-
-        const tokenData = tokenSnapshot.val();
-        const token = typeof tokenData === 'string' ? tokenData : tokenData.token;
-
-        if (!token) {
-          console.log(`Token inválido para el usuario ${recipientId}`);
-          continue;
-        }
-
-        // Obtener el nombre del remitente
-        const senderDataRef = ref(this.db, `usuarios/${senderId}`);
-        const senderSnapshot = await get(senderDataRef);
-        let senderName = "Usuario";
-        let senderPhotoURL = null;
-
-        if (senderSnapshot.exists()) {
-          const userData = senderSnapshot.val();
-          senderName = `${userData.nombre} ${userData.apellido}`;
-          senderPhotoURL = userData.photoURL || null;
-        }
-
-        // Crear datos de la notificación más completos
-        const notificationData = {
-          recipientToken: token,
-          title: senderName,
-          body: message.length > 100 ? message.substring(0, 97) + '...' : message,
-          chatId: chatId,
-          senderId: senderId,
-          recipientId: recipientId,
-          type: 'newMessage',
-          timestamp: Date.now(),
-          imageUrl: senderPhotoURL,
-          platform: tokenData.platform || 'unknown'
-        };
-
-        // Guardar en Firebase para que Cloud Functions lo procese
-        const notificationsRef = ref(this.db, 'notifications');
-        const newNotificationRef = push(notificationsRef);
-        await set(newNotificationRef, notificationData);
-
-        console.log(`Notification queued for user ${recipientId}`);
-      }
-    } catch (error) {
-      console.error('Error sending notification:', error);
-    }
-  }
-
   async startChat(user1Id: string, user2Id: string): Promise<string> {
     try {
       // Verificar si ya existe un chat activo para user1
@@ -428,9 +345,6 @@ export class ChatService {
       
       // Forzar actualizaciones de UI
       this.forceRefreshChats();
-      
-      // Enviar notificación push por el nuevo mensaje
-      await this.sendNotificationForNewMessage(chatId, senderId, content);
       
       return newMessageRef.key || '';
     } catch (error) {

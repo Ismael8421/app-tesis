@@ -4,8 +4,6 @@ import { ChatService } from './data-access/chat.service';
 import { ChatStorageService } from './data-access/chat-storage.service';
 import { NetworkService } from './data-access/network.service';
 import { UserStatusService } from './data-access/userstatus.service';
-import { NotificationService } from './data-access/notification.service';
-
 /**
  * Módulo que centraliza todos los servicios relacionados con chats
  * y configura la inicialización del almacenamiento local.
@@ -18,15 +16,13 @@ import { NotificationService } from './data-access/notification.service';
     ChatService,
     ChatStorageService,
     NetworkService,
-    UserStatusService,
-    NotificationService
+    UserStatusService
   ]
 })
 export class ChatStorageModule {
   constructor(
     private storageService: ChatStorageService,
     private networkService: NetworkService,
-    private notificationService: NotificationService
   ) {
     // Inicializar servicios
     this.initializeServices();
@@ -37,9 +33,5 @@ export class ChatStorageModule {
     setInterval(() => {
       this.storageService.pruneExpiredData();
     }, 12 * 60 * 60 * 1000);
-    
-    // Inicializar notificaciones si estamos en plataforma nativa
-    this.notificationService.initPushNotifications();
-    this.notificationService.setupNotificationChannels();
   }
 }

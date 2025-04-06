@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { LocalNotifications } from '@capacitor/local-notifications';
+import { LocalNotifications, Channel, Importance, Visibility } from '@capacitor/local-notifications';
 import { BackgroundRunner } from '@capacitor/background-runner';
 import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
@@ -17,6 +17,7 @@ import { BehaviorSubject } from 'rxjs';
 export class NotificationService {
   // Controlar el estado de permisos
   private hasNotificationPermission = new BehaviorSubject<boolean>(false);
+  public permissionStatus$ = this.hasNotificationPermission.asObservable();
   
   // Almacena los IDs de los últimos mensajes procesados para evitar duplicados
   private lastProcessedMessages: {[chatId: string]: string} = {};
@@ -34,6 +35,8 @@ export class NotificationService {
    * Inicializa las notificaciones locales
    */
   async initPushNotifications() {
+    console.log('Inicializando sistema de notificaciones...');
+    
     // Solo inicializar en dispositivos nativos
     if (!Capacitor.isNativePlatform()) {
       console.log('Las notificaciones solo funcionan en plataformas nativas');
@@ -43,25 +46,27 @@ export class NotificationService {
     try {
       // Verificar si el plugin está disponible
       if (!Capacitor.isPluginAvailable('LocalNotifications')) {
-        console.log('LocalNotifications no está disponible en este dispositivo/plataforma');
+        console.error('LocalNotifications no está disponible en este dispositivo/plataforma');
         return;
       }
 
+      // Configurar canales de notificación primero
+      await this.setupNotificationChannels();
+
       // Solicitar permisos para notificaciones
+      console.log('Solicitando permisos de notificación...');
       const permResult = await LocalNotifications.requestPermissions();
-      const hasPermission = permResult.display === 'granted';
+      console.log('Resultado de permisos:', permResult);
       
+      const hasPermission = permResult.display === 'granted';
       this.hasNotificationPermission.next(hasPermission);
       
+      console.log('Permiso de notificación concedido:', hasPermission);
+      
       if (!hasPermission) {
-        console.log('Permiso de notificación denegado');
+        console.error('Permiso de notificación denegado');
         return;
       }
-      
-      console.log('Permiso de notificación concedido');
-      
-      // BackgroundRunner se configura de otra manera, no con addListener
-      // Verificaremos los mensajes no leídos en el evento de 'appStateChange'
       
       // Configurar el manejo de notificaciones cuando se tocan
       LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
@@ -89,12 +94,14 @@ export class NotificationService {
       
       // Configurar monitoreo de estado de la app
       App.addListener('appStateChange', ({ isActive }) => {
+        console.log('Estado de app cambió a:', isActive ? 'Primer plano' : 'Segundo plano');
+        
         if (isActive) {
           // App en primer plano
-          console.log('App en primer plano');
+          console.log('App en primer plano - detener verificaciones en segundo plano');
         } else {
-          // App en segundo plano, verificar mensajes nuevos periódicamente
-          console.log('App en segundo plano');
+          // App en segundo plano, configurar verificaciones periódicas
+          console.log('App en segundo plano - iniciar verificaciones periódicas');
           this.setupBackgroundChecks();
         }
       });
@@ -102,10 +109,18 @@ export class NotificationService {
       console.log('Notificaciones locales inicializadas correctamente');
       
       // Iniciar la suscripción a chats para monitorizarlos
-      this.subscribeToChats();
+      await this.subscribeToChats();
+      
+      // Ejecutar prueba de notificación después de inicializar
+      if (hasPermission) {
+        setTimeout(() => {
+          this.testLocalNotification();
+        }, 2000);
+      }
       
     } catch (error) {
       console.error('Error inicializando notificaciones locales:', error);
+      console.error('Detalles del error:', JSON.stringify(error));
     }
   }
 
@@ -113,42 +128,61 @@ export class NotificationService {
    * Configura canales de notificación para Android
    */
   async setupNotificationChannels() {
+    console.log('Configurando canales de notificación...');
+    
     // Sólo aplicable para Android
     if (Capacitor.getPlatform() !== 'android') {
+      console.log('No es Android, no se configuran canales');
       return;
     }
 
     try {
-      await LocalNotifications.createChannel({
+      // Definir el canal como un objeto separado
+      const channelConfig: Channel = {
         id: 'chat_messages',
         name: 'Mensajes de Chat',
         description: 'Notificaciones para nuevos mensajes de chat',
-        importance: 5, // HIGH
-        visibility: 1, // PUBLIC
+        importance: 5, // Equivalente a Importance.High
+        visibility: 1, // Equivalente a Visibility.Public
         lights: true,
         lightColor: '#4CAF50',
         vibration: true
-      });
+      };
+      
+      console.log('Configuración de canal:', JSON.stringify(channelConfig));
+      await LocalNotifications.createChannel(channelConfig);
 
       console.log('Canales de notificación creados correctamente');
     } catch (error) {
       console.error('Error configurando canales de notificación:', error);
+      console.error('Detalles del error:', JSON.stringify(error));
     }
   }
 
   /**
    * Suscribe al servicio para escuchar cambios en los chats del usuario
    */
-  subscribeToChats() {
+  async subscribeToChats() {
+    console.log('Iniciando suscripción a chats...');
+    
     const user = this.auth.currentUser;
-    if (!user) return;
+    if (!user) {
+      console.log('No hay usuario autenticado, no se puede suscribir a chats');
+      return;
+    }
+
+    console.log('Suscribiendo a chats para el usuario:', user.uid);
 
     // Obtener todos los chats del usuario y escuchar cambios
     const userChatsRef = ref(this.db, `userChats/${user.uid}`);
     onValue(userChatsRef, (snapshot) => {
-      if (!snapshot.exists()) return;
+      if (!snapshot.exists()) {
+        console.log('No se encontraron chats para el usuario');
+        return;
+      }
       
       const chats = snapshot.val();
+      console.log(`Se encontraron ${Object.keys(chats).length} chats para monitorizar`);
       
       // Para cada chat, escuchar nuevos mensajes
       for (const chatId in chats) {
@@ -161,30 +195,54 @@ export class NotificationService {
    * Escucha los nuevos mensajes en un chat específico
    */
   private subscribeToMessages(chatId: string, userId: string) {
+    console.log(`Suscribiéndose a mensajes del chat ${chatId} para usuario ${userId}`);
+    
     const messagesRef = ref(this.db, `messages/${chatId}`);
     
     // Utilizar onValue para escuchar cambios en tiempo real
     onValue(messagesRef, async (snapshot) => {
-      if (!snapshot.exists()) return;
+      console.log(`Cambios detectados en mensajes del chat ${chatId}`);
+      
+      if (!snapshot.exists()) {
+        console.log('No hay mensajes en el chat');
+        return;
+      }
       
       // Obtener el chat para verificar participantes
       const chatRef = ref(this.db, `chats/${chatId}`);
       const chatSnapshot = await get(chatRef);
       
-      if (!chatSnapshot.exists()) return;
+      if (!chatSnapshot.exists()) {
+        console.log('El chat no existe');
+        return;
+      }
       
       const chat = chatSnapshot.val();
+      console.log('Datos del chat:', JSON.stringify({
+        chatId,
+        unreadMessages: chat.unreadMessages ? Object.keys(chat.unreadMessages) : [],
+        hasUnread: chat.unreadMessages && chat.unreadMessages[userId]
+      }));
       
       // Verificar si hay mensajes no leídos para este usuario
       if (chat.unreadMessages && chat.unreadMessages[userId]) {
+        console.log(`Usuario ${userId} tiene mensajes no leídos`);
+        
         // Obtener el último mensaje del chat
         const messages = snapshot.val();
         const messageKeys = Object.keys(messages);
         const lastMessageKey = messageKeys[messageKeys.length - 1];
         const lastMessage = messages[lastMessageKey];
         
+        console.log('Último mensaje:', {
+          key: lastMessageKey,
+          sender: lastMessage?.senderId,
+          processed: this.lastProcessedMessages[chatId] === lastMessageKey
+        });
+        
         // Verificar si ya procesamos este mensaje
         if (this.lastProcessedMessages[chatId] === lastMessageKey) {
+          console.log('Mensaje ya procesado, ignorando');
           return;
         }
         
@@ -193,14 +251,22 @@ export class NotificationService {
         
         // Solo enviar notificación si el mensaje no fue enviado por el usuario actual
         if (lastMessage && lastMessage.senderId !== userId) {
+          console.log('Mensaje enviado por otro usuario, procesando notificación');
+          
           // Obtener datos del remitente
           const otherUserId = lastMessage.senderId;
           let senderName = lastMessage.senderName || 'Usuario';
           
           // Si la app está en segundo plano, enviar una notificación local
-          this.checkAppStateAndNotify(senderName, lastMessage.content, chatId);
+          await this.checkAppStateAndNotify(senderName, lastMessage.content, chatId);
+        } else {
+          console.log('Mensaje enviado por el usuario actual, no se notifica');
         }
+      } else {
+        console.log(`Usuario ${userId} no tiene mensajes no leídos`);
       }
+    }, error => {
+      console.error(`Error escuchando mensajes del chat ${chatId}:`, error);
     });
   }
   
@@ -209,20 +275,29 @@ export class NotificationService {
    */
   private async checkAppStateAndNotify(sender: string, message: string, chatId: string) {
     try {
+      console.log('Verificando estado de app para notificación:', {sender, chatId});
+      
       // Verificar si la app está activa
       const appState = await App.getState();
       const isInForeground = appState.isActive;
+      console.log('App en primer plano:', isInForeground);
       
-      // Si la app está en segundo plano o si no estamos en el chat específico
+      // Si la app está en segundo plano, enviar notificación
       if (!isInForeground) {
-        this.sendLocalNotification(sender, message, chatId);
+        console.log('App en segundo plano, enviando notificación local');
+        await this.sendLocalNotification(sender, message, chatId);
+        return;
+      }
+      
+      // La app está en primer plano, verificar si estamos en el chat específico
+      const currentUrl = this.router.url;
+      console.log('URL actual:', currentUrl, 'Chat ID:', chatId);
+      
+      if (!currentUrl.includes(`/menu/mensajes/${chatId}`)) {
+        console.log('No estamos en el chat específico, enviando notificación local');
+        await this.sendLocalNotification(sender, message, chatId);
       } else {
-        // La app está en primer plano, verificar si estamos en el chat específico
-        const currentUrl = this.router.url;
-        if (!currentUrl.includes(`/menu/mensajes/${chatId}`)) {
-          // Estamos en otra pantalla, mostrar notificación en la app
-          this.sendLocalNotification(sender, message, chatId);
-        }
+        console.log('Estamos en el chat específico, no enviando notificación');
       }
     } catch (error) {
       console.error('Error verificando estado de la app:', error);
@@ -233,15 +308,19 @@ export class NotificationService {
    * Envía una notificación local
    */
   private async sendLocalNotification(title: string, body: string, chatId: string) {
+    console.log('Intentando enviar notificación local:', {title, body: body.substring(0, 20) + '...', chatId});
+    
     if (!this.hasNotificationPermission.value) {
-      console.log('No hay permiso para enviar notificaciones');
-      return;
+      console.error('No hay permiso para enviar notificaciones');
+      return false;
     }
     
     try {
       const notificationId = new Date().getTime();
       
-      await LocalNotifications.schedule({
+      console.log('Configurando notificación con ID:', notificationId);
+      
+      const notificationConfig = {
         notifications: [
           {
             title: title,
@@ -256,11 +335,17 @@ export class NotificationService {
             channelId: 'chat_messages'
           }
         ]
-      });
+      };
+      
+      console.log('Configuración de notificación:', JSON.stringify(notificationConfig));
+      await LocalNotifications.schedule(notificationConfig);
       
       console.log('Notificación local enviada correctamente');
+      return true;
     } catch (error) {
       console.error('Error enviando notificación local:', error);
+      console.error('Detalles del error:', JSON.stringify(error));
+      return false;
     }
   }
   
@@ -278,6 +363,8 @@ export class NotificationService {
       
       // Programar una notificación local que se dispare periódicamente
       // para recordar al usuario que revise sus mensajes
+      console.log('Configurando verificación periódica de mensajes en segundo plano');
+      
       await LocalNotifications.schedule({
         notifications: [
           {
@@ -299,6 +386,9 @@ export class NotificationService {
       });
       
       console.log('Recordatorio periódico configurado');
+      
+      // También realizar una comprobación inmediata
+      this.checkForNewMessages(userId);
     } catch (error) {
       console.error('Error configurando recordatorio periódico:', error);
     }
@@ -310,13 +400,18 @@ export class NotificationService {
   private async checkForNewMessages(userId: string) {
     try {
       if (!userId) return;
+      console.log(`Verificando mensajes no leídos para usuario ${userId}`);
       
       const userChatsRef = ref(this.db, `userChats/${userId}`);
       const snapshot = await get(userChatsRef);
       
-      if (!snapshot.exists()) return;
+      if (!snapshot.exists()) {
+        console.log('No se encontraron chats para el usuario');
+        return;
+      }
       
       const chats = snapshot.val();
+      console.log(`Verificando ${Object.keys(chats).length} chats`);
       
       for (const chatId in chats) {
         const chatRef = ref(this.db, `chats/${chatId}`);
@@ -328,6 +423,8 @@ export class NotificationService {
         
         // Verificar si hay mensajes no leídos
         if (chat.unreadMessages && chat.unreadMessages[userId]) {
+          console.log(`Chat ${chatId}: tiene mensajes no leídos`);
+          
           // Hay mensajes no leídos, obtener el último mensaje
           const messagesRef = ref(this.db, `messages/${chatId}`);
           const messagesSnapshot = await get(messagesRef);
@@ -341,6 +438,7 @@ export class NotificationService {
           
           // Verificar si ya procesamos este mensaje
           if (this.lastProcessedMessages[chatId] === lastMessageKey) {
+            console.log(`Mensaje ya procesado para chat ${chatId}, ignorando`);
             continue;
           }
           
@@ -353,13 +451,55 @@ export class NotificationService {
             const otherUserId = lastMessage.senderId;
             let senderName = lastMessage.senderName || 'Usuario';
             
+            console.log(`Enviando notificación para mensaje de ${senderName} en chat ${chatId}`);
+            
             // Enviar notificación
-            this.sendLocalNotification(senderName, lastMessage.content, chatId);
+            await this.sendLocalNotification(senderName, lastMessage.content, chatId);
           }
         }
       }
     } catch (error) {
       console.error('Error verificando nuevos mensajes:', error);
+    }
+  }
+
+  /**
+   * Método para probar las notificaciones locales
+   */
+  public async testLocalNotification(): Promise<boolean> {
+    console.log('Ejecutando prueba de notificación local');
+    
+    // Verificar permisos primero
+    const permResult = await LocalNotifications.requestPermissions();
+    console.log('Estado de permisos:', permResult);
+    
+    if (permResult.display !== 'granted') {
+      console.error('No hay permiso para enviar notificaciones');
+      return false;
+    }
+    
+    try {
+      const testId = Date.now();
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            title: 'Prueba de Notificación',
+            body: 'Esta es una notificación de prueba para verificar si el sistema funciona.',
+            id: testId,
+            sound: 'default',
+            extra: {
+              test: true
+            },
+            channelId: 'chat_messages'
+          }
+        ]
+      });
+      
+      console.log('Notificación de prueba enviada correctamente');
+      return true;
+    } catch (error) {
+      console.error('Error enviando notificación de prueba:', error);
+      return false;
     }
   }
 }

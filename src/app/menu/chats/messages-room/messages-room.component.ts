@@ -15,6 +15,7 @@ import { RegisterService } from '../../../register/data-access/register.service'
 import { catchError, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { ThemeService } from '../../configs/settings/data-access/theme.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { UserProfileService } from '../../../core/services/user-profile.service';
 
 @Component({
   selector: 'app-messages-room',
@@ -35,6 +36,7 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private appRef = inject(ApplicationRef);
   private _themeService = inject(ThemeService);
+  private userProfileService = inject(UserProfileService);
 
   // Suscripciones
   private chatsSubscription?: Subscription;
@@ -42,6 +44,8 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   private refreshSubscription?: Subscription;
   private searchSubscription?: Subscription;
   private networkSubscription?: Subscription;
+
+  private profileImageCache = new Map<string, string>();
 
   // Intervalo de refresco en milisegundos (15 segundos)
   private REFRESH_INTERVAL = 15000;
@@ -447,35 +451,35 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
       this.cancelDelete();
       return;
     }
-    
+
     try {
       // Guardar referencia al chat que va a ser eliminado
       const chatToDelete = { ...this.selectedChat };
-      
+
       // Ocultar la alerta de confirmación
       this.showDeleteConfirm = false;
       this.selectedChat = null;
-      
+
       // Actualizar UI primero (optimista)
       this.zone.run(() => {
         this.chats = this.chats.filter(chat => chat.id !== chatToDelete.id);
         this.filteredChats = this.filteredChats.filter(chat => chat.id !== chatToDelete.id);
         this.cdr.detectChanges();
-        
+
         // Mostrar mensaje de éxito inmediatamente
         this.presentToast('Eliminando conversación...');
       });
-      
+
       // Luego eliminar en el backend
       await this.chatService.deleteChat(chatToDelete.id, this.currentUser.uid);
-      
+
       // Mostrar confirmación final
       this.presentToast('Conversación eliminada correctamente');
-      
+
     } catch (error) {
       console.error('Error eliminando chat:', error);
       this.presentToast('Error al eliminar la conversación', 'danger');
-      
+
       // Recargar la lista de chats en caso de error
       this.setupChatsSubscription();
     }
@@ -498,7 +502,7 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
     try {
       const { ToastController } = await import('@ionic/angular/standalone');
       const toastController = new ToastController();
-      
+
       const toast = await toastController.create({
         message: message,
         duration: 2000,
@@ -506,10 +510,49 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
         color: color,
         cssClass: 'toast-custom-class'
       });
-      
+
       await toast.present();
     } catch (error) {
       console.log('Toast no disponible, mostrando mensaje en consola:', message);
     }
+  }
+
+  getProfileImageUrl(userId: string): string {
+    // Si ya tenemos la URL en caché, devolverla
+    if (this.profileImageCache.has(userId)) {
+      return this.profileImageCache.get(userId) || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    }
+
+    // Si no, solicitar la URL y guardarla en caché cuando llegue
+    this.userProfileService.getProfileImageUrl(userId).subscribe(url => {
+      if (url) {
+        this.zone.run(() => {
+          this.profileImageCache.set(userId, url);
+          this.cdr.detectChanges();
+        });
+      }
+    });
+
+    // Mientras tanto, devolver la imagen por defecto
+    return 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+  }
+
+  // Método para manejar errores de carga de imagen
+  handleImageError(event: Event, userId: string): void {
+    if (event.target) {
+      (event.target as HTMLImageElement).src = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    }
+
+    // Marcar en caché que esta imagen falló para no volver a intentar cargarla
+    this.profileImageCache.set(userId, 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg');
+  }
+
+  getUserParticipantId(participants: string[]): string {
+    if (!this.currentUser) return participants[0] || '';
+    
+    // Encontrar el ID del otro participante (que no sea el usuario actual)
+    const otherUserId = participants.find(userId => userId !== this.currentUser?.uid);
+    
+    return otherUserId || '';
   }
 }

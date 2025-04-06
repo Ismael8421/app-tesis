@@ -11,14 +11,15 @@
             <app-back-icon class="back-icon"></app-back-icon>
           </ion-back-button>
         </ion-buttons>
-
+    
         <ion-title class="title-container" *ngIf="chatData$ | async as chatData">
           <h1>{{ chatData.otherUserName }}</h1>
           <h2>{{ isOnline ? 'En línea' : 'Sin conexión' }}</h2>
         </ion-title>
-
+    
         <ion-avatar slot="end" class="avatar">
-          <img src="https://pbs.twimg.com/profile_images/1602554587499601920/wUov6Tgl_400x400.jpg">
+          <img [src]="otherUserProfileImage || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg'"
+               (error)="handleProfileImageError($event)">
         </ion-avatar>
       </ion-toolbar>
     </ion-header>

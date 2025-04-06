@@ -41,26 +41,27 @@
     <ion-list lines="full" class="ion-no-padding" *ngIf="!isLoading">
       <ng-container *ngIf="currentUser">
         <ion-item *ngFor="let chat of filteredChats" button detail
-          class="chat-item"
-          [class.unread]="chat.unreadMessages?.[currentUser.uid]"
-          (click)="navigateTo(chat.id)"
-          (touchstart)="onChatItemTouchStart($event, chat)"
-          (touchend)="onChatItemTouchEnd($event)">
-          <ion-avatar slot="start">
-            <img
-              src="https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg">
-          </ion-avatar>
-          <ion-label>
-            <div class="chat-header">
-              <h3>{{ getUserName(chat.participants) }}</h3>
-              <div class="unread-indicator" *ngIf="chat.unreadMessages?.[currentUser?.uid]"></div>
-            </div>
-            <p>{{ chat.lastMessage || 'No hay mensajes' }}</p>
-            <small *ngIf="chat.lastMessageTimestamp">
-              {{ chat.lastMessageTimestamp | date:'short' }}
-            </small>
-          </ion-label>
-        </ion-item>
+        class="chat-item"
+        [class.unread]="chat.unreadMessages?.[currentUser.uid]"
+        (click)="navigateTo(chat.id)"
+        (touchstart)="onChatItemTouchStart($event, chat)"
+        (touchend)="onChatItemTouchEnd($event)">
+        <ion-avatar slot="start">
+          <img
+            [src]="getProfileImageUrl(getUserParticipantId(chat.participants))"
+            (error)="handleImageError($event, getUserParticipantId(chat.participants))">
+        </ion-avatar>
+        <ion-label>
+          <div class="chat-header">
+            <h3>{{ getUserName(chat.participants) }}</h3>
+            <div class="unread-indicator" *ngIf="chat.unreadMessages?.[currentUser?.uid]"></div>
+          </div>
+          <p>{{ chat.lastMessage || 'No hay mensajes' }}</p>
+          <small *ngIf="chat.lastMessageTimestamp">
+            {{ chat.lastMessageTimestamp | date:'short' }}
+          </small>
+        </ion-label>
+      </ion-item>
       </ng-container>
       
       <div *ngIf="filteredChats.length === 0 && !isSearching" class="no-chats">

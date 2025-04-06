@@ -13,7 +13,7 @@ import { CheckIconComponent } from '../../UI/check-icon/check-icon.component';
 import { addIcons } from 'ionicons';
 import { refreshOutline, arrowUndoOutline, chatbubbleEllipsesOutline, heartOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { StarIconComponent } from '../../UI/star-icon/star-icon.component';
-
+import { UserProfileService } from '../../core/services/user-profile.service';
 
 @Component({
   selector: 'app-favoritos',
@@ -53,6 +53,9 @@ export class FavoritosComponent implements OnInit {
   private chatService = inject(ChatService);
   private router = inject(Router);
   private toastController = inject(ToastController);
+  private userProfileService = inject(UserProfileService);
+
+  private profileImageCache = new Map<string, string>();
 
   selectedSegment: 'likes' | 'rejected' = 'likes';
   likedProfiles: any[] = [];
@@ -275,5 +278,28 @@ export class FavoritosComponent implements OnInit {
     });
   
     await toast.present();
+  }
+
+  getProfileImageUrl(userId: string): string {
+    // Si ya tenemos la URL en caché, devolverla
+    if (this.profileImageCache.has(userId)) {
+      return this.profileImageCache.get(userId) || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    }
+    
+    // Si no, solicitar la URL y guardarla en caché cuando llegue
+    this.userProfileService.getProfileImageUrl(userId).subscribe(url => {
+      if (url) {
+        this.profileImageCache.set(userId, url);
+      }
+    });
+    
+    // Mientras tanto, devolver la imagen por defecto
+    return 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+  }
+
+  handleImageError(event: Event) {
+    if (event.target) {
+      (event.target as HTMLImageElement).src = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    }
   }
 }

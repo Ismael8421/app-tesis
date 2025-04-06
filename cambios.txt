@@ -6,7 +6,7 @@ Funcionando el botón de like, se guarda en la base de datos y local
 Funcionando el menú de favoritos
 Programado notificaciones(se borra FCM)
 
-Ya se suben las fotos de perfil a la nube
+La función de fotos de perfil funciona masomenos bien (v75)
 
 Contexto
 

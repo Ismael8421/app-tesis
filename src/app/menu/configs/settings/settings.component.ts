@@ -16,7 +16,8 @@ import {
   IonSelectOption
 } from '@ionic/angular/standalone';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { SciencesComponent } from '../../../form/form-questions/offer-skills/sciences/sciences.component';
+import { ProfileImageService } from '../profile/profile-image.service';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-settings',
@@ -43,9 +44,12 @@ export class SettingsComponent implements OnInit {
   private _authState = inject(AuthStateService);
   private _router = inject(Router);
   private _themeService = inject(ThemeService);
+  private _profileImageService = inject(ProfileImageService);
+  private _auth = inject(Auth);
 
   currentTheme!: ThemeType;
   isDarkMode: boolean = false;
+  profileImageUrl: string | null = null;
   
   themeOptions: { value: ThemeType; label: string }[] = [
     { value: 'system', label: 'Igual que el sistema' },
@@ -63,11 +67,32 @@ export class SettingsComponent implements OnInit {
       });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     // Inicializar el tema actual
     this.currentTheme = this._themeService.getCurrentTheme();
     // Determinar si estamos en modo oscuro
     this.updateDarkModeStatus();
+    
+    // Cargar la imagen de perfil
+    await this.loadProfileImage();
+  }
+
+  // Método para cargar la imagen de perfil
+  async loadProfileImage() {
+    try {
+      const currentUser = this._auth.currentUser;
+      if (currentUser) {
+        const imageUrl = await this._profileImageService.getProfileImage(currentUser.uid);
+        this.profileImageUrl = imageUrl;
+      }
+    } catch (error) {
+      console.error('Error al cargar imagen de perfil:', error);
+    }
+  }
+
+  // Manejar errores de carga de imagen
+  handleImageError() {
+    this.profileImageUrl = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
   }
 
   // Actualizar el estado del modo oscuro

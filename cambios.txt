@@ -8,7 +8,7 @@ Programado notificaciones(se borra FCM)
 
 La función de fotos de perfil funciona todo bien (desde la v75.1)
 
-A partir de la v77 se empieza a trabajar las notificaciones desde cero
+A partir de la v77 se empieza a trabajar las notificaciones desde cero.
 
 Despues de v77 se supone que ya funciona las notificaciones pero no funciona el firebase deploy --only functions
 

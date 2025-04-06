@@ -6,7 +6,7 @@ Funcionando el botón de like, se guarda en la base de datos y local
 Funcionando el menú de favoritos
 Programado notificaciones(se borra FCM)
 
-La función de fotos de perfil funciona masomenos bien (v75)
+La función de fotos de perfil funciona todo bien (desde la v75.1)
 
 Contexto
 

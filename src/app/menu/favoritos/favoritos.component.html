@@ -28,7 +28,7 @@
         <!-- Sección de Favoritos -->
         <ion-item *ngFor="let profile of likedProfiles" lines="full" class="profile-item">
           <ion-avatar slot="start">
-            <img [src]="getProfileImageUrl(profile.uid)" (error)="handleImageError($event)">
+            <img [src]="getProfileImageUrl(profile.uid)" (error)="handleImageError($event, profile.uid)">
           </ion-avatar>
           <ion-label>
             <h2>{{profile.nombreUsuario}}</h2>
@@ -67,7 +67,7 @@
         <!-- Sección de Rechazados -->
         <ion-item *ngFor="let profile of rejectedProfiles" lines="full" class="profile-item">
           <ion-avatar slot="start">
-            <img [src]="getProfileImageUrl(profile.uid)" (error)="handleImageError($event)">
+            <img [src]="getProfileImageUrl(profile.uid)" (error)="handleImageError($event, profile.uid)">
           </ion-avatar>
           <ion-label>
             <h2>{{profile.nombreUsuario}}</h2>

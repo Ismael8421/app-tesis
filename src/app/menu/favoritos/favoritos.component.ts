@@ -14,6 +14,7 @@ import { addIcons } from 'ionicons';
 import { refreshOutline, arrowUndoOutline, chatbubbleEllipsesOutline, heartOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { StarIconComponent } from '../../UI/star-icon/star-icon.component';
 import { UserProfileService } from '../../core/services/user-profile.service';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-favoritos',
@@ -54,8 +55,9 @@ export class FavoritosComponent implements OnInit {
   private router = inject(Router);
   private toastController = inject(ToastController);
   private userProfileService = inject(UserProfileService);
+  private cdr = inject(ChangeDetectorRef);
 
-  private profileImageCache = new Map<string, string>();
+  private profileImageCache = new Map<string, { url: string | null, loading: boolean }>();
 
   selectedSegment: 'likes' | 'rejected' = 'likes';
   likedProfiles: any[] = [];
@@ -98,6 +100,11 @@ export class FavoritosComponent implements OnInit {
 
   segmentChanged(event: any) {
     this.selectedSegment = event.detail.value;
+    
+    // Forzar la actualización de la vista al cambiar de segmento
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    }, 50);
   }
 
   async loadProfiles() {
@@ -113,6 +120,9 @@ export class FavoritosComponent implements OnInit {
         this.isLikedLoading = false;
         return;
       }
+      
+      // Array para acumular perfiles cargados
+      const loadedProfiles = [];
       
       // Cargar los detalles de cada perfil
       for (const uid of likedIds) {
@@ -135,7 +145,7 @@ export class FavoritosComponent implements OnInit {
               console.error('Error al obtener datos de carrera:', error);
             }
             
-            this.likedProfiles.push({
+            const profile = {
               uid,
               nombreUsuario: userData['nombreUsuario'] || 'Usuario',
               nombre: userData['nombre'] || '',
@@ -144,17 +154,29 @@ export class FavoritosComponent implements OnInit {
               anioLectivo: userData['anioLectivo'] || '',
               paralelo: userData['paralelo'] || '',
               ...carreraData
-            });
+            };
+            
+            loadedProfiles.push(profile);
           }
         } catch (error) {
           console.error('Error al cargar perfil con like:', error);
         }
       }
       
+      // Actualizar la lista de perfiles
+      this.likedProfiles = loadedProfiles;
+      
+      // Precargar imágenes
+      this.preloadProfileImages(this.likedProfiles);
+      
+      // Marcar carga como completa
       this.isLikedLoading = false;
+      
+      // Forzar detección de cambios
+      this.cdr.detectChanges();
     });
     
-    // Cargar perfiles rechazados
+    // Cargar perfiles rechazados con la misma lógica mejorada
     this.isRejectedLoading = true;
     this.rejectedProfilesService.getRejectedProfiles().subscribe(async (rejectedIds) => {
       this.rejectedProfiles = [];
@@ -163,6 +185,8 @@ export class FavoritosComponent implements OnInit {
         this.isRejectedLoading = false;
         return;
       }
+      
+      const loadedProfiles = [];
       
       // Cargar los detalles de cada perfil
       for (const uid of rejectedIds) {
@@ -185,7 +209,7 @@ export class FavoritosComponent implements OnInit {
               console.error('Error al obtener datos de carrera:', error);
             }
             
-            this.rejectedProfiles.push({
+            const profile = {
               uid,
               nombreUsuario: userData['nombreUsuario'] || 'Usuario',
               nombre: userData['nombre'] || '',
@@ -194,14 +218,26 @@ export class FavoritosComponent implements OnInit {
               anioLectivo: userData['anioLectivo'] || '',
               paralelo: userData['paralelo'] || '',
               ...carreraData
-            });
+            };
+            
+            loadedProfiles.push(profile);
           }
         } catch (error) {
           console.error('Error al cargar perfil rechazado:', error);
         }
       }
       
+      // Actualizar la lista de perfiles
+      this.rejectedProfiles = loadedProfiles;
+      
+      // Precargar imágenes
+      this.preloadProfileImages(this.rejectedProfiles);
+      
+      // Marcar carga como completa
       this.isRejectedLoading = false;
+      
+      // Forzar detección de cambios
+      this.cdr.detectChanges();
     });
   }
 
@@ -281,15 +317,46 @@ export class FavoritosComponent implements OnInit {
   }
 
   getProfileImageUrl(userId: string): string {
-    // Si ya tenemos la URL en caché, devolverla
-    if (this.profileImageCache.has(userId)) {
-      return this.profileImageCache.get(userId) || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    // Verificar si ya tenemos esta imagen en caché
+    const cachedData = this.profileImageCache.get(userId);
+    
+    if (cachedData) {
+      // Si tenemos un resultado (exitoso o fallido), devolverlo
+      if (cachedData.url) {
+        return cachedData.url;
+      }
+      // Si está cargando, devolver la imagen por defecto
+      if (cachedData.loading) {
+        return 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+      }
     }
     
-    // Si no, solicitar la URL y guardarla en caché cuando llegue
-    this.userProfileService.getProfileImageUrl(userId).subscribe(url => {
-      if (url) {
-        this.profileImageCache.set(userId, url);
+    // Si no está en caché, iniciar la carga
+    this.profileImageCache.set(userId, { url: null, loading: true });
+    
+    this.userProfileService.getProfileImageUrl(userId).subscribe({
+      next: (url) => {
+        if (url) {
+          // Actualizar caché con la URL
+          this.profileImageCache.set(userId, { url, loading: false });
+          // Forzar detección de cambios
+          this.cdr.detectChanges();
+        } else {
+          // Si no hay URL, usar la imagen predeterminada
+          this.profileImageCache.set(userId, { 
+            url: 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg', 
+            loading: false 
+          });
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error('Error obteniendo imagen de perfil:', err);
+        this.profileImageCache.set(userId, { 
+          url: 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg', 
+          loading: false 
+        });
+        this.cdr.detectChanges();
       }
     });
     
@@ -297,9 +364,29 @@ export class FavoritosComponent implements OnInit {
     return 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
   }
 
-  handleImageError(event: Event) {
+  handleImageError(event: Event, userId?: string) {
     if (event.target) {
       (event.target as HTMLImageElement).src = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    }
+    
+    // Si tenemos el userId, actualizar el caché
+    if (userId) {
+      this.profileImageCache.set(userId, { 
+        url: 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg', 
+        loading: false 
+      });
+    }
+  }
+
+  private preloadProfileImages(profiles: any[]) {
+    if (!profiles || profiles.length === 0) return;
+    
+    // Precargar imágenes para todos los perfiles
+    for (const profile of profiles) {
+      if (profile.uid) {
+        // Esto iniciará la carga y guardará en caché
+        this.getProfileImageUrl(profile.uid);
+      }
     }
   }
 }

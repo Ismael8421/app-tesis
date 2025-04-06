@@ -4,7 +4,7 @@ Tutorial de uso de las recomendaciones
 Funcionando el botón de rechazar, se guarda en la base de datos y local
 Funcionando el botón de like, se guarda en la base de datos y local
 Funcionando el menú de favoritos
-Programado notificaciones(se borra capacitor y se regresa a notificaciones de firebase)
+Programado notificaciones(se borra FCM)
 
 Contexto
 

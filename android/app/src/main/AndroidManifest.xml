@@ -49,15 +49,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
-
-        <!-- Configuración para Firebase Cloud Messaging - PUEDES ELIMINAR ESTA PARTE -->
-        <service
-            android:name="com.google.firebase.messaging.FirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
         
         <!-- Canal de notificaciones para Android 8+ - PUEDES MANTENER ESTO -->
         <meta-data

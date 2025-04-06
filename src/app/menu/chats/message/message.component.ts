@@ -341,7 +341,7 @@ export class MessageComponent implements OnInit, OnDestroy {
   handleProfileImageError(event: Event) {
     const imgElement = event.target as HTMLImageElement;
     if (imgElement) {
-      imgElement.src = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+      imgElement.src = 'icons/logo_tesis.png';
     }
   }
 }

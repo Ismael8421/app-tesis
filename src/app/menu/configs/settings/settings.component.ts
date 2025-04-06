@@ -92,7 +92,7 @@ export class SettingsComponent implements OnInit {
 
   // Manejar errores de carga de imagen
   handleImageError() {
-    this.profileImageUrl = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    this.profileImageUrl = 'icons/logo_tesis.png';
   }
 
   // Actualizar el estado del modo oscuro

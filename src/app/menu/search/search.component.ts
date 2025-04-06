@@ -1244,7 +1244,7 @@ export class SearchComponent {
   getProfileImageUrl(userId: string): string {
     // Verificar primero si ya está en el caché local
     if (this.profileImageCache.has(userId)) {
-      return this.profileImageCache.get(userId) || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+      return this.profileImageCache.get(userId) || 'icons/logo_tesis.png';
     }
     
     // Inicialmente establecer como undefined para saber que estamos cargando
@@ -1267,22 +1267,22 @@ export class SearchComponent {
       },
       error: (err) => {
         console.error('Error cargando imagen de perfil:', err);
-        this.profileImageCache.set(userId, 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg');
+        this.profileImageCache.set(userId, 'icons/logo_tesis.png');
       }
     });
     
     // Mientras tanto, devolver la imagen por defecto
-    return 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    return 'icons/logo_tesis.png';
   }
 
   handleImageError(event: Event, userId?: string): void {
     if (event.target) {
-      (event.target as HTMLImageElement).src = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+      (event.target as HTMLImageElement).src = 'icons/logo_tesis.png';
     }
     
     // Si tenemos el ID del usuario, actualizar el caché
     if (userId) {
-      this.profileImageCache.set(userId, 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg');
+      this.profileImageCache.set(userId, 'icons/logo_tesis.png');
     }
   }
 }

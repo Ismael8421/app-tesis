@@ -1077,7 +1077,7 @@ export class ProfileComponent implements OnInit {
     // Si el evento viene de un elemento, establecer la imagen predeterminada
     if (event && event.target) {
       const imgElement = event.target as HTMLImageElement;
-      imgElement.src = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+      imgElement.src = 'icons/logo_tesis.png';
     }
     
     // Si la imagen en la vista es la que falló, actualizar la variable
@@ -1090,7 +1090,7 @@ export class ProfileComponent implements OnInit {
           this.profileImagePreview = localImage;
         } else {
           // Si no hay imagen local o es la misma que falló, usar la predeterminada
-          this.profileImagePreview = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+          this.profileImagePreview = 'icons/logo_tesis.png';
         }
       }
     }

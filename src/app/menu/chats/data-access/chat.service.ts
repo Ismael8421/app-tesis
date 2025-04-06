@@ -429,8 +429,8 @@ export class ChatService {
       // Forzar actualizaciones de UI
       this.forceRefreshChats();
       
-      // Ya no necesitamos esta llamada, pues será manejada por el NotificationService
-      // await this.sendNotificationForNewMessage(chatId, senderId, content);
+      // Enviar notificación push por el nuevo mensaje
+      await this.sendNotificationForNewMessage(chatId, senderId, content);
       
       return newMessageRef.key || '';
     } catch (error) {

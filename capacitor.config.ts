@@ -24,8 +24,7 @@ const config: CapacitorConfig = {
     },
     LocalNotifications: {
       smallIcon: "ic_notification",
-      iconColor: "#4CAF50",
-      sound: "default"
+      iconColor: "#4CAF50"
     }
   },
   ios: {

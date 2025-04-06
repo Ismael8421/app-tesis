@@ -10,6 +10,8 @@ La función de fotos de perfil funciona todo bien (desde la v75.1)
 
 A partir de la v77 se empieza a trabajar las notificaciones desde cero
 
+Despues de v77 se supone que ya funciona las notificaciones pero no funciona el firebase deploy --only functions
+
 Contexto
 
 Estamos trabajando en un algoritmo de recomendación para una aplicación educativa que conecta estudiantes universitarios para colaboraciones académicas. La estructura incluye colecciones generales de usuarios y colecciones específicas por carrera (Informatica, IEME, MCM, EMA, Mecatronica, Ciencias).

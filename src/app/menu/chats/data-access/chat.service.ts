@@ -4,6 +4,7 @@ import { Observable, from, of, combineLatest, BehaviorSubject, Subject } from 'r
 import { map, switchMap, tap, catchError, shareReplay, share } from 'rxjs/operators';
 import { ChatStorageService } from './chat-storage.service';
 import { NetworkService } from './network.service';
+import { NotificationService } from './notification.service';
 
 interface Message {
   content: string;
@@ -41,7 +42,8 @@ export class ChatService {
   constructor(
     private db: Database,
     private storageService: ChatStorageService,
-    private networkService: NetworkService
+    private networkService: NetworkService,
+    private notificationService: NotificationService
   ) { }
 
   async startChat(user1Id: string, user2Id: string): Promise<string> {
@@ -345,6 +347,9 @@ export class ChatService {
       
       // Forzar actualizaciones de UI
       this.forceRefreshChats();
+      
+      // Enviar notificación push por el nuevo mensaje usando OneSignal
+      await this.notificationService.sendNewMessageNotification(chatId, senderId, content);
       
       return newMessageRef.key || '';
     } catch (error) {

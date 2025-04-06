@@ -10,7 +10,8 @@ const config: CapacitorConfig = {
       'accounts.google.com',
       'apis.google.com',
       '*.firebaseapp.com',
-      '*.googleapis.com'
+      '*.googleapis.com',
+      'onesignal.com'
     ],
     cleartext: true
   },

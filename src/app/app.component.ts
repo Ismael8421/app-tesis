@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthStateService } from './account/shared/data-access/auth-state.service';
 import { ThemeService } from './menu/configs/settings/data-access/theme.service';
-import { NotificationService } from './menu/chats/data-access/notification.service';
 import { UserStatusService } from './menu/chats/data-access/userstatus.service';
 import { Auth, getRedirectResult } from '@angular/fire/auth';
 import { Platform } from '@ionic/angular';
@@ -23,7 +22,6 @@ export class AppComponent implements OnInit {
 
   constructor(
     private themeService: ThemeService,
-    private notificationService: NotificationService,
     private auth: Auth,
     private authService: AuthService
   ) {
@@ -55,9 +53,6 @@ export class AppComponent implements OnInit {
       // El usuario ya estaba autenticado
       this.initNotifications();
     }
-
-    // Inicializar canales de notificación (Android)
-    await this.notificationService.setupNotificationChannels();
     
     // Verificar resultados de redirección de autenticación
     await this.checkRedirectResult();
@@ -74,13 +69,6 @@ export class AppComponent implements OnInit {
    */
   private initNotifications() {
     if (!this.auth.currentUser) return;
-    
-    // Inicializar notificaciones push
-    this.notificationService.initPushNotifications();
-    
-    // Suscribirse a los chats para recibir notificaciones
-    this.notificationService.subscribeToChats();
-    
     // Inicializar el estado del usuario
     this.userStatusService.refreshStatus();
   }

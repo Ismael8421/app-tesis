@@ -16,7 +16,6 @@ import { AlertController, IonAlert, IonAvatar, IonButton, IonCard, IonCardConten
 import { Firestore, collection, doc, getDoc, getDocs, query, where, limit } from '@angular/fire/firestore';
 import { RejectedProfilesService } from './data-access/rejected-profiles.service';
 import { LikedProfilesService } from './data-access/iked-profiles.service';
-import { UserProfileService } from '../../core/services/user-profile.service';
 
 register();
 
@@ -49,8 +48,6 @@ export class SearchComponent {
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
   private likedProfilesService = inject(LikedProfilesService);
-  private userProfileService = inject(UserProfileService);
-  private profileImageCache = new Map<string, string | null>();
 
   recommendedUsers: any[] = [];
   loading = true;
@@ -117,12 +114,12 @@ export class SearchComponent {
             this.formService.getFormData(user.uid),
             this.formStateService.checkFormCompletion(user.uid)
           ]);
-
+  
           this.userData = registerData;
           this.formData = formData;
           this.isFormComplete = formCompleted;
           this.showAlert = !formCompleted;
-
+  
           // Suscribirse a los perfiles rechazados
           this.rejectedProfilesService.getRejectedProfiles().subscribe(
             profiles => {
@@ -130,7 +127,7 @@ export class SearchComponent {
               console.log('Perfiles rechazados cargados:', this.rejectedProfiles.length);
             }
           );
-
+          
           // Suscribirse a los perfiles con like
           this.likedProfilesService.getLikedProfiles().subscribe(
             profiles => {
@@ -138,7 +135,7 @@ export class SearchComponent {
               console.log('Perfiles con like cargados:', this.likedProfiles.length);
             }
           );
-
+  
           // Cargar recomendaciones solo si el formulario está completo
           if (formCompleted && this.userData && this.formData) {
             await this.loadRecommendations();
@@ -250,13 +247,13 @@ export class SearchComponent {
       this.loading = false; // Asegurar que se oculta el spinner
       return;
     }
-
+  
     try {
       // Solo mostrar indicador de carga si no hay recomendaciones aún
       if (this.recommendedUsers.length === 0) {
         this.loading = true;
       }
-
+  
       // Verificar usuario actual
       const currentUser = this.auth.currentUser;
       if (!currentUser) {
@@ -264,18 +261,18 @@ export class SearchComponent {
         this.loading = false;
         return;
       }
-
+  
       const currentUserId = currentUser.uid;
-
+  
       // Verificar que userData existe
       if (!this.userData || !this.userData.anioLectivo) {
         console.error('Datos de usuario no disponibles');
         this.loading = false;
         return;
       }
-
+  
       const userAnioLectivo = this.userData.anioLectivo;
-
+  
       // Procesar una colección a la vez para mejor control
       const collectionName = this.pendingCollections.shift();
       if (!collectionName) {
@@ -283,62 +280,62 @@ export class SearchComponent {
         this.loading = false;
         return;
       }
-
+  
       console.log(`Procesando colección: ${collectionName}`);
-
+  
       const carreraCollection = collection(this.firestore, collectionName);
-
+  
       // Consulta limitada para mejor rendimiento
       const q = query(
         carreraCollection,
         where('uid', '!=', currentUserId),
         limit(this.searchLimit)
       );
-
+  
       const querySnapshot = await getDocs(q);
       console.log(`Encontrados ${querySnapshot.docs.length} documentos en ${collectionName}`);
-
+  
       // Procesar los documentos encontrados
       let newCandidatesCount = 0;
       const candidatesInCollection: any[] = [];
-
+  
       for (const docSnap of querySnapshot.docs) {
         // Obtener la información general del usuario
         const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
         const userData = userGeneralDoc.data();
-
+  
         if (!userData) {
           console.log(`Sin datos para usuario ${docSnap.id}`);
           continue;
         }
-
+  
         // Verificar si este perfil ya ha sido rechazado
         if (this.rejectedProfiles.includes(docSnap.id) || this.likedProfiles.includes(docSnap.id)) {
           console.log(`Descartando - Perfil rechazado o con like: ${docSnap.id}`);
           continue;
         }
-
+  
         const formCompleted = userData['formCompleted'] ?? false;
-
+  
         // Solo considerar usuarios que hayan completado el formulario
         if (formCompleted) {
           const userFormData = docSnap.data();
-
+  
           // Obtener el año lectivo y la carrera
           const otherUserData = await this.registerService.getUserData(docSnap.id);
           const otherUserYear = otherUserData?.anioLectivo;
           const userCarrera = userData['carrera'];
-
+  
           // FILTRO CRÍTICO: Verificar que sean del mismo año lectivo
           if (otherUserYear !== userAnioLectivo) {
             console.log(`Descartando - Año diferente: ${otherUserYear} vs ${userAnioLectivo}`);
             continue;
           }
-
+  
           // Calcular puntuación para poder ordenar por calidad
           if (userFormData && userCarrera) {
             const matchDetails = this.calculateDetailedMatchScore(userFormData, userCarrera);
-
+  
             candidatesInCollection.push({
               uid: docSnap.id,
               nombreUsuario: userFormData['nombreUsuario'] || 'Usuario',
@@ -353,21 +350,21 @@ export class SearchComponent {
               skillScore: matchDetails.skillScore,
               otherScore: matchDetails.otherScore
             });
-
+  
             newCandidatesCount++;
           }
         } else {
           console.log(`Descartando - Formulario no completado`);
         }
       }
-
+  
       // Agregar al pool de candidatos potenciales
       this.allPotentialMatches = [...this.allPotentialMatches, ...candidatesInCollection];
       this.collectionsProcessed++;
-
+  
       console.log(`Procesados ${newCandidatesCount} nuevos candidatos de ${collectionName}`);
       console.log(`Total de candidatos acumulados: ${this.allPotentialMatches.length}`);
-
+  
       // Ordenar todos los candidatos por puntuación
       this.allPotentialMatches.sort((a, b) => {
         // Primero ordenar por coincidencia de habilidades
@@ -377,14 +374,14 @@ export class SearchComponent {
         // En caso de empate, usar la puntuación total
         return b.matchScore - a.matchScore;
       });
-
+  
       // Si no hay recomendaciones cargadas aún, cargar el primer lote visual
       if (this.recommendedUsers.length === 0) {
         await this.loadNextBatch();
         // Ocultar el spinner principal después de cargar el primer lote
         this.loading = false;
       }
-
+  
       // Si los candidatos son pocos, cargar más automáticamente
       if (this.allPotentialMatches.length < 10 && this.pendingCollections.length > 0) {
         console.log('Pocos candidatos, buscando en más colecciones...');
@@ -393,7 +390,7 @@ export class SearchComponent {
         this.loading = false; // Asegurar que el spinner principal está oculto
         await this.loadMoreCandidates();
       }
-
+  
     } catch (error) {
       console.error('Error al cargar candidatos:', error);
       this.loading = false;
@@ -1029,9 +1026,9 @@ export class SearchComponent {
     try {
       if (this.isLoadingMore) return;
       this.isLoadingMore = true;
-  
+
       console.log(`Cargando lote ${this.currentBatch} de recomendaciones...`);
-  
+
       // Verificar si hay suficientes candidatos, si no, cargar más
       if (this.allPotentialMatches.length <= this.recommendedUsers.length + this.batchSize / 2 &&
         this.pendingCollections.length > 0) {
@@ -1042,10 +1039,10 @@ export class SearchComponent {
           this.loadMoreCandidates();
         }, 100);
       }
-  
+
       // Calcular el índice de inicio para el lote actual
       const startIndex = this.recommendedUsers.length;
-  
+
       // Si ya hemos cargado todas las recomendaciones, no hacer nada
       if (startIndex >= this.allPotentialMatches.length) {
         console.log('No quedan más recomendaciones para mostrar');
@@ -1053,33 +1050,25 @@ export class SearchComponent {
         this.loading = false; // Asegurar que el spinner principal está oculto
         return;
       }
-  
+
       // Dar tiempo para que se muestre el indicador de carga
       await new Promise(resolve => setTimeout(resolve, 300));
-  
+
       // Obtener el siguiente lote
       const endIndex = Math.min(startIndex + this.batchSize, this.allPotentialMatches.length);
       const nextBatch = this.allPotentialMatches.slice(startIndex, endIndex);
-  
+
       console.log(`Añadiendo lote visual desde índice ${startIndex} hasta ${endIndex - 1}`);
       console.log(`Tamaño del lote: ${nextBatch.length}`);
-  
+
       // Añadir el nuevo lote a las recomendaciones mostradas
       this.recommendedUsers = [...this.recommendedUsers, ...nextBatch];
-      
-      // NUEVO: Precargar las imágenes de perfil
-      for (const user of nextBatch) {
-        if (user.uid) {
-          // Iniciar la carga de la imagen, el resultado se guardará en el caché
-          this.getProfileImageUrl(user.uid);
-        }
-      }
-  
+
       // Incrementar el contador de lotes
       this.currentBatch++;
-  
+
       console.log(`Recomendaciones mostradas: ${this.recommendedUsers.length} de ${this.allPotentialMatches.length} disponibles`);
-  
+
       // Si ya tenemos recomendaciones, ocultar el spinner principal
       if (this.recommendedUsers.length > 0) {
         this.loading = false;
@@ -1099,33 +1088,33 @@ export class SearchComponent {
       console.error('ID de usuario no válido para rechazar');
       return;
     }
-
+  
     try {
       // 1. Obtener la tarjeta actual para animar
       const swiperEl = document.querySelector('swiper-container');
       if (!swiperEl || !swiperEl.swiper) return;
-
+      
       const activeIndex = swiperEl.swiper.activeIndex;
       const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
       if (!activeSlide) return;
-
+      
       const card = activeSlide.querySelector('ion-card');
       if (!card) return;
-
+      
       // 2. Aplicar clase de animación
       activeSlide.classList.add('animating');
       card.classList.add('profile-rejected');
-
+      
       // 3. Rechazar en Firebase mientras se reproduce la animación
       this.rejectedProfilesService.rejectProfile(user.uid);
-
+      
       // 4. Esperar a que termine la animación
       await new Promise(resolve => setTimeout(resolve, 500));
-
+      
       // 5. Eliminar el usuario de las recomendaciones
       this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
       this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
-
+      
       // 6. Gestionar el estado después de eliminar
       if (this.recommendedUsers.length === 0 && this.allPotentialMatches.length > 0) {
         // Si no quedan recomendaciones mostradas pero hay más disponibles
@@ -1142,7 +1131,7 @@ export class SearchComponent {
           swiperEl.swiper.update();
         }
       }
-
+      
       // Opcional: mostrar un toast muy breve
       const toast = await this.toastController.create({
         message: 'Perfil rechazado',
@@ -1152,7 +1141,7 @@ export class SearchComponent {
         cssClass: 'reject-toast'
       });
       await toast.present();
-
+      
     } catch (error) {
       console.error('Error al rechazar perfil:', error);
       this.presentToast('Error al rechazar perfil', 'danger');
@@ -1172,7 +1161,7 @@ export class SearchComponent {
         }
       ]
     });
-
+  
     await toast.present();
   }
 
@@ -1181,33 +1170,33 @@ export class SearchComponent {
       console.error('ID de usuario no válido para dar like');
       return;
     }
-
+  
     try {
       // 1. Obtener la tarjeta actual para animar
       const swiperEl = document.querySelector('swiper-container');
       if (!swiperEl || !swiperEl.swiper) return;
-
+      
       const activeIndex = swiperEl.swiper.activeIndex;
       const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
       if (!activeSlide) return;
-
+      
       const card = activeSlide.querySelector('ion-card');
       if (!card) return;
-
+      
       // 2. Aplicar clase de animación (opcional: puedes crear una animación específica para likes)
       activeSlide.classList.add('animating');
       card.classList.add('profile-liked');
-
+      
       // 3. Registrar el like en Firebase mientras se reproduce la animación
       this.likedProfilesService.likeProfile(user.uid);
-
+      
       // 4. Esperar a que termine la animación
       await new Promise(resolve => setTimeout(resolve, 500));
-
+      
       // 5. Eliminar el usuario de las recomendaciones
       this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
       this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
-
+      
       // 6. Gestionar el estado después de eliminar
       if (this.recommendedUsers.length === 0 && this.allPotentialMatches.length > 0) {
         // Si no quedan recomendaciones mostradas pero hay más disponibles
@@ -1224,7 +1213,7 @@ export class SearchComponent {
           swiperEl.swiper.update();
         }
       }
-
+      
       // Mostrar un toast breve
       const toast = await this.toastController.create({
         message: 'Perfil añadido a favoritos',
@@ -1234,55 +1223,10 @@ export class SearchComponent {
         cssClass: 'like-toast'
       });
       await toast.present();
-
+      
     } catch (error) {
       console.error('Error al dar like al perfil:', error);
       this.presentToast('Error al añadir perfil a favoritos', 'danger');
-    }
-  }
-
-  getProfileImageUrl(userId: string): string {
-    // Verificar primero si ya está en el caché local
-    if (this.profileImageCache.has(userId)) {
-      return this.profileImageCache.get(userId) || 'icons/logo_tesis.png';
-    }
-    
-    // Inicialmente establecer como undefined para saber que estamos cargando
-    this.profileImageCache.set(userId, null);
-    
-    // Solicitar la imagen y actualizar el caché cuando llegue
-    this.userProfileService.getProfileImageUrl(userId).subscribe({
-      next: (url) => {
-        if (url) {
-          this.profileImageCache.set(userId, url);
-          // Forzar la detección de cambios
-          setTimeout(() => {
-            // Este timeout es crucial para que Angular detecte el cambio
-            const swiperEl = document.querySelector('swiper-container');
-            if (swiperEl && swiperEl.swiper) {
-              swiperEl.swiper.update();
-            }
-          }, 50);
-        }
-      },
-      error: (err) => {
-        console.error('Error cargando imagen de perfil:', err);
-        this.profileImageCache.set(userId, 'icons/logo_tesis.png');
-      }
-    });
-    
-    // Mientras tanto, devolver la imagen por defecto
-    return 'icons/logo_tesis.png';
-  }
-
-  handleImageError(event: Event, userId?: string): void {
-    if (event.target) {
-      (event.target as HTMLImageElement).src = 'icons/logo_tesis.png';
-    }
-    
-    // Si tenemos el ID del usuario, actualizar el caché
-    if (userId) {
-      this.profileImageCache.set(userId, 'icons/logo_tesis.png');
     }
   }
 }

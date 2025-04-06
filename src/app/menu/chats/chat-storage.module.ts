@@ -5,7 +5,6 @@ import { ChatStorageService } from './data-access/chat-storage.service';
 import { NetworkService } from './data-access/network.service';
 import { UserStatusService } from './data-access/userstatus.service';
 import { NotificationService } from './data-access/notification.service';
-import { Capacitor } from '@capacitor/core';
 
 /**
  * Módulo que centraliza todos los servicios relacionados con chats
@@ -39,17 +38,8 @@ export class ChatStorageModule {
       this.storageService.pruneExpiredData();
     }, 12 * 60 * 60 * 1000);
     
-    // Inicializar notificaciones solo si estamos en plataforma nativa
-    if (Capacitor.isNativePlatform()) {
-      console.log('Inicializando servicios de notificación...');
-      
-      try {
-        await this.notificationService.setupNotificationChannels();
-        await this.notificationService.initPushNotifications();
-        console.log('Servicios de notificación inicializados correctamente');
-      } catch (error) {
-        console.error('Error inicializando servicios de notificación:', error);
-      }
-    }
+    // Inicializar notificaciones si estamos en plataforma nativa
+    this.notificationService.initPushNotifications();
+    this.notificationService.setupNotificationChannels();
   }
 }

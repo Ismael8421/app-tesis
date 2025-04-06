@@ -392,16 +392,16 @@
 
             <!-- Sección inferior: Botones -->
             <div class="buttons-container">
+              <ion-button fill="solid" shape="round" mode="ios" (click)="rejectProfile(user)">
+                <app-check-icon></app-check-icon>
+              </ion-button>
+
               <ion-button fill="solid" shape="round" mode="ios" (click)="startChat(user.uid, user.nombreUsuario)">
                 <app-messages-icon></app-messages-icon>
               </ion-button>
 
               <ion-button fill="solid" shape="round" mode="ios" (click)="likeProfile(user)">
                 <app-heart-icon></app-heart-icon>
-              </ion-button>
-
-              <ion-button fill="solid" shape="round" mode="ios" (click)="rejectProfile(user)">
-                <app-check-icon></app-check-icon>
               </ion-button>
             </div>
           </ion-card-content>

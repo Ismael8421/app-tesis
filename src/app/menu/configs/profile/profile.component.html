@@ -34,7 +34,8 @@
             <div class="circular-image-container">
               <ion-img
                 [src]="profileImagePreview || 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg'"
-                alt="Foto de perfil"></ion-img>
+                alt="Foto de perfil" class="profile-image"
+                (ionError)="handleImageError()"></ion-img>
             </div>
           </ion-avatar>
           <ion-button class="change-photo-btn" fill="clear" (click)="presentPhotoOptions()">
@@ -166,7 +167,11 @@
     <ion-content class="fullscreen-image-content">
       <div class="fullscreen-image-container">
         <div class="square-image-wrapper">
-          <img [src]="profileImagePreview || 'icons/logo_tesis.png'" alt="Foto de perfil" class="fullscreen-image">
+          <img 
+            [src]="profileImagePreview || 'icons/logo_tesis.png'" 
+            alt="Foto de perfil" 
+            class="fullscreen-image"
+            (error)="handleImageError($event)">
         </div>
       </div>
     </ion-content>

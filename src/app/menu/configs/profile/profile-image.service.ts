@@ -1,23 +1,44 @@
 // src/app/menu/configs/profile/profile-image.service.ts
 import { Injectable } from '@angular/core';
+import { Firestore, doc, updateDoc, getDoc } from '@angular/fire/firestore';
+import { CloudinaryService } from '../../../core/services/cloudinary.service';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProfileImageService {
     private readonly USER_PROFILE_IMAGE_KEY = 'user_profile_image';
+    private readonly PROFILE_IMAGE_FIELD = 'profileImageUrl';
 
-    constructor() { }
+    constructor(
+        private firestore: Firestore,
+        private cloudinaryService: CloudinaryService
+    ) { }
 
     /**
-     * Guarda la imagen de perfil en localStorage (temporal)
-     * Esto será reemplazado por Firebase Storage más adelante
+     * Guarda la imagen de perfil en localStorage (temporal) y en Cloudinary
+     * @param userId ID del usuario
+     * @param imageDataUrl Imagen en formato Data URL
      */
-    saveProfileImage(userId: string, imageDataUrl: string): void {
+    async saveProfileImage(userId: string, imageDataUrl: string): Promise<string> {
         try {
-            // Guardar en localStorage por ahora
+            // Guardar en localStorage por ahora (para respuesta inmediata)
             localStorage.setItem(`${this.USER_PROFILE_IMAGE_KEY}_${userId}`, imageDataUrl);
-            console.log('Imagen de perfil guardada localmente');
+            
+            // Subir a Cloudinary
+            const cloudinaryResponse = await firstValueFrom(
+                this.cloudinaryService.uploadImage(imageDataUrl, `profile_images/${userId}`)
+            );
+            
+            // Extraer URL segura de Cloudinary
+            const secureUrl = cloudinaryResponse.secure_url;
+            
+            // Guardar URL en Firestore
+            await this.saveProfileImageUrlToFirestore(userId, secureUrl, cloudinaryResponse.public_id);
+            
+            console.log('Imagen de perfil guardada en Cloudinary:', secureUrl);
+            return secureUrl;
         } catch (error) {
             console.error('Error al guardar imagen de perfil:', error);
             throw error;
@@ -25,12 +46,56 @@ export class ProfileImageService {
     }
 
     /**
-     * Obtiene la imagen de perfil del localStorage (temporal)
-     * Esto será reemplazado por Firebase Storage más adelante
+     * Guarda la URL de la imagen de perfil en Firestore
      */
-    getProfileImage(userId: string): string | null {
+    private async saveProfileImageUrlToFirestore(
+        userId: string, 
+        imageUrl: string, 
+        publicId: string
+    ): Promise<void> {
         try {
-            return localStorage.getItem(`${this.USER_PROFILE_IMAGE_KEY}_${userId}`);
+            // Referencia al documento del usuario
+            const userRef = doc(this.firestore, 'usuarios', userId);
+            
+            // Actualizar el campo de imagen de perfil
+            await updateDoc(userRef, {
+                [this.PROFILE_IMAGE_FIELD]: imageUrl,
+                profileImagePublicId: publicId,
+                profileImageUpdatedAt: new Date().toISOString()
+            });
+            
+            console.log('URL de imagen guardada en Firestore');
+        } catch (error) {
+            console.error('Error al guardar URL en Firestore:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtiene la imagen de perfil, primero del localStorage y luego de Firestore si es necesario
+     */
+    async getProfileImage(userId: string): Promise<string | null> {
+        try {
+            // Primero intentamos obtener del localStorage (para respuesta rápida)
+            const localImage = localStorage.getItem(`${this.USER_PROFILE_IMAGE_KEY}_${userId}`);
+            
+            if (localImage) {
+                return localImage;
+            }
+            
+            // Si no está en localStorage, la buscamos en Firestore
+            const userDoc = await getDoc(doc(this.firestore, 'usuarios', userId));
+            
+            if (userDoc.exists() && userDoc.data()[this.PROFILE_IMAGE_FIELD]) {
+                const imageUrl = userDoc.data()[this.PROFILE_IMAGE_FIELD];
+                
+                // Guardamos en localStorage para acelerar futuras solicitudes
+                localStorage.setItem(`${this.USER_PROFILE_IMAGE_KEY}_${userId}`, imageUrl);
+                
+                return imageUrl;
+            }
+            
+            return null;
         } catch (error) {
             console.error('Error al obtener imagen de perfil:', error);
             return null;
@@ -38,32 +103,18 @@ export class ProfileImageService {
     }
 
     /**
-     * Implementación futura para subir imagen a Firebase Storage
-     * Este método estará disponible para cuando actualices tu plan de Firebase
+     * Obtiene la URL optimizada para mostrar la imagen de perfil
      */
-    async uploadProfileImageToFirebase(userId: string, imageDataUrl: string): Promise<string> {
-        // Esta es una implementación ficticia
-        // Se reemplazará cuando implementes Firebase Storage
-
-        // Simular carga a Firebase
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Guardar localmente mientras tanto
-        this.saveProfileImage(userId, imageDataUrl);
-
-        // Retornar una URL ficticia
-        return `https://firebase-storage-url.example.com/users/${userId}/profile.jpg`;
+    getOptimizedProfileImageUrl(imageUrl: string, size: number = 300): string {
+        if (!imageUrl) {
+            return 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+        }
+        
+        return this.cloudinaryService.getOptimizedUrl(imageUrl, size, size);
     }
 
     /**
      * Genera una versión recortada circular de la imagen
-     * usando Canvas para un recorte real
-     * 
-     * @param imageUrl URL de la imagen original
-     * @param offsetX Desplazamiento X
-     * @param offsetY Desplazamiento Y
-     * @param zoom Nivel de zoom
-     * @returns Promise con la imagen recortada como Data URL
      */
     getCircularDisplayUrl(squareImageUrl: string): string {
         return squareImageUrl; // La URL es la misma, solo cambia el CSS de visualización
@@ -136,7 +187,6 @@ export class ProfileImageService {
         });
     }
 
-    // Añadir al ProfileImageService.ts
     async simpleCropToCircle(imageUrl: string): Promise<string> {
         return new Promise((resolve, reject) => {
             const img = new Image();

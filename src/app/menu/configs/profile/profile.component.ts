@@ -11,6 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PreferencesService } from './preferences.service';
 import { addIcons } from 'ionicons';
+import { CloudinaryService } from '../../../core/services/cloudinary.service';
 import {
   cameraOutline,
   imageOutline,
@@ -176,7 +177,9 @@ export class ProfileComponent implements OnInit {
   // Variables para manipulación de imagen
   isProcessingImage = false;
 
-  constructor() {
+  constructor(
+    private _cloudinaryService: CloudinaryService
+  ) {
     // Registrar iconos
     addIcons({
       camera,
@@ -215,9 +218,16 @@ export class ProfileComponent implements OnInit {
 
       // Cargar la imagen de perfil si existe
       if (currentUser.uid) {
-        const savedImage = this._profileImageService.getProfileImage(currentUser.uid);
-        if (savedImage) {
-          this.profileImagePreview = savedImage;
+        this.loading = true;
+        try {
+          const savedImage = await this._profileImageService.getProfileImage(currentUser.uid);
+          if (savedImage) {
+            this.profileImagePreview = savedImage;
+          }
+        } catch (error) {
+          console.error('Error al cargar imagen de perfil:', error);
+        } finally {
+          this.loading = false;
         }
       }
 
@@ -391,7 +401,7 @@ export class ProfileComponent implements OnInit {
   // Corregir el método saveCroppedImage() en profile.component.ts
   async saveCroppedImage() {
     this.isProcessingImage = true;
-
+  
     try {
       // Verificar usuario
       const currentUser = this._auth.currentUser;
@@ -399,43 +409,43 @@ export class ProfileComponent implements OnInit {
         this.showAlert('Error', 'Usuario no identificado');
         return;
       }
-
+  
       // Obtener referencias a elementos
       const img = this.cropImageElement?.nativeElement;
       const frame = this.cropFrameElement?.nativeElement;
-
+  
       if (!img || !frame || !this.imageContainerRect) {
         this.showAlert('Error', 'No se pudo encontrar los elementos necesarios');
         return;
       }
-
+  
       // Dimensiones finales para el canvas
       const finalSize = 300;
-
+  
       // Paso 1: Crear un canvas con la imagen original
       const originalCanvas = document.createElement('canvas');
       originalCanvas.width = img.naturalWidth;
       originalCanvas.height = img.naturalHeight;
-
+  
       const originalCtx = originalCanvas.getContext('2d');
       if (!originalCtx) {
         throw new Error('No se pudo crear el contexto del canvas original');
       }
-
+  
       // Dibujar la imagen original
       originalCtx.drawImage(img, 0, 0);
-
+  
       // Paso 2: Crear un canvas para la rotación
       const rotatedCanvas = document.createElement('canvas');
       let rotatedCtx = rotatedCanvas.getContext('2d');
-
+  
       if (!rotatedCtx) {
         throw new Error('No se pudo crear el contexto del canvas rotado');
       }
-
+  
       // Normalizar rotación
       const rotation = ((this.imageRotation % 360) + 360) % 360;
-
+  
       // Ajustar tamaño del canvas según rotación
       if (rotation === 90 || rotation === 270) {
         rotatedCanvas.width = originalCanvas.height;
@@ -444,12 +454,12 @@ export class ProfileComponent implements OnInit {
         rotatedCanvas.width = originalCanvas.width;
         rotatedCanvas.height = originalCanvas.height;
       }
-
+  
       // Aplicar rotación
       rotatedCtx.save();
       rotatedCtx.translate(rotatedCanvas.width / 2, rotatedCanvas.height / 2);
       rotatedCtx.rotate((rotation * Math.PI) / 180);
-
+  
       // Dibujar en el centro
       if (rotation === 90 || rotation === 270) {
         rotatedCtx.drawImage(
@@ -468,26 +478,26 @@ export class ProfileComponent implements OnInit {
           originalCanvas.height
         );
       }
-
+  
       rotatedCtx.restore();
-
+  
       // Paso 3: Calcular la región de recorte
       // Obtener las dimensiones de la imagen mostrada en pantalla
       const imgRect = img.getBoundingClientRect();
       const frameRect = frame.getBoundingClientRect();
-
+  
       // Calcular el centro de la imagen en el DOM
       const imgCenterX = imgRect.left + imgRect.width / 2;
       const imgCenterY = imgRect.top + imgRect.height / 2;
-
+  
       // Calcular el centro del marco de recorte en el DOM
       const frameCenterX = frameRect.left + frameRect.width / 2;
       const frameCenterY = frameRect.top + frameRect.height / 2;
-
+  
       // Calcular el desplazamiento relativo (de -1 a 1) del marco desde el centro de la imagen
       let relOffsetX = (frameCenterX - imgCenterX) / (imgRect.width / 2);
       let relOffsetY = (frameCenterY - imgCenterY) / (imgRect.height / 2);
-
+  
       // Ajustar el desplazamiento basado en la rotación
       if (rotation === 90) {
         const temp = relOffsetX;
@@ -501,55 +511,73 @@ export class ProfileComponent implements OnInit {
         relOffsetX = relOffsetY;
         relOffsetY = -temp;
       }
-
+  
       // Calcular el tamaño relativo del marco comparado con la imagen
       const imgMinDim = Math.min(imgRect.width, imgRect.height);
       const frameRelSize = frameRect.width / imgMinDim;
-
+  
       // Calcular la región de recorte en el canvas rotado
       const rotatedMinDim = Math.min(rotatedCanvas.width, rotatedCanvas.height);
       const cropSize = rotatedMinDim * frameRelSize;
-
+  
       // Calcular las coordenadas centrales del área de recorte
       const cropCenterX = rotatedCanvas.width / 2 + relOffsetX * (rotatedCanvas.width / 2);
       const cropCenterY = rotatedCanvas.height / 2 + relOffsetY * (rotatedCanvas.height / 2);
-
+  
       // Calcular las coordenadas superiores izquierdas del área de recorte
       const cropX = cropCenterX - (cropSize / 2);
       const cropY = cropCenterY - (cropSize / 2);
-
+  
       // Paso 4: Crear canvas final y recortar
       const finalCanvas = document.createElement('canvas');
       finalCanvas.width = finalSize;
       finalCanvas.height = finalSize;
-
+  
       const finalCtx = finalCanvas.getContext('2d');
       if (!finalCtx) {
         throw new Error('No se pudo crear el contexto del canvas final');
       }
-
+  
       // Dibujar la región recortada en el canvas final
       finalCtx.drawImage(
         rotatedCanvas,
         cropX, cropY, cropSize, cropSize,
         0, 0, finalSize, finalSize
       );
-
+  
       // Obtener la imagen resultante como dataURL
       const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.9);
-
-      // Guardar la imagen
-      this._profileImageService.saveProfileImage(currentUser.uid, dataUrl);
-
-      // Actualizar la vista
-      this.profileImagePreview = dataUrl;
+  
+      // Mostrar indicador de carga
+      const loading = await this._loadingController.create({
+        message: 'Subiendo imagen...',
+        spinner: 'crescent'
+      });
+      await loading.present();
+  
+      try {
+        // Guardar la imagen en Cloudinary y obtener la URL
+        const cloudinaryUrl = await this._profileImageService.saveProfileImage(currentUser.uid, dataUrl);
+  
+        // Actualizar la vista con la URL de Cloudinary
+        this.profileImagePreview = cloudinaryUrl;
+        
+        // Mostrar mensaje de éxito
+        this.showSuccessToast('Foto de perfil actualizada y subida a la nube');
+      } catch (error) {
+        console.error('Error al subir imagen a Cloudinary:', error);
+        // Guardar localmente como respaldo en caso de error
+        this._profileImageService.saveProfileImage(currentUser.uid, dataUrl);
+        this.showAlert('Aviso', 'La imagen se guardó localmente, pero hubo un problema al subirla a la nube');
+      } finally {
+        loading.dismiss();
+      }
+  
+      // Cerrar el modal y resetear estados
       this.isCropModalOpen = false;
       this.tempImageUrl = null;
       this.imageRotation = 0; // Resetear rotación
-
-      // Mostrar mensaje de éxito
-      this.showSuccessToast('Foto de perfil actualizada');
-
+  
     } catch (error) {
       console.error('Error al recortar la imagen:', error);
       this.showAlert('Error', 'No se pudo guardar la imagen');
@@ -1041,5 +1069,30 @@ export class ProfileComponent implements OnInit {
     return carrera.normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, "");
+  }
+
+  handleImageError(event?: Event) {
+    console.warn('Error al cargar la imagen de perfil', event);
+    
+    // Si el evento viene de un elemento, establecer la imagen predeterminada
+    if (event && event.target) {
+      const imgElement = event.target as HTMLImageElement;
+      imgElement.src = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+    }
+    
+    // Si la imagen en la vista es la que falló, actualizar la variable
+    if (this.profileImagePreview && this.profileImagePreview.startsWith('http')) {
+      // Intentar una vez más con la imagen del localStorage si existe
+      const currentUser = this._auth.currentUser;
+      if (currentUser) {
+        const localImage = localStorage.getItem(`user_profile_image_${currentUser.uid}`);
+        if (localImage && localImage !== this.profileImagePreview) {
+          this.profileImagePreview = localImage;
+        } else {
+          // Si no hay imagen local o es la misma que falló, usar la predeterminada
+          this.profileImagePreview = 'https://img.freepik.com/vector-premium/vector-dibujos-animados-icono-galleta-cuadrada-comida-galleta-azucar-dulce_98402-61270.jpg';
+        }
+      }
+    }
   }
 }

@@ -50,26 +50,6 @@
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
         
-        <!-- Canal de notificaciones para Android 8+ - PUEDES MANTENER ESTO -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="chat_messages" />
-        
-        <!-- Icono de notificación - PUEDES MANTENER ESTO -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_notification" />
-        
-        <!-- Color de notificación - PUEDES MANTENER ESTO -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/notification_color" />
-
-        <!-- NUEVO: Configuración para notificaciones locales de Capacitor -->
-        <receiver android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationReceiver" android:exported="false" />
-        <receiver android:name="com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher" android:exported="false" />
-        <service android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationService" android:exported="false" />
-        
     </application>
 
     <!-- Permissions existentes -->
@@ -79,10 +59,4 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
-    <!-- NUEVOS PERMISOS para notificaciones locales -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" /> 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>

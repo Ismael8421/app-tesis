@@ -117,27 +117,27 @@ export class MessageComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Inicializar el estado del tema
     this.updateDarkModeStatus();
-
+  
     // Suscribirse a cambios en la conectividad
     this.subscriptions.push(
       this.networkService.isOnline$.subscribe(isOnline => {
         this.isOnline = isOnline;
       })
     );
-
+  
     if (!this.currentUser) {
       this.router.navigate(['/login']);
       return;
     }
-
+  
     const chatId = this.getChatId();
-
+  
     // Actualizar el estado del usuario para indicar que está activo en este chat
     this.userStatusService.refreshStatus();
-
+  
     // Cargar mensajes iniciales y suscribirse a actualizaciones
     this.loadMessages();
-
+  
     // Suscribirse a eventos de mensajes nuevos
     this.subscriptions.push(
       this.chatService.messageAddedEvent$
@@ -146,48 +146,62 @@ export class MessageComponent implements OnInit, OnDestroy {
           // Comprobar si el mensaje ya está en la lista
           const currentMessages = this.allMessages.value;
           const messageExists = currentMessages.some(m => m.id === event.message.id);
-
+  
           if (!messageExists) {
             // Añadir el nuevo mensaje a la lista
             const updatedMessages = [...currentMessages, event.message];
             this.allMessages.next(updatedMessages);
-
+  
             // Desplazar al final
             setTimeout(() => this.scrollToBottom(), 100);
+            
+            // Marcar mensajes como leídos inmediatamente si estamos en el chat
+            if (document.hasFocus() && this.isOnline) {
+              this.markMessagesAsRead();
+            }
           }
         })
     );
-
+  
     // Configurar un intervalo para marcar mensajes como leídos periódicamente
     this.markAsReadInterval = setInterval(() => {
       if (document.hasFocus() && this.isOnline) {
         this.markMessagesAsRead();
       }
     }, 2000);
-
-    // Marcar mensajes como leídos al entrar al chat
+  
+    // Marcar mensajes como leídos al entrar al chat - múltiples intentos
+    // Primer intento inmediato
     this.markMessagesAsRead();
+    
+    // Segundo intento después de 500ms
+    setTimeout(() => this.markMessagesAsRead(), 500);
+    
+    // Tercer intento después de la carga de mensajes (normalmente 1-2 segundos)
+    setTimeout(() => this.markMessagesAsRead(), 2000);
   }
 
   // Cargar mensajes iniciales
   private loadMessages() {
     const chatId = this.getChatId();
-
+  
     // Mostrar carga
     this.isLoading = true;
-
+  
     // Suscribirse a los mensajes
     this.subscriptions.push(
       this.chatService.getMessages(chatId).subscribe({
         next: (messages) => {
           this.isLoading = false;
           this.allMessages.next(messages);
-
+  
           // Desplazar al final después de cargar mensajes
           setTimeout(() => this.scrollToBottom(), 100);
-
-          // Marcar mensajes como leídos
-          this.markMessagesAsRead();
+  
+          // Marcar mensajes como leídos después de cargar
+          if (this.isOnline && this.currentUser) {
+            setTimeout(() => this.markMessagesAsRead(), 300);
+          }
         },
         error: (error) => {
           console.error('Error loading messages:', error);
@@ -228,10 +242,17 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   private async markMessagesAsRead() {
     if (!this.currentUser || !this.isOnline) return;
-
+  
     const chatId = this.getChatId();
     try {
+      console.log('Marcando mensajes como leídos al entrar/interactuar con el chat');
       await this.chatService.markMessagesAsRead(chatId, this.currentUser.uid);
+      
+      // Forzar actualización de UI para reflejar cambios inmediatamente
+      this.chatService.forceRefreshChats();
+      
+      // Forzar refrescar mensajes también
+      this.chatService.forceRefreshMessages();
     } catch (error) {
       console.error('Error marking messages as read:', error);
     }

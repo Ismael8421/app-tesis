@@ -15,12 +15,8 @@
     <div class="search-container">
       <form (submit)="$event.preventDefault()">
         <div class="search-input" [class.active]="searchTerm">
-          <input type="text" 
-                 placeholder="Buscar" 
-                 [(ngModel)]="searchTerm" 
-                 name="searchTerm"
-                 (input)="onSearchInput()" 
-                 class="ion-color-light" />
+          <input type="text" placeholder="Buscar" [(ngModel)]="searchTerm" name="searchTerm" (input)="onSearchInput()"
+            class="ion-color-light" />
           <button type="button" class="ion-color-light">
             <app-recomendatio-icon class="icon" />
           </button>
@@ -40,59 +36,49 @@
 
     <ion-list lines="full" class="ion-no-padding" *ngIf="!isLoading">
       <ng-container *ngIf="currentUser">
-        <ion-item *ngFor="let chat of filteredChats" button detail
-        class="chat-item"
-        [class.unread]="chat.unreadMessages?.[currentUser.uid]"
-        (click)="navigateTo(chat.id)"
-        (touchstart)="onChatItemTouchStart($event, chat)"
-        (touchend)="onChatItemTouchEnd($event)">
-        <ion-avatar slot="start">
-          <img
-            [src]="getProfileImageUrl(getUserParticipantId(chat.participants))"
-            (error)="handleImageError($event, getUserParticipantId(chat.participants))">
-        </ion-avatar>
-        <ion-label>
-          <div class="chat-header">
-            <h3>{{ getUserName(chat.participants) }}</h3>
-            <div class="unread-indicator" *ngIf="chat.unreadMessages?.[currentUser?.uid]"></div>
-          </div>
-          <p>{{ chat.lastMessage || 'No hay mensajes' }}</p>
-          <small *ngIf="chat.lastMessageTimestamp">
-            {{ chat.lastMessageTimestamp | date:'short' }}
-          </small>
-        </ion-label>
-      </ion-item>
+        <ion-item *ngFor="let chat of filteredChats" button detail class="chat-item"
+          [class.unread]="hasUnreadMessages(chat)" (click)="navigateTo(chat.id)"
+          (touchstart)="onChatItemTouchStart($event, chat)" (touchend)="onChatItemTouchEnd($event)">
+          <ion-avatar slot="start">
+            <img [src]="getProfileImageUrl(getUserParticipantId(chat.participants))"
+              (error)="handleImageError($event, getUserParticipantId(chat.participants))">
+          </ion-avatar>
+          <ion-label>
+            <div class="chat-header">
+              <h3>{{ getUserName(chat.participants) }}</h3>
+              <div class="unread-indicator" *ngIf="hasUnreadMessages(chat)"></div>
+            </div>
+            <p>{{ chat.lastMessage || 'No hay mensajes' }}</p>
+            <small *ngIf="chat.lastMessageTimestamp">
+              {{ chat.lastMessageTimestamp | date:'short' }}
+            </small>
+          </ion-label>
+        </ion-item>
       </ng-container>
-      
+
       <div *ngIf="filteredChats.length === 0 && !isSearching" class="no-chats">
         <p>No hay conversaciones activas</p>
       </div>
-      
+
       <div *ngIf="filteredChats.length === 0 && isSearching" class="no-chats">
         <p>No se encontraron resultados para "{{searchTerm}}"</p>
       </div>
     </ion-list>
-    
+
     <!-- Mensaje informativo sobre long press -->
     <div *ngIf="filteredChats.length > 0" class="long-press-hint">
       <small>Mantén presionado un chat para ver más opciones</small>
     </div>
   </div>
-  
+
   <!-- Action Sheet para acciones de chat -->
-  <ion-action-sheet
-    [isOpen]="showActionSheet"
-    header="Opciones de chat"
-    [buttons]="actionSheetButtons"
+  <ion-action-sheet [isOpen]="showActionSheet" header="Opciones de chat" [buttons]="actionSheetButtons"
     (didDismiss)="closeActionSheet()">
   </ion-action-sheet>
-  
+
   <!-- Confirmación de eliminación -->
-  <ion-alert
-    [isOpen]="showDeleteConfirm"
-    header="Eliminar conversación"
+  <ion-alert [isOpen]="showDeleteConfirm" header="Eliminar conversación"
     message="¿Estás seguro que deseas eliminar esta conversación? Esta acción no se puede deshacer."
-    [buttons]="alertButtons"
-    (didDismiss)="cancelDelete()">
+    [buttons]="alertButtons" (didDismiss)="cancelDelete()">
   </ion-alert>
 </ion-content>

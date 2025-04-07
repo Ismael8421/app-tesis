@@ -39,6 +39,7 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   private userProfileService = inject(UserProfileService);
 
   // Suscripciones
+  private subscriptions: Subscription[] = [];
   private chatsSubscription?: Subscription;
   private authStateSubscription?: Subscription;
   private refreshSubscription?: Subscription;
@@ -137,6 +138,21 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
 
     // Configurar el debounce para la búsqueda
     this.setupSearchDebounce();
+
+    // Suscribirse a eventos de eliminación de chat
+    this.subscriptions.push(
+      this.chatService.chatDeletedEvent$
+        .subscribe(event => {
+          if (event.userId === this.currentUser?.uid) {
+            // Actualizar las listas locales inmediatamente
+            this.zone.run(() => {
+              this.chats = this.chats.filter(chat => chat.id !== event.chatId);
+              this.filteredChats = this.filteredChats.filter(chat => chat.id !== event.chatId);
+              this.cdr.detectChanges();
+            });
+          }
+        })
+    );
 
     // Suscribirse a cambios en la conectividad
     this.networkSubscription = this.networkService.isOnline$.subscribe(isOnline => {
@@ -359,6 +375,8 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Desuscribirse de todas las suscripciones
+    this.subscriptions.forEach(sub => sub.unsubscribe());
     if (this.chatsSubscription) {
       this.chatsSubscription.unsubscribe();
     }
@@ -381,6 +399,8 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
       console.error('No chat ID provided');
       return;
     }
+
+    // Navegar al chat
     this.router.navigate(['/menu/mensajes', chatId]);
   }
 
@@ -549,10 +569,25 @@ export class MessagesRoomComponent implements OnInit, OnDestroy {
 
   getUserParticipantId(participants: string[]): string {
     if (!this.currentUser) return participants[0] || '';
-    
+
     // Encontrar el ID del otro participante (que no sea el usuario actual)
     const otherUserId = participants.find(userId => userId !== this.currentUser?.uid);
-    
+
     return otherUserId || '';
+  }
+
+  // Método para verificar correctamente si un chat tiene mensajes no leídos
+  hasUnreadMessages(chat: any): boolean {
+    if (!this.currentUser || !chat) {
+      return false;
+    }
+
+    // Si no hay propiedad unreadMessages, devolver false
+    if (!chat.unreadMessages) {
+      return false;
+    }
+
+    // Comprobar explícitamente si el valor es true (no solo si existe)
+    return chat.unreadMessages[this.currentUser.uid] === true;
   }
 }

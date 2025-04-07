@@ -4,7 +4,6 @@ import { Observable, from, of, combineLatest, BehaviorSubject, Subject } from 'r
 import { map, switchMap, tap, catchError, shareReplay, share } from 'rxjs/operators';
 import { ChatStorageService } from './chat-storage.service';
 import { NetworkService } from './network.service';
-import { NotificationService } from './notification.service';
 
 interface Message {
   content: string;
@@ -43,7 +42,6 @@ export class ChatService {
     private db: Database,
     private storageService: ChatStorageService,
     private networkService: NetworkService,
-    private notificationService: NotificationService
   ) { }
 
   async startChat(user1Id: string, user2Id: string): Promise<string> {
@@ -334,7 +332,16 @@ export class ChatService {
       updates[`messages/${chatId}/${newMessageRef.key}`] = message;
       updates[`chats/${chatId}/lastMessage`] = content;
       updates[`chats/${chatId}/lastMessageTimestamp`] = timestamp;
-      updates[`chats/${chatId}/unreadMessages`] = unreadMessages;
+      
+      // Importante: Actualizar unreadMessages para cada participante
+      for (const participantId of chatData.participants) {
+        if (participantId !== senderId) {
+          updates[`chats/${chatId}/unreadMessages/${participantId}`] = true;
+        } else {
+          // El remitente ya ha leído el mensaje
+          updates[`chats/${chatId}/unreadMessages/${participantId}`] = false;
+        }
+      }
       
       // Realizar todas las actualizaciones en una sola operación
       await update(ref(this.db), updates);
@@ -348,9 +355,6 @@ export class ChatService {
       // Forzar actualizaciones de UI
       this.forceRefreshChats();
       
-      // Enviar notificación push por el nuevo mensaje usando OneSignal
-      await this.notificationService.sendNewMessageNotification(chatId, senderId, content);
-      
       return newMessageRef.key || '';
     } catch (error) {
       console.error('Error sending message:', error);
@@ -361,19 +365,59 @@ export class ChatService {
   // Add new method to mark messages as read
   async markMessagesAsRead(chatId: string, userId: string): Promise<void> {
     try {
-      const updates: any = {};
-      updates[`chats/${chatId}/unreadMessages/${userId}`] = false;
-
-      const messagesRef = ref(this.db, `messages/${chatId}`);
-      const snapshot = await get(messagesRef);
-
-      if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-          updates[`messages/${chatId}/${childSnapshot.key}/readBy/${userId}`] = true;
-        });
+      // Comprobación de conectividad
+      if (!navigator.onLine) {
+        console.log('Sin conexión, no se pueden marcar mensajes como leídos');
+        return;
       }
-
-      await update(ref(this.db), updates);
+  
+      console.log(`Marcando mensajes como leídos para usuario ${userId} en chat ${chatId}`);
+      
+      // 1. Obtener el chat actual para verificar que existe
+      const chatRef = ref(this.db, `chats/${chatId}`);
+      const chatSnapshot = await get(chatRef);
+      
+      if (!chatSnapshot.exists()) {
+        console.log('El chat no existe, no se pueden marcar mensajes');
+        return;
+      }
+      
+      // Obtener los datos del chat
+      const chatData = chatSnapshot.val();
+      
+      // Solo procesar si el indicador de no leído está activo
+      if (chatData.unreadMessages && chatData.unreadMessages[userId] === true) {
+        // Preparamos las actualizaciones como un objeto
+        const updates: any = {};
+        
+        // 2. Actualizar el estado de lectura en el chat (muy importante)
+        updates[`chats/${chatId}/unreadMessages/${userId}`] = false;
+    
+        // 3. Obtener mensajes y marcarlos como leídos también
+        const messagesRef = ref(this.db, `messages/${chatId}`);
+        const snapshot = await get(messagesRef);
+    
+        if (snapshot.exists()) {
+          snapshot.forEach((childSnapshot) => {
+            const messageData = childSnapshot.val();
+            // Solo actualizar si el mensaje no ha sido leído
+            if (!messageData.readBy || !messageData.readBy[userId]) {
+              updates[`messages/${chatId}/${childSnapshot.key}/readBy/${userId}`] = true;
+            }
+          });
+        }
+    
+        // 4. Realizar todas las actualizaciones en una sola operación atómica
+        await update(ref(this.db), updates);
+        
+        // 5. Actualizar también localmente para reflejar cambios inmediatamente
+        this.forceRefreshChats();
+        this.forceRefreshMessages();
+        
+        console.log(`Mensajes marcados como leídos exitosamente para ${userId}`);
+      } else {
+        console.log(`Los mensajes ya estaban marcados como leídos para ${userId}`);
+      }
     } catch (error) {
       console.error('Error marking messages as read:', error);
       throw new Error('Failed to mark messages as read');
@@ -592,9 +636,16 @@ export class ChatService {
   }
 
   forceRefreshChats(): void {
+    console.log('Forzando actualización de UI para chats');
+    // Emitir múltiples veces para asegurar que se procesa
     this.forceRefresh$.next(true);
-    // Reiniciamos después de un tiempo para futuras solicitudes
-    setTimeout(() => this.forceRefresh$.next(false), 100);
+    
+    // Emitir de nuevo después de un breve retraso
+    setTimeout(() => {
+      this.forceRefresh$.next(true);
+      // Reiniciar después
+      setTimeout(() => this.forceRefresh$.next(false), 50);
+    }, 50);
   }
 
   private loadRemoteMessages(chatId: string): Observable<Message[]> {
@@ -640,14 +691,14 @@ export class ChatService {
   }
 
   forceRefreshMessages(): void {
-    console.log('Forzando refresco de mensajes');
+    console.log('Forzando actualización de UI para mensajes');
+    // Emitir múltiples veces para asegurar que se procesa
     this.forceRefresh$.next(true);
-
-    // Emitir de nuevo después de un breve retraso para asegurar que los observables
-    // capten múltiples cambios rápidos
+    
+    // Emitir de nuevo después de un breve retraso
     setTimeout(() => {
       this.forceRefresh$.next(true);
-      // Reiniciar después para futuras solicitudes
+      // Reiniciar después
       setTimeout(() => this.forceRefresh$.next(false), 50);
     }, 50);
   }

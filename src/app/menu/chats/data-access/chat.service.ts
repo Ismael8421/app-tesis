@@ -42,9 +42,19 @@ export class ChatService {
   private db = inject(Database);
   private storageService = inject(ChatStorageService);
   private networkService = inject(NetworkService);
-  private notificationSender = inject(NotificationSenderService);
+
+  // Instancia privada del NotificationSenderService que se inicializará bajo demanda
+  private _notificationSender: NotificationSenderService | null = null;
 
   constructor() { }
+
+  // Método para obtener NotificationSenderService bajo demanda
+  private get notificationSender(): NotificationSenderService {
+    if (!this._notificationSender) {
+      this._notificationSender = inject(NotificationSenderService);
+    }
+    return this._notificationSender;
+  }
 
   async startChat(user1Id: string, user2Id: string): Promise<string> {
     try {
@@ -360,7 +370,7 @@ export class ChatService {
         // Para cada participante (excepto el remitente)
         for (const participantId of chatData.participants) {
           if (participantId !== senderId) {
-            // Enviar notificación usando el servicio de notificaciones
+            // Usar el getter para obtener la instancia de notificationSender bajo demanda
             this.notificationSender
               .sendMessageNotification(
                 participantId,  // Destinatario

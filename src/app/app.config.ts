@@ -1,6 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
 import { routes } from './app.routes';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
@@ -10,6 +9,7 @@ import { provideIonicAngular } from '@ionic/angular/standalone';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideHttpClient } from '@angular/common/http';
+import { getFunctions, provideFunctions } from '@angular/fire/functions';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWICQxQQutJ-7t3hjIZP9QRuhtszoNkM8",
@@ -29,6 +29,7 @@ export const appConfig: ApplicationConfig = {
     provideAuth(() => getAuth()), 
     provideFirestore(() => getFirestore()),
     provideDatabase(() => getDatabase()), 
+    provideFunctions(() => getFunctions()), // Añadido el proveedor de Functions
     provideIonicAngular({}),
     provideMessaging(() => getMessaging()), 
     provideStorage(() => getStorage()),

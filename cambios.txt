@@ -14,6 +14,8 @@ Despues de v77 se supone que ya funciona las notificaciones pero no funciona el 
 
 intentar que el método de mensaje nuevo, active una notificaciones local de capacitor
 
+Despues de la v78.3 o sea en la v79 se vuelve a trabajar con FCM y functions
+
 Contexto
 
 Estamos trabajando en un algoritmo de recomendación para una aplicación educativa que conecta estudiantes universitarios para colaboraciones académicas. La estructura incluye colecciones generales de usuarios y colecciones específicas por carrera (Informatica, IEME, MCM, EMA, Mecatronica, Ciencias).

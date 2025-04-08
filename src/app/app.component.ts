@@ -7,6 +7,7 @@ import { Auth, getRedirectResult } from '@angular/fire/auth';
 import { Platform } from '@ionic/angular';
 import { AuthService } from './account/auth/data-access/auth.service';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+import { NotificationService } from './menu/chats/data-access/notification.service';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,7 @@ export class AppComponent implements OnInit {
   private router = inject(Router);
   private platform = inject(Platform);
   private userStatusService = inject(UserStatusService);
+  private notificationService = inject(NotificationService);
 
   constructor(
     private themeService: ThemeService,
@@ -35,8 +37,11 @@ export class AppComponent implements OnInit {
     FirebaseAuthentication.addListener('authStateChange', (change) => {
       console.log('Auth state changed', change);
       if (change.user) {
-        // El usuario ha iniciado sesión, inicializar servicios de notificaciones
-        this.initNotifications();
+        // El usuario ha iniciado sesión, inicializar servicios
+        this.initServices();
+      } else {
+        // El usuario ha cerrado sesión, limpiar tokens
+        this.notificationService.clearTokensOnLogout();
       }
     });
   }
@@ -48,10 +53,10 @@ export class AppComponent implements OnInit {
       // El usuario ha iniciado sesión exitosamente después de una redirección
       console.log('Usuario autenticado:', result.user);
       // Inicializar servicios después de la autenticación
-      this.initNotifications();
+      this.initServices();
     } else if (this.auth.currentUser) {
       // El usuario ya estaba autenticado
-      this.initNotifications();
+      this.initServices();
     }
     
     // Verificar resultados de redirección de autenticación
@@ -60,17 +65,44 @@ export class AppComponent implements OnInit {
     // Cuando la plataforma está lista, inicializar todo lo relacionado
     this.platform.ready().then(() => {
       // Esto asegura que las operaciones nativas se ejecuten una vez que la plataforma esté lista
-      this.initNotifications();
+      this.initServices();
     });
   }
 
   /**
-   * Inicializa todos los servicios relacionados con notificaciones
+   * Inicializa todos los servicios de la aplicación
    */
-  private initNotifications() {
+  private initServices() {
     if (!this.auth.currentUser) return;
-    // Inicializar el estado del usuario
+    
+    // Inicializar el estado del usuario (online/offline)
     this.userStatusService.refreshStatus();
+    
+    // Inicializar el servicio de notificaciones
+    this.initNotifications();
+  }
+
+  /**
+   * Inicializa el sistema de notificaciones
+   */
+  private async initNotifications() {
+    try {
+      // Solicitar/comprobar permisos de notificaciones
+      const hasPermission = await this.notificationService.checkAndRequestPermissions();
+      
+      if (hasPermission) {
+        console.log('Permisos de notificaciones concedidos');
+        
+        // Actualizar el token FCM después del login
+        if (this.auth.currentUser) {
+          await this.notificationService.updateTokenAfterLogin();
+        }
+      } else {
+        console.log('Permisos de notificaciones denegados o no disponibles');
+      }
+    } catch (error) {
+      console.error('Error inicializando notificaciones:', error);
+    }
   }
 
   /**
@@ -83,6 +115,9 @@ export class AppComponent implements OnInit {
       if (result && result.user) {
         // Usuario ha iniciado sesión correctamente mediante redirección
         this.router.navigateByUrl('/menu');
+        
+        // Inicializar notificaciones después del login
+        await this.notificationService.updateTokenAfterLogin();
       }
     } catch (error) {
       console.error('Error al manejar redirección de autenticación:', error);

@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Database, ref, push, set, onValue, get, update, query, orderByChild, remove } from '@angular/fire/database';
 import { Observable, from, of, combineLatest, BehaviorSubject, Subject } from 'rxjs';
 import { map, switchMap, tap, catchError, shareReplay, share } from 'rxjs/operators';
 import { ChatStorageService } from './chat-storage.service';
 import { NetworkService } from './network.service';
+import { NotificationSenderService } from '../data-access/notification-sender.service';
 
 interface Message {
   content: string;
@@ -38,11 +39,12 @@ export class ChatService {
   public chatDeletedEvent$ = this.chatDeleted$.asObservable();
   public messageAddedEvent$ = this.messageAdded$.asObservable();
 
-  constructor(
-    private db: Database,
-    private storageService: ChatStorageService,
-    private networkService: NetworkService,
-  ) { }
+  private db = inject(Database);
+  private storageService = inject(ChatStorageService);
+  private networkService = inject(NetworkService);
+  private notificationSender = inject(NotificationSenderService);
+
+  constructor() { }
 
   async startChat(user1Id: string, user2Id: string): Promise<string> {
     try {
@@ -351,6 +353,34 @@ export class ChatService {
         chatId, 
         message: {...message, id: newMessageRef.key}
       });
+      
+      // Enviar notificaciones push a los destinatarios
+      // Solo si el contenido no está vacío y hay destinatarios
+      if (content.trim() && chatData.participants.length > 1) {
+        // Para cada participante (excepto el remitente)
+        for (const participantId of chatData.participants) {
+          if (participantId !== senderId) {
+            // Enviar notificación usando el servicio de notificaciones
+            this.notificationSender
+              .sendMessageNotification(
+                participantId,  // Destinatario
+                chatId,         // ID del chat
+                content,        // Contenido del mensaje
+                senderName      // Nombre del remitente
+              )
+              .subscribe(
+                success => {
+                  if (success) {
+                    console.log(`Notificación enviada a ${participantId}`);
+                  } else {
+                    console.log(`Error enviando notificación a ${participantId}`);
+                  }
+                },
+                error => console.error('Error en envío de notificación:', error)
+              );
+          }
+        }
+      }
       
       // Forzar actualizaciones de UI
       this.forceRefreshChats();

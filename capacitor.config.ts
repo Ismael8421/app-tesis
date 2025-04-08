@@ -20,12 +20,19 @@ const config: CapacitorConfig = {
       skipNativeAuth: false,
       providers: ['google.com']
     },
+    // Configuración de notificaciones push
     PushNotifications: {
       presentationOptions: ["badge", "sound", "alert"]
     },
+    // Configuración de notificaciones locales
     LocalNotifications: {
       smallIcon: "ic_notification",
-      iconColor: "#4CAF50"
+      iconColor: "#4CAF50",
+      sound: "notification_sound.wav" 
+    },
+    // Configuración de Firebase Cloud Messaging
+    FirebaseMessaging: {
+      presentationOptions: ["badge", "sound", "alert"]
     }
   },
   ios: {

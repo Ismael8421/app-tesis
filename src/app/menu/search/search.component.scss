@@ -369,3 +369,36 @@ swiper-slide.animating {
     background: var(--ion-color-light-shade) !important;
   }
 }
+
+.group-buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  
+  .group-button {
+    --border-radius: 8px;
+    height: 2.5rem;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+.in-group-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+  
+  ion-icon {
+    font-size: 1.2rem;
+    color: var(--ion-color-primary);
+  }
+}

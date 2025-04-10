@@ -4,38 +4,43 @@ import { AuthStateService } from '../../../account/shared/data-access/auth-state
 import { ThemeService, ThemeType } from './data-access/theme.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  IonAvatar, 
-  IonContent, 
-  IonIcon, 
-  IonImg, 
-  IonItem, 
-  IonLabel, 
-  IonList, 
-  IonSelect, 
-  IonSelectOption
+import {
+  IonAvatar,
+  IonContent,
+  IonIcon,
+  IonImg,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonSelect,
+  IonSelectOption,
+  AlertController,
+  ToastController,
+  IonButton
 } from '@ionic/angular/standalone';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProfileImageService } from '../profile/profile-image.service';
 import { Auth } from '@angular/fire/auth';
+import { ProfileVisibilityService } from '../../search/data-access/profile-visibility.service';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   imports: [
-    RouterLink, 
-    RouterOutlet, 
-    CommonModule, 
-    FormsModule, 
-    IonContent, 
-    IonList, 
-    IonItem, 
-    IonAvatar, 
-    IonImg, 
-    IonLabel, 
-    IonIcon, 
-    IonSelect, 
-    IonSelectOption
+    RouterLink,
+    RouterOutlet,
+    CommonModule,
+    FormsModule,
+    IonContent,
+    IonList,
+    IonItem,
+    IonAvatar,
+    IonImg,
+    IonLabel,
+    IonIcon,
+    IonSelect,
+    IonSelectOption,
+    IonButton
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
@@ -50,14 +55,25 @@ export class SettingsComponent implements OnInit {
   currentTheme!: ThemeType;
   isDarkMode: boolean = false;
   profileImageUrl: string | null = null;
-  
+  isInGroup: boolean = false;
+
   themeOptions: { value: ThemeType; label: string }[] = [
     { value: 'system', label: 'Igual que el sistema' },
     { value: 'light', label: 'Claro' },
     { value: 'dark', label: 'Oscuro' }
   ];
 
-  constructor() {
+  constructor(
+    private profileVisibilityService: ProfileVisibilityService,
+    private alertController: AlertController,
+    private toastController: ToastController
+  ) {
+    // Constructor - suscribirse al estado
+    this.profileVisibilityService.getProfileStatus()
+      .pipe(takeUntilDestroyed())
+      .subscribe(status => {
+        this.isInGroup = status.visibility === 'visible_in_group';
+      });
     // Suscribirse a los cambios del tema usando takeUntilDestroyed
     this._themeService.theme$
       .pipe(takeUntilDestroyed())
@@ -67,12 +83,14 @@ export class SettingsComponent implements OnInit {
       });
   }
 
+  currentVisibility: 'visible' | 'visible_in_group' | 'invisible' = 'visible';
+
   async ngOnInit() {
     // Inicializar el tema actual
     this.currentTheme = this._themeService.getCurrentTheme();
     // Determinar si estamos en modo oscuro
     this.updateDarkModeStatus();
-    
+
     // Cargar la imagen de perfil
     await this.loadProfileImage();
   }
@@ -120,5 +138,70 @@ export class SettingsComponent implements OnInit {
   onThemeChange(event: CustomEvent) {
     const newTheme = event.detail.value as ThemeType;
     this._themeService.setTheme(newTheme);
+  }
+
+  async onVisibilityChange(event: CustomEvent) {
+    const newVisibility = event.detail.value;
+    try {
+      await this.profileVisibilityService.changeVisibility(newVisibility);
+    } catch (error) {
+      console.error('Error al cambiar visibilidad:', error);
+      // Mostrar mensaje de error
+    }
+  }
+
+  async showVisibilityInfo() {
+    const alert = await this.alertController.create({
+      header: 'Visibilidad del perfil',
+      message: `
+        <p><strong>Visible para todos:</strong> Tu perfil aparecerá en las recomendaciones para todos los usuarios.</p>
+        <p><strong>Visible (en grupo):</strong> Tu perfil aparecerá indicando que ya estás en un grupo de trabajo.</p>
+        <p><strong>Invisible:</strong> Tu perfil no aparecerá en las recomendaciones para otros usuarios.</p>
+      `,
+      buttons: ['Entendido']
+    });
+
+    await alert.present();
+  }
+
+  // Método para confirmar y abandonar grupo
+  async confirmLeaveGroup() {
+    const alert = await this.alertController.create({
+      header: 'Abandonar grupo',
+      message: '¿Estás seguro de que quieres abandonar tu grupo actual?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Abandonar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.profileVisibilityService.leaveGroup();
+              const toast = await this.toastController.create({
+                message: 'Has abandonado el grupo',
+                duration: 2000,
+                position: 'bottom',
+                color: 'primary'
+              });
+              await toast.present();
+            } catch (error) {
+              console.error('Error al abandonar grupo:', error);
+              const toast = await this.toastController.create({
+                message: 'Error al abandonar el grupo',
+                duration: 2000,
+                position: 'bottom',
+                color: 'danger'
+              });
+              await toast.present();
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }

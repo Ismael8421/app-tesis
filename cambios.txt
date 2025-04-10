@@ -16,6 +16,8 @@ intentar que el método de mensaje nuevo, active una notificaciones local de cap
 
 Despues de la v78.3 o sea en la v79 se vuelve a trabajar con FCM y functions
 
+v80 se agrega grupos y invitaciones de grupos
+
 Contexto
 
 Estamos trabajando en un algoritmo de recomendación para una aplicación educativa que conecta estudiantes universitarios para colaboraciones académicas. La estructura incluye colecciones generales de usuarios y colecciones específicas por carrera (Informatica, IEME, MCM, EMA, Mecatronica, Ciencias).

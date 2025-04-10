@@ -3,10 +3,7 @@
     <!-- Perfil -->
     <ion-item (click)="navigateTo()" class="profile-item ion-activatable" button>
       <ion-avatar slot="start">
-        <ion-img
-          [src]="profileImageUrl || 'icons/logo_tesis.png'"
-          alt="Perfil"
-          (ionError)="handleImageError()">
+        <ion-img [src]="profileImageUrl || 'icons/logo_tesis.png'" alt="Perfil" (ionError)="handleImageError()">
         </ion-img>
       </ion-avatar>
       <ion-label>
@@ -17,6 +14,26 @@
     </ion-item>
 
     <!-- Secciones de configuración -->
+    <div class="section-group">
+      <ion-item>
+        <ion-icon name="eye-outline" slot="start" class="custom-icon"></ion-icon>
+        <ion-label>Visibilidad del perfil</ion-label>
+        <ion-button fill="clear" slot="end" (click)="showVisibilityInfo()">
+          <ion-icon name="information-circle-outline" color="medium"></ion-icon>
+        </ion-button>
+        <ion-select [value]="currentVisibility" (ionChange)="onVisibilityChange($event)" interface="action-sheet">
+          <ion-select-option value="visible">Visible para todos</ion-select-option>
+          <ion-select-option value="visible_in_group">Visible (en grupo)</ion-select-option>
+          <ion-select-option value="invisible">Invisible</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item *ngIf="isInGroup" button (click)="confirmLeaveGroup()" class="warning-item">
+        <ion-icon name="exit-outline" slot="start" class="custom-icon warning"></ion-icon>
+        <ion-label color="warning">Abandonar grupo</ion-label>
+      </ion-item>
+    </div>
+
     <div class="section-group">
       <ion-item>
         <ion-icon name="contrast-outline" slot="start" class="custom-icon"></ion-icon>

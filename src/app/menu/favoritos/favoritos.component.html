@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-segment [(ngModel)]="selectedSegment" (ionChange)="segmentChanged($event)">
       <ion-segment-button value="likes">
-        <ion-label>Favoritos</ion-label>
+        <ion-label>Guardados</ion-label>
       </ion-segment-button>
       <ion-segment-button value="rejected">
         <ion-label>Rechazados</ion-label>
@@ -20,7 +20,7 @@
   <div *ngIf="selectedSegment === 'likes'" class="ion-padding">
     <div *ngIf="isLikedLoading" class="loading-container">
       <ion-spinner></ion-spinner>
-      <p>Cargando favoritos...</p>
+      <p>Cargando guardados...</p>
     </div>
 
     <ng-container *ngIf="!isLikedLoading">
@@ -46,7 +46,7 @@
 
       <div *ngIf="likedProfiles.length === 0" class="empty-list-message">
         <ion-icon name="heart-outline" size="large"></ion-icon>
-        <h2>Sin perfiles favoritos</h2>
+        <h2>Sin perfiles guardados</h2>
         <p>Aún no has marcado ningún perfil como favorito.</p>
         <ion-button expand="block" routerLink="/menu/recomendados">
           Descubrir perfiles

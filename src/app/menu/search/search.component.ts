@@ -1249,7 +1249,7 @@ export class SearchComponent {
 
       // Mostrar un toast breve
       const toast = await this.toastController.create({
-        message: 'Perfil añadido a favoritos',
+        message: 'Perfil añadido a guardados',
         duration: 1000,
         position: 'bottom',
         color: 'success',
@@ -1259,7 +1259,7 @@ export class SearchComponent {
 
     } catch (error) {
       console.error('Error al dar like al perfil:', error);
-      this.presentToast('Error al añadir perfil a favoritos', 'danger');
+      this.presentToast('Error al añadir perfil a guardados', 'danger');
     }
   }
 

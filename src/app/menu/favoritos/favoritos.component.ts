@@ -278,10 +278,10 @@ export class FavoritosComponent implements OnInit {
       await this.likedProfilesService.unlikeProfile(this.profileToUnlike.uid);
       // Actualizar la lista localmente
       this.likedProfiles = this.likedProfiles.filter(p => p.uid !== this.profileToUnlike.uid);
-      this.presentToast('Perfil eliminado de favoritos', 'success');
+      this.presentToast('Perfil eliminado de guardados', 'success');
     } catch (error) {
       console.error('Error al quitar like:', error);
-      this.presentToast('Error al eliminar de favoritos', 'danger');
+      this.presentToast('Error al eliminar de guardados', 'danger');
     }
     
     this.profileToUnlike = null;

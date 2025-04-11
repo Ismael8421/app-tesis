@@ -17,6 +17,7 @@ import { Firestore, collection, doc, getDoc, getDocs, query, where, limit } from
 import { RejectedProfilesService } from './data-access/rejected-profiles.service';
 import { LikedProfilesService } from './data-access/iked-profiles.service';
 import { ProfileVisibilityService } from './data-access/profile-visibility.service';
+import { GroupInvitationsService } from '../groups/data-access/group-invitations.service';
 
 register();
 

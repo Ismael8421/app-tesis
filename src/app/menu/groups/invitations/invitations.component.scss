@@ -1,0 +1,82 @@
+.invitations-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .invitation-card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    
+    ion-card-header {
+      padding-bottom: 8px;
+      
+      ion-card-title {
+        display: flex;
+        align-items: center;
+        font-size: 1.2rem;
+        
+        ion-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+
+  .invitation-item {
+    --padding-start: 8px;
+    --inner-padding-end: 8px;
+    
+    ion-avatar {
+      width: 48px;
+      height: 48px;
+    }
+    
+    ion-label {
+      h2 {
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      
+      p {
+        margin: 2px 0;
+        color: var(--ion-color-medium);
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .invitation-actions {
+    display: flex;
+    
+    ion-button {
+      margin: 0 4px;
+    }
+  }
+
+  .no-invitations {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    text-align: center;
+    
+    ion-icon {
+      font-size: 64px;
+      color: var(--ion-color-medium);
+      margin-bottom: 16px;
+    }
+    
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+    }
+    
+    p {
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .loading-container {
+    padding: 16px;
+  }

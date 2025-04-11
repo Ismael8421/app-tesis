@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
@@ -25,6 +25,8 @@ import { Auth } from '@angular/fire/auth';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { ProfileImageService } from '../configs/profile/profile-image.service';
 import { RegisterService } from '../../register/data-access/register.service';
+import { GroupInvitationsService, GroupInvitation } from './data-access/group-invitations.service';
+import { Subscription } from 'rxjs';
 
 interface GroupMember {
   uid: string;
@@ -59,7 +61,7 @@ interface GroupMember {
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.scss'
 })
-export class GroupsComponent implements OnInit {
+export class GroupsComponent implements OnInit, OnDestroy {
   private _auth = inject(Auth);
   private _router = inject(Router);
   private _firestore = inject(Firestore);
@@ -69,14 +71,26 @@ export class GroupsComponent implements OnInit {
   private _alertController = inject(AlertController);
   private _toastController = inject(ToastController);
   private _actionSheetController = inject(ActionSheetController);
+  private _groupInvitationsService = inject(GroupInvitationsService);
 
   loading = true;
   isInGroup = false;
   groupMembers: string[] = [];
+  pendingInvitations: string[] = [];
   groupMembersData: GroupMember[] = [];
   remainingSlots: number[] = [];
   profileImageUrl: string | null = null;
   userName: string = 'Usuario';
+  
+  // Invitaciones pendientes recibidas
+  pendingInvitationsReceived: GroupInvitation[] = [];
+  
+  // Invitaciones pendientes enviadas por el usuario
+  pendingGroupInvitations: GroupInvitation[] = [];
+  
+  // Suscripciones
+  private invitationsReceivedSubscription: Subscription | null = null;
+  private invitationsSentSubscription: Subscription | null = null;
 
   constructor() {
     // Suscribirse al estado del perfil para detectar cambios en el grupo
@@ -85,7 +99,20 @@ export class GroupsComponent implements OnInit {
       .subscribe(status => {
         this.isInGroup = status.visibility === 'visible_in_group';
         this.groupMembers = status.groupMembers || [];
+        this.pendingInvitations = status.pendingInvitations || [];
         this.loadGroupMembersData();
+      });
+      
+    // Suscribirse a las invitaciones recibidas
+    this.invitationsReceivedSubscription = this._groupInvitationsService.getInvitationsReceived()
+      .subscribe(invitations => {
+        this.pendingInvitationsReceived = invitations;
+      });
+      
+    // Suscribirse a las invitaciones enviadas
+    this.invitationsSentSubscription = this._groupInvitationsService.getInvitationsSent()
+      .subscribe(invitations => {
+        this.pendingGroupInvitations = invitations;
       });
   }
 
@@ -106,6 +133,16 @@ export class GroupsComponent implements OnInit {
       this.loading = false;
     }
   }
+  
+  ngOnDestroy() {
+    if (this.invitationsReceivedSubscription) {
+      this.invitationsReceivedSubscription.unsubscribe();
+    }
+    
+    if (this.invitationsSentSubscription) {
+      this.invitationsSentSubscription.unsubscribe();
+    }
+  }
 
   handleImageError(event: any) {
     event.target.src = 'icons/logo_tesis.png';
@@ -113,6 +150,10 @@ export class GroupsComponent implements OnInit {
 
   navigateToRecommended() {
     this._router.navigateByUrl('/menu/recomendados');
+  }
+  
+  viewInvitations() {
+    this._router.navigateByUrl('/menu/invitaciones');
   }
 
   async handleRefresh(event?: any) {
@@ -224,9 +265,10 @@ export class GroupsComponent implements OnInit {
       this.groupMembersData = membersData.filter(member => member !== null) as GroupMember[];
       console.log('Datos finales filtrados:', this.groupMembersData);
       
-      // Calcular espacios restantes
+      // Calcular espacios restantes (considerando invitaciones pendientes)
       const totalMembers = this.groupMembersData.length;
-      this.remainingSlots = Array(Math.max(0, 5 - totalMembers)).fill(0);
+      const totalPendingInvitations = this.pendingGroupInvitations.length;
+      this.remainingSlots = Array(Math.max(0, 5 - totalMembers - totalPendingInvitations)).fill(0);
       
     } catch (error) {
       console.error('Error al cargar datos de los miembros del grupo:', error);
@@ -323,6 +365,52 @@ export class GroupsComponent implements OnInit {
       ]
     });
 
+    await alert.present();
+  }
+  
+  async cancelPendingInvitation(invitation: GroupInvitation) {
+    if (!invitation.id) return;
+    
+    const alert = await this._alertController.create({
+      header: 'Cancelar invitación',
+      message: `¿Estás seguro de que quieres cancelar la invitación enviada a ${invitation.toUserName || 'este usuario'}?`,
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel'
+        },
+        {
+          text: 'Sí, cancelar',
+          handler: async () => {
+            try {
+              await this._groupInvitationsService.cancelInvitation(invitation.id!);
+              await this._profileVisibilityService.removeInvitation(invitation.toUserId);
+              
+              const toast = await this._toastController.create({
+                message: 'Invitación cancelada',
+                duration: 2000,
+                position: 'bottom',
+                color: 'medium'
+              });
+              await toast.present();
+              
+              // Actualizar la lista
+              await this.loadGroupMembersData();
+            } catch (error) {
+              console.error('Error al cancelar invitación:', error);
+              const toast = await this._toastController.create({
+                message: 'Error al cancelar la invitación',
+                duration: 2000,
+                position: 'bottom',
+                color: 'danger'
+              });
+              await toast.present();
+            }
+          }
+        }
+      ]
+    });
+    
     await alert.present();
   }
 

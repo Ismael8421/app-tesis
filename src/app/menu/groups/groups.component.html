@@ -10,6 +10,22 @@
       <p>Cargando grupos...</p>
     </div>
 
+    <!-- Banner de invitaciones pendientes -->
+    <ion-card *ngIf="!loading && pendingInvitations.length > 0" class="invitations-banner">
+      <ion-card-content>
+        <div class="invitation-content">
+          <ion-icon name="mail-unread-outline"></ion-icon>
+          <div class="invitation-text">
+            <h3>Tienes {{ pendingInvitations.length }} invitación(es) a grupos</h3>
+            <p>Revisa tus invitaciones pendientes</p>
+          </div>
+          <ion-button fill="outline" (click)="viewInvitations()">
+            Ver invitaciones
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
     <!-- Mensaje cuando no hay grupos -->
     <div *ngIf="!loading && !isInGroup" class="no-groups">
       <ion-icon name="people-outline" size="large"></ion-icon>
@@ -71,6 +87,25 @@
             </ion-label>
           </ion-item>
 
+          <!-- Invitaciones pendientes -->
+          <div *ngIf="pendingGroupInvitations.length > 0" class="pending-invitations-section">
+            <h4>Invitaciones pendientes</h4>
+            <ion-item *ngFor="let invitation of pendingGroupInvitations" lines="full" class="member-item pending">
+              <ion-avatar slot="start">
+                <div class="pending-avatar">
+                  <ion-icon name="hourglass-outline"></ion-icon>
+                </div>
+              </ion-avatar>
+              <ion-label>
+                <h2>{{invitation.toUserName || 'Usuario'}}</h2>
+                <p>Pendiente de aceptar</p>
+              </ion-label>
+              <ion-button fill="clear" color="medium" (click)="cancelPendingInvitation(invitation)">
+                <ion-icon name="close-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </div>
+
           <!-- Espacios disponibles -->
           <ion-item *ngFor="let i of remainingSlots" lines="full" class="member-item empty">
             <ion-avatar slot="start">
@@ -87,6 +122,10 @@
 
         <!-- Botones de acción -->
         <div class="action-buttons">
+          <ion-button expand="block" (click)="navigateToRecommended()">
+            <ion-icon name="search-outline" slot="start"></ion-icon>
+            Invitar estudiantes
+          </ion-button>
           <ion-button expand="block" fill="outline" color="danger" (click)="confirmLeaveGroup()">
             <ion-icon name="exit-outline" slot="start"></ion-icon>
             Abandonar grupo

@@ -40,6 +40,54 @@ $dark-secondary: #A3A9B0;
     }
   }
 
+  .invitations-banner {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    background-color: var(--ion-color-light);
+    border-left: 4px solid var(--ion-color-primary);
+
+    @media (prefers-color-scheme: dark) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    ion-card-content {
+      padding: 12px;
+
+      .invitation-content {
+        display: flex;
+        align-items: center;
+        
+        ion-icon {
+          font-size: 24px;
+          color: var(--ion-color-primary);
+          margin-right: 12px;
+        }
+        
+        .invitation-text {
+          flex: 1;
+          
+          h3 {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+            font-weight: 500;
+          }
+          
+          p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--ion-color-medium);
+          }
+        }
+        
+        ion-button {
+          margin: 0;
+          --border-radius: 8px;
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+
   .no-groups {
     display: flex;
     flex-direction: column;
@@ -123,6 +171,13 @@ $dark-secondary: #A3A9B0;
         color: var(--ion-text-color);
       }
 
+      h4 {
+        font-size: 1rem;
+        font-weight: normal;
+        margin: 16px 0 8px 0;
+        color: var(--ion-color-medium);
+      }
+
       .member-item {
         --padding-start: 0;
         --inner-padding-end: 0;
@@ -133,6 +188,29 @@ $dark-secondary: #A3A9B0;
           ion-label h2 {
             color: var(--ion-color-primary);
             font-weight: 500;
+          }
+        }
+
+        &.pending {
+          --background: rgba(var(--ion-color-warning-rgb), 0.08);
+          
+          .pending-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(var(--ion-color-warning-rgb), 0.2);
+            border-radius: 50%;
+
+            ion-icon {
+              font-size: 24px;
+              color: var(--ion-color-warning);
+            }
+          }
+          
+          ion-label h2 {
+            color: var(--ion-color-warning-shade);
           }
         }
 
@@ -181,6 +259,12 @@ $dark-secondary: #A3A9B0;
       }
     }
 
+    .pending-invitations-section {
+      margin-top: 16px;
+      padding-top: 8px;
+      border-top: 1px solid var(--ion-color-light-shade);
+    }
+
     .action-buttons {
       display: flex;
       flex-direction: column;
@@ -204,6 +288,10 @@ $dark-secondary: #A3A9B0;
 
   .empty-avatar {
     background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  .pending-avatar {
+    background-color: rgba(var(--ion-color-warning-rgb), 0.3) !important;
   }
 }
 

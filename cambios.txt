@@ -20,6 +20,8 @@ v80 se agrega grupos y invitaciones de grupos
 
 v81 se agrega menú gruposd
 
+v81.5 se agrega invitaciones a grupos
+
 Contexto
 
 Estamos trabajando en un algoritmo de recomendación para una aplicación educativa que conecta estudiantes universitarios para colaboraciones académicas. La estructura incluye colecciones generales de usuarios y colecciones específicas por carrera (Informatica, IEME, MCM, EMA, Mecatronica, Ciencias).

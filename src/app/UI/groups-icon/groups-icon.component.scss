@@ -1,0 +1,19 @@
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Asegurar que el ícono responde a los colores del tema */
+:host-context(.ion-color-primary) svg {
+    color: var(--ion-color-primary);
+}
+
+:host-context(.ion-color-medium) svg {
+    color: var(--ion-color-medium);
+}

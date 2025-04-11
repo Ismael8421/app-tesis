@@ -163,45 +163,4 @@ export class SettingsComponent implements OnInit {
 
     await alert.present();
   }
-
-  // Método para confirmar y abandonar grupo
-  async confirmLeaveGroup() {
-    const alert = await this.alertController.create({
-      header: 'Abandonar grupo',
-      message: '¿Estás seguro de que quieres abandonar tu grupo actual?',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Abandonar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.profileVisibilityService.leaveGroup();
-              const toast = await this.toastController.create({
-                message: 'Has abandonado el grupo',
-                duration: 2000,
-                position: 'bottom',
-                color: 'primary'
-              });
-              await toast.present();
-            } catch (error) {
-              console.error('Error al abandonar grupo:', error);
-              const toast = await this.toastController.create({
-                message: 'Error al abandonar el grupo',
-                duration: 2000,
-                position: 'bottom',
-                color: 'danger'
-              });
-              await toast.present();
-            }
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
 }

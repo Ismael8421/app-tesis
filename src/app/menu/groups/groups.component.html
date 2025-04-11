@@ -1,0 +1,98 @@
+<ion-content class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-container">
+    <!-- Estado de carga -->
+    <div class="loading-container" *ngIf="loading">
+      <ion-spinner></ion-spinner>
+      <p>Cargando grupos...</p>
+    </div>
+
+    <!-- Mensaje cuando no hay grupos -->
+    <div *ngIf="!loading && !isInGroup" class="no-groups">
+      <ion-icon name="people-outline" size="large"></ion-icon>
+      <h2>No perteneces a ningún grupo</h2>
+      <p>Puedes crear un grupo invitando a otros estudiantes desde la sección de Recomendados.</p>
+      <ion-button expand="block" (click)="navigateToRecommended()">
+        Explorar recomendaciones
+      </ion-button>
+    </div>
+
+    <!-- Información del grupo actual cuando el usuario está en un grupo -->
+    <ion-card *ngIf="!loading && isInGroup" class="group-card">
+      <ion-card-header>
+        <div class="card-header-content">
+          <ion-card-title>
+            <ion-icon name="people" class="group-icon"></ion-icon>
+            Tu grupo actual
+          </ion-card-title>
+          <span class="member-count">
+            {{groupMembers.length + 1}}/6 miembros
+          </span>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="group-info">
+          <p class="info-text" *ngIf="groupMembers.length < 5">
+            Puedes invitar hasta {{5 - groupMembers.length}} estudiantes más a tu grupo.
+          </p>
+          <p class="info-text" *ngIf="groupMembers.length === 5">
+            Has alcanzado el límite de 6 miembros en el grupo (incluyéndote).
+          </p>
+        </div>
+
+        <!-- Miembros del grupo -->
+        <div class="members-list">
+          <h3>Miembros del grupo</h3>
+
+          <!-- Usuario actual (propietario) -->
+          <ion-item lines="full" class="member-item owner">
+            <ion-avatar slot="start">
+              <img [src]="profileImageUrl || 'icons/logo_tesis.png'" (ionError)="handleImageError()">
+            </ion-avatar>
+            <ion-label>
+              <h2>{{userName}} (Tú)</h2>
+              <p>Propietario del grupo</p>
+            </ion-label>
+          </ion-item>
+
+          <!-- Listado de miembros -->
+          <ion-item *ngFor="let member of groupMembersData" lines="full" class="member-item" button detail
+            (click)="openMemberOptions(member)">
+            <ion-avatar slot="start">
+              <img src="icons/logo_tesis.png">
+            </ion-avatar>
+            <ion-label>
+              <h2>{{member.nombreUsuario || 'Usuario'}}</h2>
+              <p>{{member.carrera}} - {{member.anioLectivo}} {{member.paralelo}}</p>
+            </ion-label>
+          </ion-item>
+
+          <!-- Espacios disponibles -->
+          <ion-item *ngFor="let i of remainingSlots" lines="full" class="member-item empty">
+            <ion-avatar slot="start">
+              <div class="empty-avatar">
+                <ion-icon name="add"></ion-icon>
+              </div>
+            </ion-avatar>
+            <ion-label>
+              <h2 class="empty-slot">Espacio disponible</h2>
+              <p>Invita a un estudiante desde Descubrir</p>
+            </ion-label>
+          </ion-item>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+          <ion-button expand="block" fill="outline" color="danger" (click)="confirmLeaveGroup()">
+            <ion-icon name="exit-outline" slot="start"></ion-icon>
+            Abandonar grupo
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

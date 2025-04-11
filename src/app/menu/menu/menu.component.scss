@@ -96,3 +96,23 @@ app-settings-icon {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 }
+
+ion-tab-bar {
+  --background: var(--ion-background-color);
+  --border: 1px solid var(--ion-border-color);
+}
+
+ion-tab-button {
+  --color: var(--ion-color-medium);
+  --color-selected: var(--ion-color-primary);
+}
+
+.tab-selected {
+  .ion-color {
+    color: var(--ion-color-primary);
+  }
+}
+
+.ion-color {
+  color: var(--ion-color-medium);
+}

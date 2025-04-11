@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc, updateDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, updateDoc, arrayRemove } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
@@ -94,6 +94,42 @@ export class ProfileVisibilityService {
       });
     } catch (error) {
       console.error('Error al añadir miembro al grupo:', error);
+      throw error;
+    }
+  }
+
+  // Eliminar miembro del grupo
+  async removeMemberFromGroup(memberId: string): Promise<void> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) throw new Error('No hay usuario autenticado');
+    
+    const currentStatus = this.profileStatus$.value;
+    
+    if (currentStatus.visibility !== 'visible_in_group') {
+      throw new Error('No tienes un grupo activo');
+    }
+    
+    try {
+      // Verificar si el usuario está en el grupo
+      if (!currentStatus.groupMembers.includes(memberId)) {
+        throw new Error('Este usuario no está en tu grupo');
+      }
+      
+      // Actualizar grupo en Firestore usando arrayRemove para quitar al miembro específico
+      await updateDoc(doc(this.firestore, 'profileVisibility', currentUser.uid), {
+        groupMembers: arrayRemove(memberId),
+        updatedAt: new Date()
+      });
+      
+      // Actualizar estado local
+      const updatedMembers = currentStatus.groupMembers.filter(id => id !== memberId);
+      
+      this.profileStatus$.next({
+        ...currentStatus,
+        groupMembers: updatedMembers
+      });
+    } catch (error) {
+      console.error('Error al eliminar miembro del grupo:', error);
       throw error;
     }
   }

@@ -16,8 +16,7 @@ import { AlertController, IonAlert, IonAvatar, IonButton, IonCard, IonCardConten
 import { Firestore, collection, doc, getDoc, getDocs, query, where, limit } from '@angular/fire/firestore';
 import { RejectedProfilesService } from './data-access/rejected-profiles.service';
 import { LikedProfilesService } from './data-access/iked-profiles.service';
-import { ProfileVisibilityService } from './data-access/profile-visibility.service';
-import { GroupInvitationsService } from '../groups/data-access/group-invitations.service';
+import { ProfileVisibilityService, VisibilityType } from './data-access/profile-visibility.service';
 
 register();
 
@@ -72,15 +71,19 @@ export class SearchComponent {
   isInGroup: boolean = false;
   groupMembers: string[] = [];
 
+  userVisibility: VisibilityType = 'visible';
+
+
   constructor(
-    private profileVisibilityService: ProfileVisibilityService
+    private profileVisibilityService: ProfileVisibilityService,
   ) {
     this.profileVisibilityService.getProfileStatus()
-      .subscribe(status => {
-        this.isInGroup = status.visibility === 'visible_in_group';
-        this.groupMembers = status.groupMembers;
-      });
+    .subscribe((status: {visibility: VisibilityType}) => {
+      // Solo guardar el estado de visibilidad, sin funcionalidad de grupos
+      this.userVisibility = status.visibility;
+    });
   }
+  
 
   // Colecciones para las diferentes carreras
   private carreraCollections = [
@@ -1262,87 +1265,5 @@ export class SearchComponent {
       console.error('Error al dar like al perfil:', error);
       this.presentToast('Error al añadir perfil a guardados', 'danger');
     }
-  }
-
-  // Funciones para manejar grupos
-  async createGroup(user: any) {
-    if (!user || !user.uid) return;
-
-    const alert = await this.alertController.create({
-      header: 'Formar grupo',
-      message: `¿Quieres formar un grupo con ${user.nombreUsuario}?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Formar grupo',
-          handler: async () => {
-            try {
-              await this.profileVisibilityService.createGroupWith(user.uid);
-
-              // Mostrar mensaje de éxito
-              const toast = await this.toastController.create({
-                message: `Has formado un grupo con ${user.nombreUsuario}`,
-                duration: 2000,
-                position: 'bottom',
-                color: 'success'
-              });
-              await toast.present();
-
-              // Cambiar botones mostrados
-              this.isInGroup = true;
-              this.groupMembers = [user.uid];
-            } catch (error) {
-              console.error('Error al formar grupo:', error);
-              this.presentToast('Error al formar grupo', 'danger');
-            }
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  async inviteToGroup(user: any) {
-    if (!user || !user.uid) return;
-
-    const alert = await this.alertController.create({
-      header: 'Invitar al grupo',
-      message: `¿Quieres invitar a ${user.nombreUsuario} a tu grupo?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Invitar',
-          handler: async () => {
-            try {
-              await this.profileVisibilityService.addGroupMember(user.uid);
-
-              // Mostrar mensaje de éxito
-              const toast = await this.toastController.create({
-                message: `Has invitado a ${user.nombreUsuario} a tu grupo`,
-                duration: 2000,
-                position: 'bottom',
-                color: 'success'
-              });
-              await toast.present();
-
-              // Actualizar lista de miembros
-              this.groupMembers = [...this.groupMembers, user.uid];
-            } catch (error) {
-              console.error('Error al invitar al grupo:', error);
-              this.presentToast('Error al invitar al grupo', 'danger');
-            }
-          }
-        }
-      ]
-    });
-
-    await alert.present();
   }
 }

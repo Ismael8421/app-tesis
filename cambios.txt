@@ -22,6 +22,8 @@ v81 se agrega menú gruposd
 
 v81.5 se agrega invitaciones a grupos
 
+v82 se elimina todo lo de los grupos y solo queda lo de visibilidad de perfil
+
 Contexto
 
 Estamos trabajando en un algoritmo de recomendación para una aplicación educativa que conecta estudiantes universitarios para colaboraciones académicas. La estructura incluye colecciones generales de usuarios y colecciones específicas por carrera (Informatica, IEME, MCM, EMA, Mecatronica, Ciencias).

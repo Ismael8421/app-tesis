@@ -410,20 +410,6 @@
               </ion-button>
             </div>
 
-            <!-- Añadir después de los botones existentes -->
-            <div class="group-buttons-container">
-              <!-- Botón para formar grupo (visible cuando no está en grupo) -->
-              <ion-button *ngIf="!isInGroup" expand="block" fill="outline" class="group-button"
-                (click)="createGroup(user)">
-                Formar grupo
-              </ion-button>
-
-              <!-- Botón para invitar al grupo (visible cuando ya está en grupo) -->
-              <ion-button *ngIf="isInGroup && groupMembers.length < 5" expand="block" fill="outline"
-                class="group-button" (click)="inviteToGroup(user)">
-                Invitar al grupo
-              </ion-button>
-            </div>
           </ion-card-content>
         </ion-card>
       </swiper-slide>

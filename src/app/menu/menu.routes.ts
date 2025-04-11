@@ -29,14 +29,6 @@ export default [
                 loadChildren: () => import('./favoritos/favoritos.routes')
             },
             {
-                path: 'grupos',
-                loadComponent: () => import('./groups/groups.component').then(m => m.GroupsComponent)
-            },
-            {
-                path: 'invitaciones',
-                loadComponent: () => import('./groups/invitations/invitations.component').then(m => m.InvitationsComponent)
-            },
-            {
                 path: 'configuraciones',
                 loadComponent: () => import('./configs/settings/settings.component').then(m => m.SettingsComponent)
             }

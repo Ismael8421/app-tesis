@@ -160,7 +160,7 @@ export class SettingsComponent implements OnInit {
       `,
       buttons: ['Entendido']
     });
-
+  
     await alert.present();
   }
 }

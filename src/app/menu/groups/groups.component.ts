@@ -17,7 +17,11 @@ import {
   IonButton,
   AlertController,
   ToastController,
-  ActionSheetController
+  ActionSheetController,
+  IonSegment,
+  IonSegmentButton,
+  IonBadge,
+  IonList
 } from '@ionic/angular/standalone';
 import { ProfileVisibilityService } from '../search/data-access/profile-visibility.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -27,6 +31,7 @@ import { ProfileImageService } from '../configs/profile/profile-image.service';
 import { RegisterService } from '../../register/data-access/register.service';
 import { GroupInvitationsService, GroupInvitation } from './data-access/group-invitations.service';
 import { Subscription } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 interface GroupMember {
   uid: string;
@@ -44,6 +49,7 @@ interface GroupMember {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     IonContent,
     IonRefresher,
     IonRefresherContent,
@@ -56,7 +62,11 @@ interface GroupMember {
     IonAvatar,
     IonLabel,
     IonIcon,
-    IonButton
+    IonButton,
+    IonSegment,
+    IonSegmentButton,
+    IonBadge,
+    IonList
   ],
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.scss'
@@ -81,13 +91,16 @@ export class GroupsComponent implements OnInit, OnDestroy {
   remainingSlots: number[] = [];
   profileImageUrl: string | null = null;
   userName: string = 'Usuario';
-  
+
   // Invitaciones pendientes recibidas
   pendingInvitationsReceived: GroupInvitation[] = [];
-  
+
   // Invitaciones pendientes enviadas por el usuario
   pendingGroupInvitations: GroupInvitation[] = [];
-  
+
+  // Controla qué tab está seleccionada (grupos o invitaciones)
+  selectedTab: string = 'groups';
+
   // Suscripciones
   private invitationsReceivedSubscription: Subscription | null = null;
   private invitationsSentSubscription: Subscription | null = null;
@@ -102,13 +115,13 @@ export class GroupsComponent implements OnInit, OnDestroy {
         this.pendingInvitations = status.pendingInvitations || [];
         this.loadGroupMembersData();
       });
-      
+
     // Suscribirse a las invitaciones recibidas
     this.invitationsReceivedSubscription = this._groupInvitationsService.getInvitationsReceived()
       .subscribe(invitations => {
         this.pendingInvitationsReceived = invitations;
       });
-      
+
     // Suscribirse a las invitaciones enviadas
     this.invitationsSentSubscription = this._groupInvitationsService.getInvitationsSent()
       .subscribe(invitations => {
@@ -132,13 +145,17 @@ export class GroupsComponent implements OnInit, OnDestroy {
     } finally {
       this.loading = false;
     }
+
+    if (this.pendingInvitationsReceived.length > 0) {
+      this.selectedTab = 'invitations';
+    }
   }
-  
+
   ngOnDestroy() {
     if (this.invitationsReceivedSubscription) {
       this.invitationsReceivedSubscription.unsubscribe();
     }
-    
+
     if (this.invitationsSentSubscription) {
       this.invitationsSentSubscription.unsubscribe();
     }
@@ -151,9 +168,9 @@ export class GroupsComponent implements OnInit, OnDestroy {
   navigateToRecommended() {
     this._router.navigateByUrl('/menu/recomendados');
   }
-  
+
   viewInvitations() {
-    this._router.navigateByUrl('/menu/invitaciones');
+    this.selectedTab = 'invitations';
   }
 
   async handleRefresh(event?: any) {
@@ -174,31 +191,31 @@ export class GroupsComponent implements OnInit, OnDestroy {
   async loadGroupMembersData() {
     try {
       this.groupMembersData = [];
-      
+
       // Si no está en un grupo o no hay miembros, mostrar los slots vacíos
       if (!this.isInGroup || this.groupMembers.length === 0) {
         this.remainingSlots = Array(5).fill(0);
         this.loading = false;
         return;
       }
-  
+
       // Cargar datos de cada miembro del grupo
       const membersPromises = this.groupMembers.map(async (memberId) => {
         try {
           // Primero obtenemos los datos básicos para saber la carrera
           const userDoc = await getDoc(doc(this._firestore, 'usuarios', memberId));
-          
+
           if (!userDoc.exists()) {
             console.log(`No se encontraron datos para el miembro ${memberId}`);
             return null;
           }
-          
+
           const userData = userDoc.data();
           const userCarrera = userData['carrera'];
-          
+
           // Obtener la URL de la imagen de perfil
           let profileImageUrl = userData['profileImageUrl'] || null;
-          
+
           if (!userCarrera) {
             console.log(`No se encontró carrera para el miembro ${memberId}`);
             return {
@@ -212,22 +229,22 @@ export class GroupsComponent implements OnInit, OnDestroy {
               profileImageUrl: profileImageUrl
             } as GroupMember;
           }
-          
+
           console.log(`Carrera del miembro ${memberId}: ${userCarrera}`);
-          
+
           // Ahora buscamos los datos académicos en la colección correspondiente a su carrera
           const carreraDoc = await getDoc(doc(this._firestore, userCarrera, memberId));
-          
+
           let anioLectivo = '';
           let paralelo = '';
-          
+
           if (carreraDoc.exists()) {
             const carreraData = carreraDoc.data();
             anioLectivo = carreraData['anioLectivo'] || '';
             paralelo = carreraData['paralelo'] || '';
             const nombreUsuario = carreraData['nombreUsuario'] || '';
             console.log(`Datos académicos encontrados: Año=${anioLectivo}, Paralelo=${paralelo}, Nombre=${nombreUsuario}`);
-            
+
             return {
               uid: memberId,
               nombreUsuario: nombreUsuario || userData['nombreUsuario'] || 'Usuario',
@@ -241,7 +258,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
           } else {
             console.warn(`No se encontraron datos académicos en la colección ${userCarrera} para el miembro ${memberId}`);
           }
-          
+
           return {
             uid: memberId,
             nombreUsuario: userData['nombreUsuario'] || 'Usuario',
@@ -257,19 +274,19 @@ export class GroupsComponent implements OnInit, OnDestroy {
           return null;
         }
       });
-  
+
       const membersData = await Promise.all(membersPromises);
       console.log('Datos finales de todos los miembros:', membersData);
-      
+
       // Filtrar los miembros nulos (error al cargar)
       this.groupMembersData = membersData.filter(member => member !== null) as GroupMember[];
       console.log('Datos finales filtrados:', this.groupMembersData);
-      
+
       // Calcular espacios restantes (considerando invitaciones pendientes)
       const totalMembers = this.groupMembersData.length;
       const totalPendingInvitations = this.pendingGroupInvitations.length;
       this.remainingSlots = Array(Math.max(0, 5 - totalMembers - totalPendingInvitations)).fill(0);
-      
+
     } catch (error) {
       console.error('Error al cargar datos de los miembros del grupo:', error);
     } finally {
@@ -339,10 +356,10 @@ export class GroupsComponent implements OnInit, OnDestroy {
             try {
               // Implementar la lógica para eliminar al miembro
               await this._profileVisibilityService.removeMemberFromGroup(member.uid);
-              
+
               // Actualizar la lista
               await this.loadGroupMembersData();
-              
+
               const toast = await this._toastController.create({
                 message: `${member.nombreUsuario} ha sido eliminado del grupo`,
                 duration: 2000,
@@ -367,10 +384,10 @@ export class GroupsComponent implements OnInit, OnDestroy {
 
     await alert.present();
   }
-  
+
   async cancelPendingInvitation(invitation: GroupInvitation) {
     if (!invitation.id) return;
-    
+
     const alert = await this._alertController.create({
       header: 'Cancelar invitación',
       message: `¿Estás seguro de que quieres cancelar la invitación enviada a ${invitation.toUserName || 'este usuario'}?`,
@@ -385,7 +402,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
             try {
               await this._groupInvitationsService.cancelInvitation(invitation.id!);
               await this._profileVisibilityService.removeInvitation(invitation.toUserId);
-              
+
               const toast = await this._toastController.create({
                 message: 'Invitación cancelada',
                 duration: 2000,
@@ -393,7 +410,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
                 color: 'medium'
               });
               await toast.present();
-              
+
               // Actualizar la lista
               await this.loadGroupMembersData();
             } catch (error) {
@@ -410,7 +427,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
         }
       ]
     });
-    
+
     await alert.present();
   }
 
@@ -452,5 +469,91 @@ export class GroupsComponent implements OnInit, OnDestroy {
     });
 
     await alert.present();
+  }
+
+  // Gestiona el cambio entre pestañas
+  segmentChanged(event: any) {
+    this.selectedTab = event.detail.value;
+  }
+
+  async acceptInvitation(invitation: GroupInvitation) {
+    if (!invitation.id) return;
+    
+    const alert = await this._alertController.create({
+      header: 'Aceptar invitación',
+      message: `¿Quieres unirte al grupo de ${invitation.fromUserName}?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Aceptar',
+          handler: async () => {
+            try {
+              await this._groupInvitationsService.acceptInvitation(invitation.id!);
+              this.presentToast(`Te has unido al grupo de ${invitation.fromUserName}`, 'success');
+              
+              // Cambiar a la pestaña de grupos
+              this.selectedTab = 'groups';
+              
+              // Actualizar los datos
+              await this.loadGroupMembersData();
+            } catch (error) {
+              console.error('Error al aceptar invitación:', error);
+              this.presentToast('Error al aceptar la invitación', 'danger');
+            }
+          }
+        }
+      ]
+    });
+    
+    await alert.present();
+  }
+  
+  async rejectInvitation(invitation: GroupInvitation) {
+    if (!invitation.id) return;
+    
+    const alert = await this._alertController.create({
+      header: 'Rechazar invitación',
+      message: `¿Quieres rechazar la invitación de ${invitation.fromUserName}?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Rechazar',
+          handler: async () => {
+            try {
+              await this._groupInvitationsService.rejectInvitation(invitation.id!);
+              this.presentToast('Invitación rechazada', 'medium');
+            } catch (error) {
+              console.error('Error al rechazar invitación:', error);
+              this.presentToast('Error al rechazar la invitación', 'danger');
+            }
+          }
+        }
+      ]
+    });
+    
+    await alert.present();
+  }
+  
+  async presentToast(message: string, color: string = 'success') {
+    const toast = await this._toastController.create({
+      message,
+      duration: 2000,
+      position: 'bottom',
+      color,
+      buttons: [
+        {
+          text: 'Cerrar',
+          role: 'cancel'
+        }
+      ]
+    });
+    
+    await toast.present();
   }
 }

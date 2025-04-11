@@ -4,134 +4,212 @@
   </ion-refresher>
 
   <div class="page-container">
-    <!-- Estado de carga -->
-    <div class="loading-container" *ngIf="loading">
-      <ion-spinner></ion-spinner>
-      <p>Cargando grupos...</p>
+    <!-- Barra de navegación/segmentos -->
+    <div class="segment-container">
+      <ion-segment [(ngModel)]="selectedTab" (ionChange)="segmentChanged($event)">
+        <ion-segment-button value="groups">
+          <ion-label>Mis Grupos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="invitations">
+          <ion-label>Invitaciones <ion-badge *ngIf="pendingInvitationsReceived.length > 0">{{ pendingInvitationsReceived.length }}</ion-badge></ion-label>
+        </ion-segment-button>
+      </ion-segment>
     </div>
 
-    <!-- Banner de invitaciones pendientes -->
-    <ion-card *ngIf="!loading && pendingInvitations.length > 0" class="invitations-banner">
-      <ion-card-content>
-        <div class="invitation-content">
-          <ion-icon name="mail-unread-outline"></ion-icon>
-          <div class="invitation-text">
-            <h3>Tienes {{ pendingInvitations.length }} invitación(es) a grupos</h3>
-            <p>Revisa tus invitaciones pendientes</p>
+    <!-- Vista de GRUPOS -->
+    <div *ngIf="selectedTab === 'groups'">
+      <!-- Estado de carga -->
+      <div class="loading-container" *ngIf="loading">
+        <ion-spinner></ion-spinner>
+        <p>Cargando grupos...</p>
+      </div>
+
+      <!-- Mensaje cuando no hay grupos -->
+      <div *ngIf="!loading && !isInGroup" class="no-groups">
+        <ion-icon name="people-outline" size="large"></ion-icon>
+        <h2>No perteneces a ningún grupo</h2>
+        <p>Puedes crear un grupo invitando a otros estudiantes desde la sección de Recomendados.</p>
+        <ion-button expand="block" (click)="navigateToRecommended()">
+          Explorar recomendaciones
+        </ion-button>
+      </div>
+
+      <!-- Información del grupo actual cuando el usuario está en un grupo -->
+      <ion-card *ngIf="!loading && isInGroup" class="group-card">
+        <ion-card-header>
+          <div class="card-header-content">
+            <ion-card-title>
+              <ion-icon name="people" class="group-icon"></ion-icon>
+              Tu grupo actual
+            </ion-card-title>
+            <span class="member-count">
+              {{groupMembers.length + 1}}/6 miembros
+            </span>
           </div>
-          <ion-button fill="outline" (click)="viewInvitations()">
-            Ver invitaciones
-          </ion-button>
-        </div>
-      </ion-card-content>
-    </ion-card>
+        </ion-card-header>
 
-    <!-- Mensaje cuando no hay grupos -->
-    <div *ngIf="!loading && !isInGroup" class="no-groups">
-      <ion-icon name="people-outline" size="large"></ion-icon>
-      <h2>No perteneces a ningún grupo</h2>
-      <p>Puedes crear un grupo invitando a otros estudiantes desde la sección de Recomendados.</p>
-      <ion-button expand="block" (click)="navigateToRecommended()">
-        Explorar recomendaciones
-      </ion-button>
-    </div>
+        <ion-card-content>
+          <div class="group-info">
+            <p class="info-text" *ngIf="groupMembers.length < 5">
+              Puedes invitar hasta {{5 - groupMembers.length}} estudiantes más a tu grupo.
+            </p>
+            <p class="info-text" *ngIf="groupMembers.length === 5">
+              Has alcanzado el límite de 6 miembros en el grupo (incluyéndote).
+            </p>
+          </div>
 
-    <!-- Información del grupo actual cuando el usuario está en un grupo -->
-    <ion-card *ngIf="!loading && isInGroup" class="group-card">
-      <ion-card-header>
-        <div class="card-header-content">
-          <ion-card-title>
-            <ion-icon name="people" class="group-icon"></ion-icon>
-            Tu grupo actual
-          </ion-card-title>
-          <span class="member-count">
-            {{groupMembers.length + 1}}/6 miembros
-          </span>
-        </div>
-      </ion-card-header>
+          <!-- Miembros del grupo -->
+          <div class="members-list">
+            <h3>Miembros del grupo</h3>
 
-      <ion-card-content>
-        <div class="group-info">
-          <p class="info-text" *ngIf="groupMembers.length < 5">
-            Puedes invitar hasta {{5 - groupMembers.length}} estudiantes más a tu grupo.
-          </p>
-          <p class="info-text" *ngIf="groupMembers.length === 5">
-            Has alcanzado el límite de 6 miembros en el grupo (incluyéndote).
-          </p>
-        </div>
-
-        <!-- Miembros del grupo -->
-        <div class="members-list">
-          <h3>Miembros del grupo</h3>
-
-          <!-- Usuario actual (propietario) -->
-          <ion-item lines="full" class="member-item owner">
-            <ion-avatar slot="start">
-              <img [src]="profileImageUrl || 'icons/logo_tesis.png'" (ionError)="handleImageError($event)">
-            </ion-avatar>
-            <ion-label>
-              <h2>{{userName}} (Tú)</h2>
-              <p>Propietario del grupo</p>
-            </ion-label>
-          </ion-item>
-
-          <!-- Listado de miembros -->
-          <ion-item *ngFor="let member of groupMembersData" lines="full" class="member-item" button detail
-            (click)="openMemberOptions(member)">
-            <ion-avatar slot="start">
-              <img [src]="member.profileImageUrl || 'icons/logo_tesis.png'" (ionError)="handleImageError($event)">
-            </ion-avatar>
-            <ion-label>
-              <h2>{{member.nombreUsuario || 'Usuario'}}</h2>
-              <p>{{member.carrera}} - {{member.anioLectivo}} {{member.paralelo}}</p>
-            </ion-label>
-          </ion-item>
-
-          <!-- Invitaciones pendientes -->
-          <div *ngIf="pendingGroupInvitations.length > 0" class="pending-invitations-section">
-            <h4>Invitaciones pendientes</h4>
-            <ion-item *ngFor="let invitation of pendingGroupInvitations" lines="full" class="member-item pending">
+            <!-- Usuario actual (propietario) -->
+            <ion-item lines="full" class="member-item owner">
               <ion-avatar slot="start">
-                <div class="pending-avatar">
-                  <ion-icon name="hourglass-outline"></ion-icon>
+                <img [src]="profileImageUrl || 'icons/logo_tesis.png'" (ionError)="handleImageError($event)">
+              </ion-avatar>
+              <ion-label>
+                <h2>{{userName}} (Tú)</h2>
+                <p>Propietario del grupo</p>
+              </ion-label>
+            </ion-item>
+
+            <!-- Listado de miembros -->
+            <ion-item *ngFor="let member of groupMembersData" lines="full" class="member-item" button detail
+              (click)="openMemberOptions(member)">
+              <ion-avatar slot="start">
+                <img [src]="member.profileImageUrl || 'icons/logo_tesis.png'" (ionError)="handleImageError($event)">
+              </ion-avatar>
+              <ion-label>
+                <h2>{{member.nombreUsuario || 'Usuario'}}</h2>
+                <p>{{member.carrera}} - {{member.anioLectivo}} {{member.paralelo}}</p>
+              </ion-label>
+            </ion-item>
+
+            <!-- Invitaciones pendientes -->
+            <div *ngIf="pendingGroupInvitations.length > 0" class="pending-invitations-section">
+              <h4>Invitaciones pendientes</h4>
+              <ion-item *ngFor="let invitation of pendingGroupInvitations" lines="full" class="member-item pending">
+                <ion-avatar slot="start">
+                  <div class="pending-avatar">
+                    <ion-icon name="hourglass-outline"></ion-icon>
+                  </div>
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{invitation.toUserName || 'Usuario'}}</h2>
+                  <p>Pendiente de aceptar</p>
+                </ion-label>
+                <ion-button fill="clear" color="medium" (click)="cancelPendingInvitation(invitation)">
+                  <ion-icon name="close-outline"></ion-icon>
+                </ion-button>
+              </ion-item>
+            </div>
+
+            <!-- Espacios disponibles -->
+            <ion-item *ngFor="let i of remainingSlots" lines="full" class="member-item empty">
+              <ion-avatar slot="start">
+                <div class="empty-avatar">
+                  <ion-icon name="add"></ion-icon>
                 </div>
               </ion-avatar>
               <ion-label>
-                <h2>{{invitation.toUserName || 'Usuario'}}</h2>
-                <p>Pendiente de aceptar</p>
+                <h2 class="empty-slot">Espacio disponible</h2>
+                <p>Invita a un estudiante desde Descubrir</p>
               </ion-label>
-              <ion-button fill="clear" color="medium" (click)="cancelPendingInvitation(invitation)">
-                <ion-icon name="close-outline"></ion-icon>
-              </ion-button>
             </ion-item>
           </div>
 
-          <!-- Espacios disponibles -->
-          <ion-item *ngFor="let i of remainingSlots" lines="full" class="member-item empty">
-            <ion-avatar slot="start">
-              <div class="empty-avatar">
-                <ion-icon name="add"></ion-icon>
-              </div>
-            </ion-avatar>
-            <ion-label>
-              <h2 class="empty-slot">Espacio disponible</h2>
-              <p>Invita a un estudiante desde Descubrir</p>
-            </ion-label>
-          </ion-item>
+          <!-- Botones de acción -->
+          <div class="action-buttons">
+            <ion-button expand="block" (click)="navigateToRecommended()">
+              <ion-icon name="search-outline" slot="start"></ion-icon>
+              Invitar estudiantes
+            </ion-button>
+            <ion-button expand="block" fill="outline" color="danger" (click)="confirmLeaveGroup()">
+              <ion-icon name="exit-outline" slot="start"></ion-icon>
+              Abandonar grupo
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Vista de INVITACIONES -->
+    <div *ngIf="selectedTab === 'invitations'">
+      <!-- Contenido de invitaciones -->
+      <div class="invitations-container">
+        <!-- Invitaciones recibidas -->
+        <ion-card *ngIf="pendingInvitationsReceived.length > 0" class="invitation-card">
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="mail-outline"></ion-icon>
+              Invitaciones recibidas
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list lines="full">
+              <ion-item *ngFor="let invitation of pendingInvitationsReceived" class="invitation-item">
+                <ion-avatar slot="start">
+                  <img [src]="invitation.fromUserProfileImage || 'icons/logo_tesis.png'" (ionError)="handleImageError($event)">
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{ invitation.fromUserName }}</h2>
+                  <p>Te invita a unirte a su grupo</p>
+                  <p>
+                    <small>{{ invitation.timestamp | date:'short' }}</small>
+                  </p>
+                </ion-label>
+                <div class="invitation-actions">
+                  <ion-button fill="clear" color="success" (click)="acceptInvitation(invitation)">
+                    <ion-icon name="checkmark-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                  <ion-button fill="clear" color="danger" (click)="rejectInvitation(invitation)">
+                    <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Invitaciones enviadas -->
+        <ion-card *ngIf="pendingGroupInvitations.length > 0" class="invitation-card">
+          <ion-card-header>
+            <ion-card-title>
+              <ion-icon name="paper-plane-outline"></ion-icon>
+              Invitaciones enviadas
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list lines="full">
+              <ion-item *ngFor="let invitation of pendingGroupInvitations" class="invitation-item">
+                <ion-label>
+                  <h2>{{ invitation.toUserName || 'Usuario' }}</h2>
+                  <p>Pendiente de aceptación</p>
+                  <p>
+                    <small>{{ invitation.timestamp | date:'short' }}</small>
+                  </p>
+                </ion-label>
+                <ion-button fill="clear" color="medium" (click)="cancelPendingInvitation(invitation)">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Mensaje cuando no hay invitaciones -->
+        <div *ngIf="pendingInvitationsReceived.length === 0 && pendingGroupInvitations.length === 0 && !loading" class="no-invitations">
+          <ion-icon name="mail-outline" size="large"></ion-icon>
+          <h2>No hay invitaciones</h2>
+          <p>Actualmente no tienes invitaciones a grupos pendientes</p>
         </div>
 
-        <!-- Botones de acción -->
-        <div class="action-buttons">
-          <ion-button expand="block" (click)="navigateToRecommended()">
-            <ion-icon name="search-outline" slot="start"></ion-icon>
-            Invitar estudiantes
-          </ion-button>
-          <ion-button expand="block" fill="outline" color="danger" (click)="confirmLeaveGroup()">
-            <ion-icon name="exit-outline" slot="start"></ion-icon>
-            Abandonar grupo
-          </ion-button>
+        <!-- Estado de carga -->
+        <div *ngIf="loading" class="loading-container">
+          <ion-spinner></ion-spinner>
+          <p>Cargando invitaciones...</p>
         </div>
-      </ion-card-content>
-    </ion-card>
+      </div>
+    </div>
   </div>
 </ion-content>

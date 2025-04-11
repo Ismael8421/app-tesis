@@ -18,7 +18,7 @@ Despues de la v78.3 o sea en la v79 se vuelve a trabajar con FCM y functions
 
 v80 se agrega grupos y invitaciones de grupos
 
-v81 se agrega menú grupos
+v81 se agrega menú gruposd
 
 Contexto
 

@@ -139,11 +139,11 @@ export class GroupsComponent implements OnInit {
         this.loading = false;
         return;
       }
-
+  
       // Cargar datos de cada miembro del grupo
       const membersPromises = this.groupMembers.map(async (memberId) => {
         try {
-          // Obtener datos del usuario desde Firestore
+          // Primero obtenemos los datos básicos para saber la carrera
           const userDoc = await getDoc(doc(this._firestore, 'usuarios', memberId));
           
           if (!userDoc.exists()) {
@@ -152,25 +152,70 @@ export class GroupsComponent implements OnInit {
           }
           
           const userData = userDoc.data();
+          const userCarrera = userData['carrera'];
+          
+          if (!userCarrera) {
+            console.log(`No se encontró carrera para el miembro ${memberId}`);
+            return {
+              uid: memberId,
+              nombreUsuario: userData['nombreUsuario'] || 'Usuario',
+              nombre: userData['nombre'] || '',
+              apellido: userData['apellido'] || '',
+              carrera: 'Sin carrera',
+              anioLectivo: '',
+              paralelo: ''
+            } as GroupMember;
+          }
+          
+          console.log(`Carrera del miembro ${memberId}: ${userCarrera}`);
+          
+          // Ahora buscamos los datos académicos en la colección correspondiente a su carrera
+          const carreraDoc = await getDoc(doc(this._firestore, userCarrera, memberId));
+          
+          let anioLectivo = '';
+          let paralelo = '';
+          
+          if (carreraDoc.exists()) {
+            const carreraData = carreraDoc.data();
+            anioLectivo = carreraData['anioLectivo'] || '';
+            paralelo = carreraData['paralelo'] || '';
+            const nombreUsuario = carreraData['nombreUsuario'] || '';
+            console.log(`Datos académicos encontrados: Año=${anioLectivo}, Paralelo=${paralelo}, Nombre=${nombreUsuario}`);
+            
+            return {
+              uid: memberId,
+              nombreUsuario: nombreUsuario || userData['nombreUsuario'] || 'Usuario',
+              nombre: userData['nombre'] || '',
+              apellido: userData['apellido'] || '',
+              carrera: userCarrera || 'Sin carrera',
+              anioLectivo: anioLectivo,
+              paralelo: paralelo
+            } as GroupMember;
+          } else {
+            console.warn(`No se encontraron datos académicos en la colección ${userCarrera} para el miembro ${memberId}`);
+          }
+          
           return {
             uid: memberId,
             nombreUsuario: userData['nombreUsuario'] || 'Usuario',
             nombre: userData['nombre'] || '',
             apellido: userData['apellido'] || '',
-            carrera: userData['carrera'] || '',
-            anioLectivo: userData['anioLectivo'] || '',
-            paralelo: userData['paralelo'] || ''
+            carrera: userCarrera || 'Sin carrera',
+            anioLectivo: anioLectivo,
+            paralelo: paralelo
           } as GroupMember;
         } catch (error) {
           console.error(`Error al cargar datos del miembro ${memberId}:`, error);
           return null;
         }
       });
-
+  
       const membersData = await Promise.all(membersPromises);
+      console.log('Datos finales de todos los miembros:', membersData);
       
       // Filtrar los miembros nulos (error al cargar)
       this.groupMembersData = membersData.filter(member => member !== null) as GroupMember[];
+      console.log('Datos finales filtrados:', this.groupMembersData);
       
       // Calcular espacios restantes
       const totalMembers = this.groupMembersData.length;

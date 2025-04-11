@@ -51,7 +51,7 @@
           <!-- Usuario actual (propietario) -->
           <ion-item lines="full" class="member-item owner">
             <ion-avatar slot="start">
-              <img [src]="profileImageUrl || 'icons/logo_tesis.png'" (ionError)="handleImageError()">
+              <img [src]="profileImageUrl || 'icons/logo_tesis.png'" (ionError)="handleImageError($event)">
             </ion-avatar>
             <ion-label>
               <h2>{{userName}} (Tú)</h2>
@@ -63,7 +63,7 @@
           <ion-item *ngFor="let member of groupMembersData" lines="full" class="member-item" button detail
             (click)="openMemberOptions(member)">
             <ion-avatar slot="start">
-              <img src="icons/logo_tesis.png">
+              <img [src]="member.profileImageUrl || 'icons/logo_tesis.png'" (ionError)="handleImageError($event)">
             </ion-avatar>
             <ion-label>
               <h2>{{member.nombreUsuario || 'Usuario'}}</h2>

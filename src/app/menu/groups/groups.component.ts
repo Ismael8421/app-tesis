@@ -34,6 +34,7 @@ interface GroupMember {
   carrera?: string;
   anioLectivo?: string;
   paralelo?: string;
+  profileImageUrl?: string;
 }
 
 @Component({
@@ -106,8 +107,8 @@ export class GroupsComponent implements OnInit {
     }
   }
 
-  handleImageError() {
-    this.profileImageUrl = 'icons/logo_tesis.png';
+  handleImageError(event: any) {
+    event.target.src = 'icons/logo_tesis.png';
   }
 
   navigateToRecommended() {
@@ -154,6 +155,9 @@ export class GroupsComponent implements OnInit {
           const userData = userDoc.data();
           const userCarrera = userData['carrera'];
           
+          // Obtener la URL de la imagen de perfil
+          let profileImageUrl = userData['profileImageUrl'] || null;
+          
           if (!userCarrera) {
             console.log(`No se encontró carrera para el miembro ${memberId}`);
             return {
@@ -163,7 +167,8 @@ export class GroupsComponent implements OnInit {
               apellido: userData['apellido'] || '',
               carrera: 'Sin carrera',
               anioLectivo: '',
-              paralelo: ''
+              paralelo: '',
+              profileImageUrl: profileImageUrl
             } as GroupMember;
           }
           
@@ -189,7 +194,8 @@ export class GroupsComponent implements OnInit {
               apellido: userData['apellido'] || '',
               carrera: userCarrera || 'Sin carrera',
               anioLectivo: anioLectivo,
-              paralelo: paralelo
+              paralelo: paralelo,
+              profileImageUrl: profileImageUrl
             } as GroupMember;
           } else {
             console.warn(`No se encontraron datos académicos en la colección ${userCarrera} para el miembro ${memberId}`);
@@ -202,7 +208,8 @@ export class GroupsComponent implements OnInit {
             apellido: userData['apellido'] || '',
             carrera: userCarrera || 'Sin carrera',
             anioLectivo: anioLectivo,
-            paralelo: paralelo
+            paralelo: paralelo,
+            profileImageUrl: profileImageUrl
           } as GroupMember;
         } catch (error) {
           console.error(`Error al cargar datos del miembro ${memberId}:`, error);

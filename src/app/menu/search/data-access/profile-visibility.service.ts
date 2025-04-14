@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { UserActivityService } from '../../shared/data-access/user-activity.service';
 
 export type VisibilityType = 'visible' | 'visible_in_group' | 'invisible';
 
@@ -39,6 +40,7 @@ export class ProfileVisibilityService {
     const currentStatus = this.profileStatus$.value;
     
     try {
+      // Guardamos la fecha de actualización
       await setDoc(doc(this.firestore, 'profileVisibility', currentUser.uid), {
         visibility,
         updatedAt: new Date()
@@ -49,6 +51,18 @@ export class ProfileVisibilityService {
         ...currentStatus,
         visibility
       });
+      
+      // Si se está integrando con UserActivityService, registrar esta acción como actividad
+      try {
+        // Verificar si el servicio está disponible mediante inyección dinámica
+        const activityService = inject(UserActivityService, { optional: true });
+        if (activityService) {
+          activityService.registerActivity('visibility_change');
+        }
+      } catch (e) {
+        // Si no está disponible el servicio, ignorar silenciosamente
+        console.log('UserActivityService no disponible, no se registra actividad');
+      }
     } catch (error) {
       console.error('Error al cambiar visibilidad del perfil:', error);
       throw new Error('No se pudo cambiar la visibilidad');

@@ -17,6 +17,7 @@ import { Firestore, collection, doc, getDoc, getDocs, query, where, limit } from
 import { RejectedProfilesService } from './data-access/rejected-profiles.service';
 import { LikedProfilesService } from './data-access/iked-profiles.service';
 import { ProfileVisibilityService, VisibilityType } from './data-access/profile-visibility.service';
+import { UserActivityService } from '../shared/data-access/user-activity.service';
 
 register();
 
@@ -49,6 +50,7 @@ export class SearchComponent {
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
   private likedProfilesService = inject(LikedProfilesService);
+  private userActivityService = inject(UserActivityService);
 
   recommendedUsers: any[] = [];
   loading = true;
@@ -189,9 +191,13 @@ export class SearchComponent {
       console.error('No user logged in');
       return;
     }
-
+  
     try {
       const chatId = await this.chatService.startChat(currentUser.uid, otherUserId);
+      
+      // Registrar inicio de chat como actividad importante
+      this.userActivityService.registerActivity('start_chat');
+      
       if (chatId) {
         this.router.navigate(['/menu/mensajes', chatId]);
       }
@@ -1126,33 +1132,36 @@ export class SearchComponent {
       return;
     }
 
-    try {
-      // 1. Obtener la tarjeta actual para animar
-      const swiperEl = document.querySelector('swiper-container');
-      if (!swiperEl || !swiperEl.swiper) return;
+  try {
+    // 1. Obtener la tarjeta actual para animar
+    const swiperEl = document.querySelector('swiper-container');
+    if (!swiperEl || !swiperEl.swiper) return;
 
-      const activeIndex = swiperEl.swiper.activeIndex;
-      const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
-      if (!activeSlide) return;
+    const activeIndex = swiperEl.swiper.activeIndex;
+    const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
+    if (!activeSlide) return;
 
-      const card = activeSlide.querySelector('ion-card');
-      if (!card) return;
+    const card = activeSlide.querySelector('ion-card');
+    if (!card) return;
 
-      // 2. Aplicar clase de animación
-      activeSlide.classList.add('animating');
-      card.classList.add('profile-rejected');
+    // 2. Aplicar clase de animación
+    activeSlide.classList.add('animating');
+    card.classList.add('profile-rejected');
 
-      // 3. Rechazar en Firebase mientras se reproduce la animación
-      this.rejectedProfilesService.rejectProfile(user.uid);
+    // 3. Rechazar en Firebase mientras se reproduce la animación
+    this.rejectedProfilesService.rejectProfile(user.uid);
+    
+    // 4. Registrar la actividad de rechazo
+    this.userActivityService.registerActivity('profile_reject');
 
-      // 4. Esperar a que termine la animación
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // 5. Eliminar el usuario de las recomendaciones
+    // 5. Esperar a que termine la animación
+    await new Promise(resolve => setTimeout(resolve, 500));
+  
+      // 6. Eliminar el usuario de las recomendaciones
       this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
       this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
-
-      // 6. Gestionar el estado después de eliminar
+  
+      // 7. Gestionar el estado después de eliminar
       if (this.recommendedUsers.length === 0 && this.allPotentialMatches.length > 0) {
         // Si no quedan recomendaciones mostradas pero hay más disponibles
         await this.loadNextBatch();
@@ -1168,7 +1177,7 @@ export class SearchComponent {
           swiperEl.swiper.update();
         }
       }
-
+  
       // Opcional: mostrar un toast muy breve
       const toast = await this.toastController.create({
         message: 'Perfil rechazado',
@@ -1178,7 +1187,7 @@ export class SearchComponent {
         cssClass: 'reject-toast'
       });
       await toast.present();
-
+  
     } catch (error) {
       console.error('Error al rechazar perfil:', error);
       this.presentToast('Error al rechazar perfil', 'danger');
@@ -1206,33 +1215,32 @@ export class SearchComponent {
     if (!user || !user.uid) {
       console.error('ID de usuario no válido para dar like');
       return;
-    }
+    }  
 
     try {
       // 1. Obtener la tarjeta actual para animar
       const swiperEl = document.querySelector('swiper-container');
       if (!swiperEl || !swiperEl.swiper) return;
-
+  
       const activeIndex = swiperEl.swiper.activeIndex;
       const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
       if (!activeSlide) return;
-
+  
       const card = activeSlide.querySelector('ion-card');
       if (!card) return;
-
-      // 2. Aplicar clase de animación (opcional: puedes crear una animación específica para likes)
+  
+      // 2. Aplicar clase de animación
       activeSlide.classList.add('animating');
       card.classList.add('profile-liked');
-
+  
       // 3. Registrar el like en Firebase mientras se reproduce la animación
       this.likedProfilesService.likeProfile(user.uid);
-
-      // 4. Esperar a que termine la animación
+      
+      // 4. Registrar la actividad de dar like
+      this.userActivityService.registerActivity('profile_like');
+  
+      // 5. Esperar a que termine la animación
       await new Promise(resolve => setTimeout(resolve, 500));
-
-      // 5. Eliminar el usuario de las recomendaciones
-      this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
-      this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
 
       // 6. Gestionar el estado después de eliminar
       if (this.recommendedUsers.length === 0 && this.allPotentialMatches.length > 0) {

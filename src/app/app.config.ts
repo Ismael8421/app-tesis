@@ -10,6 +10,7 @@ import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideHttpClient } from '@angular/common/http';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { UserActivityService } from './menu/shared/data-access/user-activity.service';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWICQxQQutJ-7t3hjIZP9QRuhtszoNkM8",
@@ -33,6 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideIonicAngular({}),
     provideMessaging(() => getMessaging()), 
     provideStorage(() => getStorage()),
-    provideHttpClient()
+    provideHttpClient(),
+    UserActivityService
   ]
 };

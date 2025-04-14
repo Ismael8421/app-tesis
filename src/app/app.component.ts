@@ -8,6 +8,8 @@ import { Platform } from '@ionic/angular';
 import { AuthService } from './account/auth/data-access/auth.service';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { NotificationService } from './menu/chats/data-access/notification.service';
+import { UserActivityService } from './menu/shared/data-access/user-activity.service';
+import { ModalController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +23,8 @@ export class AppComponent implements OnInit {
   private platform = inject(Platform);
   private userStatusService = inject(UserStatusService);
   private notificationService = inject(NotificationService);
+  private userActivityService = inject(UserActivityService);
+  private modalController = inject(ModalController);
 
   constructor(
     private themeService: ThemeService,
@@ -61,7 +65,7 @@ export class AppComponent implements OnInit {
     
     // Verificar resultados de redirección de autenticación
     await this.checkRedirectResult();
-
+  
     // Cuando la plataforma está lista, inicializar todo lo relacionado
     this.platform.ready().then(() => {
       // Esto asegura que las operaciones nativas se ejecuten una vez que la plataforma esté lista
@@ -78,9 +82,13 @@ export class AppComponent implements OnInit {
     // Inicializar el estado del usuario (online/offline)
     this.userStatusService.refreshStatus();
     
+    // Registrar actividad del usuario (inicio de sesión) y verificar actividad
+    this.userActivityService.registerActivity('login');
+    this.userActivityService.checkInactivity();
+    
     // Inicializar el servicio de notificaciones
     this.initNotifications();
-  }
+  }  
 
   /**
    * Inicializa el sistema de notificaciones

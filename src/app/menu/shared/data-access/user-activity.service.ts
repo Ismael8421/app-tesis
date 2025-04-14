@@ -24,8 +24,8 @@ export class UserActivityService {
   private readonly LAST_ACTIVITY_KEY = 'last_user_activity';
   private readonly NOTIFICATION_ID = 42; // ID único para nuestras notificaciones
   private readonly ACTIVITY_CHECK_ID = 43; // ID para verificación automática
-  private readonly REMINDER_DAYS = 1/(24*60); // 1 minuto expresado en días
-  private readonly MAX_INACTIVITY_DAYS = 2/(24*60); // 2 minutos expresado en días
+  private readonly REMINDER_DAYS = 5/(24*60); // 5 minutos expresado en días
+  private readonly MAX_INACTIVITY_DAYS = 8/(24*60); // 8 minutos expresado en días
 
   // Estado interno para la UI
   private needsConfirmation$ = new BehaviorSubject<boolean>(false);
@@ -338,16 +338,17 @@ export class UserActivityService {
   /**
    * Para pruebas: Fuerza una verificación inmediata
    */
-  async forceActivityCheck(): Promise<void> {
-    console.log('Forzando verificación de actividad...');
+// Modifica este método temporalmente
+async forceActivityCheck(): Promise<void> {
+    console.log('Estableciendo registro de actividad antiguo...');
     
     const currentUser = this.auth.currentUser;
     if (!currentUser) return;
     
     try {
-      // Simular fecha antigua (hace 16 días)
+      // Fecha de 4 minutos atrás (justo antes del primer recordatorio)
       const oldDate = new Date();
-      oldDate.setDate(oldDate.getDate() - 16);
+      oldDate.setMinutes(oldDate.getMinutes() - 4);
       
       // Guardar fecha antigua
       await Preferences.set({
@@ -355,10 +356,13 @@ export class UserActivityService {
         value: oldDate.toISOString()
       });
       
-      // Verificar inactividad
-      await this.checkInactivity();
+      console.log(`Actividad registrada hace 4 minutos: ${oldDate.toISOString()}`);
+      console.log('Cierra la app y espera aproximadamente 1-2 minutos para el primer recordatorio');
+      
+      return Promise.resolve();
     } catch (error) {
       console.error('Error al forzar verificación:', error);
+      return Promise.reject(error);
     }
   }
 

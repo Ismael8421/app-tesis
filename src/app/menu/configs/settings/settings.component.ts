@@ -166,9 +166,9 @@ export class SettingsComponent implements OnInit {
     await alert.present();
   }
 
-  testNotifications() {
-    // Esto programará una notificación para aparecer en 15 segundos
-    this.userActivityService.setDebugTimers(15);
-    alert('¡Notificación programada! Pon la app en segundo plano y espera 15 segundos.');
+  setupInactivityTest() {
+    this.userActivityService.forceActivityCheck().then(() => {
+      alert('Registro de actividad configurado para hace 4 minutos. Cierra la app y espera aproximadamente 1-2 minutos para recibir el recordatorio.');
+    });
   }
 }

@@ -22,6 +22,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProfileImageService } from '../profile/profile-image.service';
 import { Auth } from '@angular/fire/auth';
 import { ProfileVisibilityService } from '../../search/data-access/profile-visibility.service';
+import { UserActivityService } from '../../shared/data-access/user-activity.service';
 
 @Component({
   selector: 'app-settings',
@@ -51,6 +52,7 @@ export class SettingsComponent implements OnInit {
   private _themeService = inject(ThemeService);
   private _profileImageService = inject(ProfileImageService);
   private _auth = inject(Auth);
+  private userActivityService = inject(UserActivityService)
 
   currentTheme!: ThemeType;
   isDarkMode: boolean = false;
@@ -162,5 +164,11 @@ export class SettingsComponent implements OnInit {
     });
   
     await alert.present();
+  }
+
+  testNotifications() {
+    // Esto programará una notificación para aparecer en 15 segundos
+    this.userActivityService.setDebugTimers(15);
+    alert('¡Notificación programada! Pon la app en segundo plano y espera 15 segundos.');
   }
 }

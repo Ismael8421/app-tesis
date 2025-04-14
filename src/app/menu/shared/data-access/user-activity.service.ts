@@ -24,8 +24,8 @@ export class UserActivityService {
   private readonly LAST_ACTIVITY_KEY = 'last_user_activity';
   private readonly NOTIFICATION_ID = 42; // ID único para nuestras notificaciones
   private readonly ACTIVITY_CHECK_ID = 43; // ID para verificación automática
-  private readonly REMINDER_DAYS = 5/(24*60); // 5 minutos expresado en días
-  private readonly MAX_INACTIVITY_DAYS = 8/(24*60); // 8 minutos expresado en días
+  private readonly REMINDER_DAYS = 5 / (24 * 60); // 5 minutos expresado en días
+  private readonly MAX_INACTIVITY_DAYS = 8 / (24 * 60); // 8 minutos expresado en días
 
   // Estado interno para la UI
   private needsConfirmation$ = new BehaviorSubject<boolean>(false);
@@ -52,7 +52,7 @@ export class UserActivityService {
       // Verificar si la plataforma soporta notificaciones
       if (this.platform.is('capacitor')) {
         console.log('Inicializando sistema de notificaciones');
-        
+
         // Crear canal de notificación (importante para Android)
         await LocalNotifications.createChannel({
           id: 'activity-reminders',
@@ -63,14 +63,14 @@ export class UserActivityService {
           lights: true,
           vibration: true
         });
-        
+
         // Solicitar permiso para notificaciones
         const permResult = await LocalNotifications.requestPermissions();
         console.log('Resultado de permisos de notificaciones:', permResult);
-        
+
         if (permResult.display === 'granted') {
           console.log('Permiso de notificaciones concedido');
-          
+
           // Registrar listener para cuando se toque una notificación
           LocalNotifications.addListener('localNotificationActionPerformed', (notification) => {
             console.log('Notificación tocada:', notification);
@@ -90,7 +90,7 @@ export class UserActivityService {
    */
   private async handleNotificationAction(notificationAction: any): Promise<void> {
     const notificationId = notificationAction.notification.id;
-    
+
     // Solo procesar nuestras notificaciones específicas
     if (notificationId === this.NOTIFICATION_ID) {
       // Como no tenemos acciones personalizadas, mostrar el diálogo directamente
@@ -110,16 +110,16 @@ export class UserActivityService {
 
     try {
       const now = new Date().toISOString();
-      
+
       // 1. Guardar en almacenamiento local
       await Preferences.set({
         key: `${this.LAST_ACTIVITY_KEY}_${currentUser.uid}`,
         value: now
       });
-      
+
       // 2. Programar próxima verificación
       this.scheduleActivityCheck();
-      
+
       console.log(`Actividad registrada: ${activityType} a las ${now}`);
     } catch (error) {
       console.error('Error al registrar actividad:', error);
@@ -129,45 +129,66 @@ export class UserActivityService {
   /**
    * Programar una verificación futura de actividad
    */
+  // Versión temporal para pruebas
   private async scheduleActivityCheck(): Promise<void> {
     try {
       if (!this.platform.is('capacitor')) {
         console.log('No es plataforma capacitor, omitiendo programación');
         return;
       }
-      
+
       // Verificar que tenemos permisos
       const permResult = await LocalNotifications.requestPermissions();
       if (permResult.display !== 'granted') {
         console.log('No hay permiso para notificaciones, no se pueden programar recordatorios');
         return;
       }
-      
+
+      // PRUEBA: Añadir notificación inmediata para confirmar que funcionan
+      const now = new Date();
+      now.setSeconds(now.getSeconds() + 30);
+
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: 999, // ID único para prueba
+            title: '[PRUEBA INMEDIATA] Verificando notificaciones',
+            body: 'Esta notificación debería aparecer en 30 segundos',
+            schedule: { at: now },
+            channelId: 'activity-reminders',
+            smallIcon: 'ic_notification',
+            iconColor: '#4CAF50'
+          }
+        ]
+      });
+
+      console.log('Notificación de prueba inmediata programada para 30 segundos');
+
       // Calcular fecha para recordatorio
       const reminderDate = new Date();
-      reminderDate.setDate(reminderDate.getDate() + this.REMINDER_DAYS);
-      
+      reminderDate.setMinutes(reminderDate.getMinutes() + 1); // 1 minuto para prueba
+
       // Calcular fecha para verificación automática
       const maxInactivityDate = new Date();
-      maxInactivityDate.setDate(maxInactivityDate.getDate() + this.MAX_INACTIVITY_DAYS);
-      
+      maxInactivityDate.setMinutes(maxInactivityDate.getMinutes() + 2); // 2 minutos para prueba
+
       // Cancelar notificaciones previas con el mismo ID
-      await LocalNotifications.cancel({ 
+      await LocalNotifications.cancel({
         notifications: [
-          { id: this.NOTIFICATION_ID }, 
+          { id: this.NOTIFICATION_ID },
           { id: this.ACTIVITY_CHECK_ID }
-        ] 
+        ]
       });
-      
+
       console.log(`Programando recordatorio para: ${reminderDate.toISOString()}`);
-      
-      // Programar nueva notificación
+
+      // Programar nueva notificación de recordatorio (la principal)
       await LocalNotifications.schedule({
         notifications: [
           {
             id: this.NOTIFICATION_ID,
-            title: '¿Sigues buscando colaboradores?',
-            body: 'Han pasado varios días desde tu última actividad. Abre la app para confirmar si deseas seguir visible.',
+            title: '[PRUEBA INACTIVIDAD] ¿Sigues buscando colaboradores?',
+            body: 'Notificación de prueba de inactividad (1 minuto)',
             schedule: { at: reminderDate },
             channelId: 'activity-reminders',
             smallIcon: 'ic_notification',
@@ -178,28 +199,27 @@ export class UserActivityService {
           }
         ]
       });
-      
+
       console.log(`Programando verificación automática para: ${maxInactivityDate.toISOString()}`);
-      
+
       await LocalNotifications.schedule({
         notifications: [
           {
             id: this.ACTIVITY_CHECK_ID,
-            title: 'Verificación de actividad',
-            body: 'Verificando estado de actividad',
+            title: '[PRUEBA INACTIVIDAD] Verificación automática',
+            body: 'Prueba de verificación automática (2 minutos)',
             schedule: { at: maxInactivityDate },
             channelId: 'activity-reminders',
             smallIcon: 'ic_notification',
             iconColor: '#4CAF50',
-            silent: true,
             extra: {
               type: 'activity_check'
             }
           }
         ]
       });
-      
-      console.log('Notificaciones programadas exitosamente');
+
+      console.log('Todas las notificaciones programadas correctamente');
     } catch (error) {
       console.error('Error al programar verificación:', error);
     }
@@ -213,8 +233,8 @@ export class UserActivityService {
 
     try {
       // Obtener la última fecha de actividad
-      const { value } = await Preferences.get({ 
-        key: `${this.LAST_ACTIVITY_KEY}_${currentUser.uid}` 
+      const { value } = await Preferences.get({
+        key: `${this.LAST_ACTIVITY_KEY}_${currentUser.uid}`
       });
 
       if (!value) {
@@ -237,7 +257,7 @@ export class UserActivityService {
       else if (daysSinceLastActivity >= this.REMINDER_DAYS) {
         // Indicar que se necesita confirmación para la UI
         this.needsConfirmation$.next(true);
-        
+
         // Mostrar diálogo en la aplicación
         if (this.platform.is('capacitor')) {
           this.showActivityConfirmationDialog();
@@ -255,7 +275,7 @@ export class UserActivityService {
     try {
       await this.profileVisibilityService.changeVisibility('invisible');
       console.log('Usuario establecido como invisible por inactividad');
-      
+
       // Registrar en Firestore que se cambió automáticamente
       const currentUser = this.auth.currentUser;
       if (currentUser) {
@@ -283,15 +303,15 @@ export class UserActivityService {
     try {
       // Registrar la confirmación
       await this.registerActivity('user_confirmation');
-      
+
       // Si el usuario eligió volverse invisible, cambiar la visibilidad
       if (!keepVisible) {
         await this.profileVisibilityService.changeVisibility('invisible');
       }
-      
+
       // Restablecer el estado de confirmación
       this.needsConfirmation$.next(false);
-      
+
       console.log(`Actividad confirmada: mantenerse visible = ${keepVisible}`);
     } catch (error) {
       console.error('Error al confirmar actividad:', error);
@@ -325,7 +345,7 @@ export class UserActivityService {
 
     await alert.present();
   }
-  
+
   /**
    * Calcula la diferencia en días entre dos fechas
    */
@@ -338,27 +358,38 @@ export class UserActivityService {
   /**
    * Para pruebas: Fuerza una verificación inmediata
    */
-// Modifica este método temporalmente
-async forceActivityCheck(): Promise<void> {
+  // Modifica este método temporalmente
+  async forceActivityCheck(): Promise<void> {
     console.log('Estableciendo registro de actividad antiguo...');
-    
+
     const currentUser = this.auth.currentUser;
-    if (!currentUser) return;
-    
+    if (!currentUser) {
+      console.error('No hay usuario autenticado');
+      return Promise.reject('No hay usuario autenticado');
+    }
+
     try {
       // Fecha de 4 minutos atrás (justo antes del primer recordatorio)
       const oldDate = new Date();
       oldDate.setMinutes(oldDate.getMinutes() - 4);
-      
+
+      const key = `${this.LAST_ACTIVITY_KEY}_${currentUser.uid}`;
+
       // Guardar fecha antigua
       await Preferences.set({
-        key: `${this.LAST_ACTIVITY_KEY}_${currentUser.uid}`,
+        key: key,
         value: oldDate.toISOString()
       });
-      
-      console.log(`Actividad registrada hace 4 minutos: ${oldDate.toISOString()}`);
-      console.log('Cierra la app y espera aproximadamente 1-2 minutos para el primer recordatorio');
-      
+
+      // Verificar que se guardó correctamente
+      const { value } = await Preferences.get({ key });
+      console.log(`Actividad registrada correctamente: ${value}`);
+
+      // Programar verificación inmediatamente
+      this.scheduleActivityCheck();
+
+      console.log('Verificación programada. Cierra la app y espera aproximadamente 1-2 minutos');
+
       return Promise.resolve();
     } catch (error) {
       console.error('Error al forzar verificación:', error);
@@ -367,8 +398,8 @@ async forceActivityCheck(): Promise<void> {
   }
 
   // Para pruebas: configura tiempos rápidos (minutos en lugar de días)
-// Para pruebas: configura tiempos rápidos (segundos en lugar de días)
-async setDebugTimers(secondsForReminder: number = 30): Promise<void> {
+  // Para pruebas: configura tiempos rápidos (segundos en lugar de días)
+  async setDebugTimers(secondsForReminder: number = 30): Promise<void> {
     try {
       // Verificar usuario actual
       const currentUser = this.auth.currentUser;
@@ -376,23 +407,23 @@ async setDebugTimers(secondsForReminder: number = 30): Promise<void> {
         console.error('No hay usuario autenticado para configurar debug');
         return Promise.reject('Usuario no autenticado');
       }
-      
+
       console.log('Activando modo debug para notificaciones...');
-      
+
       // Programar notificación de recordatorio en X segundos
       const reminderDate = new Date();
       reminderDate.setSeconds(reminderDate.getSeconds() + secondsForReminder);
-      
+
       // Cancelar notificaciones existentes
-      await LocalNotifications.cancel({ 
+      await LocalNotifications.cancel({
         notifications: [
-          { id: this.NOTIFICATION_ID }, 
+          { id: this.NOTIFICATION_ID },
           { id: this.ACTIVITY_CHECK_ID }
-        ] 
+        ]
       });
-      
+
       console.log(`Programando notificación de prueba para: ${reminderDate.toISOString()}`);
-      
+
       // Crear canal de notificación (importante para Android)
       await LocalNotifications.createChannel({
         id: 'activity-reminders',
@@ -403,7 +434,7 @@ async setDebugTimers(secondsForReminder: number = 30): Promise<void> {
         lights: true,
         vibration: true
       });
-      
+
       // Programar nueva notificación de prueba
       await LocalNotifications.schedule({
         notifications: [
@@ -421,13 +452,13 @@ async setDebugTimers(secondsForReminder: number = 30): Promise<void> {
           }
         ]
       });
-      
+
       console.log('Notificación de prueba programada correctamente');
-      
+
       // También programar verificación automática un poco después
       const maxInactivityDate = new Date();
       maxInactivityDate.setSeconds(maxInactivityDate.getSeconds() + secondsForReminder + 30);
-      
+
       await LocalNotifications.schedule({
         notifications: [
           {
@@ -444,7 +475,7 @@ async setDebugTimers(secondsForReminder: number = 30): Promise<void> {
           }
         ]
       });
-      
+
       console.log('Modo debug activado correctamente.');
       return Promise.resolve();
     } catch (error) {
@@ -452,4 +483,44 @@ async setDebugTimers(secondsForReminder: number = 30): Promise<void> {
       return Promise.reject(error);
     }
   }
+
+  // Método para pruebas 
+async testInactivityDirectly() {
+  const currentUser = this.auth.currentUser;
+  if (!currentUser) {
+    console.error('No hay usuario autenticado');
+    return Promise.reject('No hay usuario autenticado');
+  }
+  
+  try {
+    // 1. Programar notificación de prueba inmediata
+    const now = new Date();
+    now.setSeconds(now.getSeconds() + 15);
+    
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: 1000, // ID único para esta prueba
+          title: 'Verificación de prueba directa',
+          body: 'Probando notificaciones directamente',
+          schedule: { at: now },
+          channelId: 'activity-reminders'
+        }
+      ]
+    });
+    
+    console.log('Notificación de prueba directa programada');
+    
+    // 2. Verificar el diálogo directamente
+    setTimeout(() => {
+      console.log('Mostrando diálogo de confirmación directamente');
+      this.showActivityConfirmationDialog();
+    }, 5000); // 5 segundos después
+    
+    return Promise.resolve();
+  } catch (error) {
+    console.error('Error en prueba directa:', error);
+    return Promise.reject(error);
+  }
+}
 }

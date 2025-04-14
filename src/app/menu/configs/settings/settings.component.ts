@@ -171,4 +171,10 @@ export class SettingsComponent implements OnInit {
       alert('Registro de actividad configurado para hace 4 minutos. Cierra la app y espera aproximadamente 1-2 minutos para recibir el recordatorio.');
     });
   }
+
+  testDirectly() {
+    this.userActivityService.testInactivityDirectly().then(() => {
+      alert('Prueba directa iniciada. Verifica las notificaciones y el diálogo.');
+    });
+  }
 }

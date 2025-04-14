@@ -76,6 +76,11 @@
             </intent-filter>
         </service>
         
+        <!-- Receptor para notificaciones locales -->
+        <receiver 
+            android:name="com.getcapacitor.plugin.notification.NotificationActionService" 
+            android:exported="false" />
+            
     </application>
 
     <!-- Permissions existentes -->
@@ -91,4 +96,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 </manifest>

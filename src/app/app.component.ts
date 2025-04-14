@@ -71,6 +71,7 @@ export class AppComponent implements OnInit {
       // Esto asegura que las operaciones nativas se ejecuten una vez que la plataforma esté lista
       this.initServices();
     });
+    this.userActivityService.registerActivity('app_start');
   }
 
   /**

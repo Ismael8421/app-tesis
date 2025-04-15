@@ -48,7 +48,7 @@
         <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
       </ion-item>
 
-      <ion-item button (click)="testDirectly()">
+      <ion-item button (click)="navigateToReport()">
         <ion-icon name="alert-circle-outline" slot="start" class="custom-icon"></ion-icon>
         <ion-label>Reportar un error</ion-label>
         <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
@@ -56,7 +56,7 @@
     </div>
 
     <div class="section-group">
-      <ion-item button (click)="setupInactivityTest()" class="logout-item">
+      <ion-item button (click)="logOut()" class="logout-item">
         <ion-icon name="log-out-outline" slot="start" class="custom-icon danger"></ion-icon>
         <ion-label color="danger">Cerrar sesión</ion-label>
       </ion-item>

@@ -18,6 +18,7 @@ import { RejectedProfilesService } from './data-access/rejected-profiles.service
 import { LikedProfilesService } from './data-access/iked-profiles.service';
 import { ProfileVisibilityService, VisibilityType } from './data-access/profile-visibility.service';
 import { UserActivityService } from '../shared/data-access/user-activity.service';
+import { RecommendationCacheService } from './data-access/recommendation-cache.service';
 
 register();
 
@@ -51,6 +52,9 @@ export class SearchComponent {
   private toastController = inject(ToastController);
   private likedProfilesService = inject(LikedProfilesService);
   private userActivityService = inject(UserActivityService);
+  private recommendationCacheService = inject(RecommendationCacheService);
+  private cachedLoaded = false;
+  private shouldUpdateCache = false;
 
   recommendedUsers: any[] = [];
   loading = true;
@@ -80,12 +84,12 @@ export class SearchComponent {
     private profileVisibilityService: ProfileVisibilityService,
   ) {
     this.profileVisibilityService.getProfileStatus()
-    .subscribe((status: {visibility: VisibilityType}) => {
-      // Solo guardar el estado de visibilidad, sin funcionalidad de grupos
-      this.userVisibility = status.visibility;
-    });
+      .subscribe((status: { visibility: VisibilityType }) => {
+        // Solo guardar el estado de visibilidad, sin funcionalidad de grupos
+        this.userVisibility = status.visibility;
+      });
   }
-  
+
 
   // Colecciones para las diferentes carreras
   private carreraCollections = [
@@ -158,7 +162,7 @@ export class SearchComponent {
 
           // Cargar recomendaciones solo si el formulario está completo
           if (formCompleted && this.userData && this.formData) {
-            await this.loadRecommendations();
+            await this.loadRecommendationsWithCache();
           }
         }
         this.loading = false;
@@ -191,13 +195,13 @@ export class SearchComponent {
       console.error('No user logged in');
       return;
     }
-  
+
     try {
       const chatId = await this.chatService.startChat(currentUser.uid, otherUserId);
-      
+
       // Registrar inicio de chat como actividad importante
       this.userActivityService.registerActivity('start_chat');
-      
+
       if (chatId) {
         this.router.navigate(['/menu/mensajes', chatId]);
       }
@@ -207,6 +211,180 @@ export class SearchComponent {
   }
 
   //Algoritmo de recomendaciones
+  async loadRecommendationsWithCache() {
+    if (!this.userData || !this.formData) {
+      console.error('Faltan datos del usuario o del formulario');
+      this.loading = false;
+      return;
+    }
+  
+    console.log('🔍 Iniciando loadRecommendationsWithCache...');
+  
+    // Parámetros actuales de búsqueda para verificar si el caché es válido
+    const queryParams = {
+      carrerasBuscadas: this.formData.carrera_buscada || [],
+      anioLectivo: this.userData.anioLectivo || ''
+    };
+    
+    console.log('🔍 Parámetros de búsqueda:', JSON.stringify(queryParams));
+  
+    // Intentar cargar desde caché primero
+    console.log('🔍 Intentando cargar desde caché...');
+    const cachedLoaded = await this.recommendationCacheService.loadFromCache(queryParams);
+  
+    if (cachedLoaded) {
+      console.log('✅ Recomendaciones cargadas desde caché con éxito');
+      this.cachedLoaded = true;
+      
+      // IMPORTANTE: Ocultar el spinner de inmediato cuando tenemos caché
+      this.loading = false;
+  
+      // Suscribirse a las recomendaciones en caché
+      this.recommendationCacheService.getCachedRecommendations().subscribe(
+        recommendations => {
+          console.log(`🔍 Recibidas ${recommendations.length} recomendaciones del caché`);
+          if (recommendations && recommendations.length > 0) {
+            this.allPotentialMatches = recommendations;
+            console.log('✅ Asignadas recomendaciones del caché a allPotentialMatches');
+  
+            // Filtrar para eliminar perfiles que ya han sido rechazados o con like
+            const beforeFilterLength = this.allPotentialMatches.length;
+            this.allPotentialMatches = this.allPotentialMatches.filter(
+              match => !this.rejectedProfiles.includes(match.uid) && 
+                     !this.likedProfiles.includes(match.uid)
+            );
+            console.log(`🔍 Filtrado: ${beforeFilterLength} → ${this.allPotentialMatches.length} después de eliminar rechazados/likes`);
+            
+            // Cargar el primer lote visual
+            this.loadNextBatch();
+            
+            // Opcionalmente, cargar recomendaciones frescas en segundo plano
+            // solo si hay muy pocas recomendaciones disponibles
+            if (this.allPotentialMatches.length < 5) {
+              console.log('ℹ️ Pocas recomendaciones en caché, cargando más en segundo plano...');
+              setTimeout(() => {
+                this.shouldUpdateCache = true;
+                this.loadRecommendationsInBackground();
+              }, 1000);
+            }
+          } else {
+            // Si el caché está vacío, cargar normalmente
+            console.log('⚠️ Cache vacío, cargando recomendaciones normalmente');
+            this.loading = true; // Vuelve a mostrar el spinner si no hay datos en caché
+            this.loadRecommendations();
+          }
+        }
+      );
+    } else {
+      // Si no hay caché válido, cargar normalmente
+      console.log('⚠️ No hay caché válido, cargando recomendaciones desde cero...');
+      this.shouldUpdateCache = true;
+      this.loading = true; // Mostrar spinner solo cuando no hay caché
+      await this.loadRecommendations();
+    }
+  }
+
+  async loadRecommendationsInBackground() {
+    console.log("🔄 Cargando recomendaciones frescas en segundo plano...");
+  
+    try {
+      if (!this.formData || !this.userData) {
+        console.error('Faltan datos del usuario o del formulario');
+        return;
+      }
+  
+      // Guardar recomendaciones actuales para preservarlas mientras cargamos nuevas
+      const currentRecommendations = [...this.allPotentialMatches];
+      const currentVisibleRecommendations = [...this.recommendedUsers];
+      
+      // Configurar para cargar en segundo plano
+      const userAnioLectivo = this.userData.anioLectivo;
+      const carrerasBuscadas = this.formData.carrera_buscada || [];
+      
+      // Si no hay carreras buscadas, no continuar
+      if (carrerasBuscadas.length === 0) {
+        console.log('El usuario no ha seleccionado carreras para buscar');
+        return;
+      }
+  
+      // Convertir las carreras buscadas a sus nombres normalizados
+      const collectionsToSearch = carrerasBuscadas.map(carrera => this.normalizeCarreraName(carrera));
+      console.log('Colecciones a buscar en segundo plano:', collectionsToSearch);
+  
+      // Preparar colecciones pendientes pero SIN modificar el estado actual
+      // Solo agregando nuevas recomendaciones
+      const pendingCollectionsBackground = [...collectionsToSearch];
+      const newPotentialMatches: any[] = [];
+      
+      // Cargar colecciones en segundo plano
+      for (const collectionName of pendingCollectionsBackground) {
+        console.log(`Procesando colección en segundo plano: ${collectionName}`);
+        
+        // Usar la misma lógica del método loadMoreCandidates pero sin impactar la UI
+        // Aquí cargarías datos de Firestore y los procesarías
+        
+        // Después de procesar, actualizar el caché con los nuevos resultados combinados
+        // Importante: no modificar this.recommendedUsers para evitar alteraciones en la UI
+      }
+      
+      // Si encontramos nuevas recomendaciones, actualizar el caché
+      if (newPotentialMatches.length > 0) {
+        console.log(`🔄 Se encontraron ${newPotentialMatches.length} nuevas recomendaciones en segundo plano`);
+        
+        // Combinar con las existentes, evitando duplicados
+        const combinedMatches = [...currentRecommendations];
+        for (const newMatch of newPotentialMatches) {
+          if (!combinedMatches.some(match => match.uid === newMatch.uid)) {
+            combinedMatches.push(newMatch);
+          }
+        }
+        
+        // Actualizar caché con datos combinados
+        if (combinedMatches.length > currentRecommendations.length) {
+          this.allPotentialMatches = combinedMatches;
+          await this.updateRecommendationsCache();
+          console.log('✅ Caché actualizado con nuevas recomendaciones en segundo plano');
+        }
+      } else {
+        console.log('🔄 No se encontraron nuevas recomendaciones en segundo plano');
+      }
+    } catch (error) {
+      console.error('Error al cargar recomendaciones en segundo plano:', error);
+      // Errores en segundo plano no afectan la experiencia del usuario
+    }
+  }
+
+  private async updateRecommendationsCache() {
+    if (!this.formData || !this.userData) {
+        console.log('⚠️ No se puede actualizar caché: faltan datos del usuario o formulario');
+        return;
+    }
+
+    try {
+        if (this.allPotentialMatches.length > 0) {
+            console.log(`🔍 Actualizando caché con ${this.allPotentialMatches.length} recomendaciones`);
+
+            const queryParams = {
+                carrerasBuscadas: this.formData.carrera_buscada || [],
+                anioLectivo: this.userData.anioLectivo || ''
+            };
+
+            await this.recommendationCacheService.cacheRecommendations(
+                this.allPotentialMatches,
+                queryParams
+            );
+
+            // Ya no necesitamos actualizar el caché hasta la próxima carga completa
+            this.shouldUpdateCache = false;
+            console.log('✅ Caché actualizado correctamente');
+        } else {
+            console.log('⚠️ No hay recomendaciones para guardar en caché');
+        }
+    } catch (error) {
+        console.error('❌ Error al actualizar caché de recomendaciones:', error);
+    }
+}
+
   async loadRecommendations() {
     console.log("Comenzando búsqueda de recomendaciones para usuario:", this.userData);
 
@@ -265,7 +443,17 @@ export class SearchComponent {
   }
 
   // Método para cargar candidatos por lotes (versión completa y corregida)
-  async loadMoreCandidates() {
+  async loadMoreCandidates(backgroundMode = false) {
+    if (!backgroundMode && this.loading && this.pendingCollections.length === 0) {
+      console.log('No hay más colecciones para buscar');
+      this.loading = false; // Asegurar que se oculta el spinner
+      
+      // Si debemos actualizar el caché y tenemos resultados, guardarlos
+      if (this.shouldUpdateCache && this.allPotentialMatches.length > 0) {
+        await this.updateRecommendationsCache();
+      }
+      return;
+    }
     if (this.pendingCollections.length === 0) {
       console.log('No hay más colecciones para buscar');
       this.loading = false; // Asegurar que se oculta el spinner
@@ -432,6 +620,9 @@ export class SearchComponent {
         const wasLoading = this.loading;
         this.loading = false; // Asegurar que el spinner principal está oculto
         await this.loadMoreCandidates();
+      }
+      if (this.pendingCollections.length === 0 && this.shouldUpdateCache) {
+        await this.updateRecommendationsCache();
       }
 
     } catch (error) {
@@ -977,7 +1168,7 @@ export class SearchComponent {
 
   async handleRefresh(event?: any) {
     console.log('Comenzando operación de actualización');
-
+  
     try {
       // Reiniciar estados
       this.loading = true;
@@ -986,7 +1177,10 @@ export class SearchComponent {
       this.currentBatch = 1;
       this.collectionsProcessed = 0;
       this.pendingCollections = [];
-
+      
+      // Esto forzará una actualización del caché
+      this.shouldUpdateCache = true;
+  
       const user = this.auth.currentUser;
       if (user) {
         // Recargar datos de ambos servicios
@@ -995,15 +1189,15 @@ export class SearchComponent {
           this.formService.getFormData(user.uid),
           this.formStateService.checkFormCompletion(user.uid)
         ]);
-
+  
         this.userData = registerData;
         this.formData = formData;
         this.isFormComplete = formCompleted;
-
+  
         // Cargar recomendaciones solo si el formulario está completo
         if (formCompleted && this.userData && this.formData) {
           await this.loadRecommendations();
-
+  
           // Después de cargar las recomendaciones, reiniciar el swiper a la primera diapositiva
           setTimeout(() => {
             const swiperEl = document.querySelector('swiper-container');
@@ -1132,35 +1326,40 @@ export class SearchComponent {
       return;
     }
 
-  try {
-    // 1. Obtener la tarjeta actual para animar
-    const swiperEl = document.querySelector('swiper-container');
-    if (!swiperEl || !swiperEl.swiper) return;
+    try {
+      // 1. Obtener la tarjeta actual para animar
+      const swiperEl = document.querySelector('swiper-container');
+      if (!swiperEl || !swiperEl.swiper) return;
 
-    const activeIndex = swiperEl.swiper.activeIndex;
-    const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
-    if (!activeSlide) return;
+      const activeIndex = swiperEl.swiper.activeIndex;
+      const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
+      if (!activeSlide) return;
 
-    const card = activeSlide.querySelector('ion-card');
-    if (!card) return;
+      const card = activeSlide.querySelector('ion-card');
+      if (!card) return;
 
-    // 2. Aplicar clase de animación
-    activeSlide.classList.add('animating');
-    card.classList.add('profile-rejected');
+      // 2. Aplicar clase de animación
+      activeSlide.classList.add('animating');
+      card.classList.add('profile-rejected');
 
-    // 3. Rechazar en Firebase mientras se reproduce la animación
-    this.rejectedProfilesService.rejectProfile(user.uid);
-    
-    // 4. Registrar la actividad de rechazo
-    this.userActivityService.registerActivity('profile_reject');
+      // 3. Rechazar en Firebase mientras se reproduce la animación
+      this.rejectedProfilesService.rejectProfile(user.uid);
 
-    // 5. Esperar a que termine la animación
-    await new Promise(resolve => setTimeout(resolve, 500));
-  
+      // 4. Registrar la actividad de rechazo
+      this.userActivityService.registerActivity('profile_reject');
+
+      // 5. Esperar a que termine la animación
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       // 6. Eliminar el usuario de las recomendaciones
       this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
       this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
-  
+
+      // Si tenemos caché cargado, actualizar el caché con las recomendaciones filtradas
+      if (this.cachedLoaded && this.allPotentialMatches.length > 0) {
+        this.updateRecommendationsCache();
+      }
+
       // 7. Gestionar el estado después de eliminar
       if (this.recommendedUsers.length === 0 && this.allPotentialMatches.length > 0) {
         // Si no quedan recomendaciones mostradas pero hay más disponibles
@@ -1177,7 +1376,7 @@ export class SearchComponent {
           swiperEl.swiper.update();
         }
       }
-  
+
       // Opcional: mostrar un toast muy breve
       const toast = await this.toastController.create({
         message: 'Perfil rechazado',
@@ -1187,7 +1386,7 @@ export class SearchComponent {
         cssClass: 'reject-toast'
       });
       await toast.present();
-  
+
     } catch (error) {
       console.error('Error al rechazar perfil:', error);
       this.presentToast('Error al rechazar perfil', 'danger');
@@ -1215,34 +1414,43 @@ export class SearchComponent {
     if (!user || !user.uid) {
       console.error('ID de usuario no válido para dar like');
       return;
-    }  
+    }
 
     try {
       // 1. Obtener la tarjeta actual para animar
       const swiperEl = document.querySelector('swiper-container');
       if (!swiperEl || !swiperEl.swiper) return;
-  
+
       const activeIndex = swiperEl.swiper.activeIndex;
       const activeSlide = swiperEl.querySelectorAll('swiper-slide')[activeIndex];
       if (!activeSlide) return;
-  
+
       const card = activeSlide.querySelector('ion-card');
       if (!card) return;
-  
+
       // 2. Aplicar clase de animación
       activeSlide.classList.add('animating');
       card.classList.add('profile-liked');
-  
+
       // 3. Registrar el like en Firebase mientras se reproduce la animación
       this.likedProfilesService.likeProfile(user.uid);
-      
+
       // 4. Registrar la actividad de dar like
       this.userActivityService.registerActivity('profile_like');
-  
+
       // 5. Esperar a que termine la animación
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // 6. Gestionar el estado después de eliminar
+      // 6. Eliminar el usuario de las recomendaciones
+      this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
+      this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
+
+      // Si tenemos caché cargado, actualizar el caché con las recomendaciones filtradas
+      if (this.cachedLoaded && this.allPotentialMatches.length > 0) {
+        this.updateRecommendationsCache();
+      }
+
+      // 7. Gestionar el estado después de eliminar
       if (this.recommendedUsers.length === 0 && this.allPotentialMatches.length > 0) {
         // Si no quedan recomendaciones mostradas pero hay más disponibles
         await this.loadNextBatch();

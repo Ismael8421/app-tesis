@@ -5,7 +5,7 @@
 
   <div class="page-container">
 
-    <div class="loading-container" *ngIf="loading && recommendedUsers.length === 0">
+    <div *ngIf="loading && (!recommendedUsers || recommendedUsers.length === 0)" class="loading-container">
       <ion-spinner></ion-spinner>
       <p>Cargando recomendaciones...</p>
     </div>

@@ -1,8 +1,14 @@
 import { Routes } from '@angular/router';
 import { privateGuard, publicGuard } from './account/core/auth.guard';
 import { profileCompleteGuard } from './register/guards/profile-complete.guard';
+import { SplashScreenComponent } from './splash-screen/splash-screen.component';
 
 export const routes: Routes = [
+    {
+        path: '',
+        component: SplashScreenComponent,
+        pathMatch: 'full'
+    },
     {
         canActivateChild: [publicGuard()],
         path: 'auth',

@@ -34,6 +34,8 @@ v85 algoritmo optimizado
 
 v86 pruebas de splash
 
+v87 elimino splash
+
 Contexto
 
 Estamos trabajando en un algoritmo de recomendación para una aplicación educativa que conecta estudiantes universitarios para colaboraciones académicas. La estructura incluye colecciones generales de usuarios y colecciones específicas por carrera (Informatica, IEME, MCM, EMA, Mecatronica, Ciencias).

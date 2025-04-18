@@ -1,1 +1,21 @@
-/* You can add global styles to this file, and also import other style files */
+/* Seleccionamos solo los ion-spinner que NO están dentro de ion-refresher */
+ion-spinner:not(ion-refresher ion-spinner) {
+    visibility: hidden;
+    position: relative;
+    min-width: 100px; /* Aumentado para que contenga el gif */
+    min-height: 100px;
+  }
+  
+  ion-spinner:not(ion-refresher ion-spinner)::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px; /* Tamaño del GIF aumentado */
+    height: 100px;
+    background: url('/icons/spinner.gif') no-repeat center center;
+    background-size: contain;
+    visibility: visible;
+  }
+  

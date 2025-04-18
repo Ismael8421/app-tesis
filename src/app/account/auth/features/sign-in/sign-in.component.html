@@ -3,7 +3,7 @@
     <div class="logo-container">
       <img src="icons/tesis2.0.png" alt="Tecnifind Logo" class="logo">
     </div>
-    
+
     <h1>Inicia sesión</h1>
 
     <!-- <div class="google-button-container">
@@ -19,25 +19,20 @@
       <div>
         <ion-label>Correo</ion-label>
         <div class="input-with-icon">
-          <ion-input 
-            type="email" 
-            formControlName="email"
-            [class.invalid]="isRequired('email') || hasEmailError() || emailError"
-          ></ion-input>
+          <ion-input type="email" formControlName="email"
+            [class.invalid]="isRequired('email') || hasEmailError() || emailError"></ion-input>
         </div>
         <small *ngIf="isRequired('email')">Este campo es requerido</small>
         <small *ngIf="hasEmailError() && !isRequired('email')">Correo inválido</small>
-        <small *ngIf="emailError && !isRequired('email') && !hasEmailError()" class="validation-error">{{emailError}}</small>
+        <small *ngIf="emailError && !isRequired('email') && !hasEmailError()"
+          class="validation-error">{{emailError}}</small>
       </div>
 
       <div>
         <ion-label>Contraseña</ion-label>
         <div class="input-with-icon">
-          <ion-input 
-            [type]="passwordInputType"
-            formControlName="password"
-            [class.invalid]="isRequired('password') || passwordError"
-          ></ion-input>
+          <ion-input [type]="passwordInputType" formControlName="password"
+            [class.invalid]="isRequired('password') || passwordError"></ion-input>
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
             <app-eye-button></app-eye-button>
           </button>
@@ -55,10 +50,13 @@
       <ion-button type="submit" expand="block" [disabled]="isSubmitting">
         {{ isSubmitting ? 'Iniciando...' : 'Iniciar' }}
       </ion-button>
+      <div *ngIf="isSubmitting" class="spinner-overlay">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+      </div>
 
       <p>
-        No tienes una cuenta? 
-        <a routerLink="/auth/sign-up">Registrarse</a>  
+        No tienes una cuenta?
+        <a routerLink="/auth/sign-up">Registrarse</a>
       </p>
     </form>
   </section>

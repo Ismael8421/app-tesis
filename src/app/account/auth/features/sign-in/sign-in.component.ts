@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../data-access/auth.service';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { hasEmailError, isRequired } from '../utils/validators';
 import { NgIf } from '@angular/common';
 import { GoogleButtonComponent } from '../../../../UI/google-button/google-button.component';
 import { EyeButtonComponent } from '../../../../UI/eye-button/eye-button.component';
-import { IonInput, IonButton, IonContent, IonLabel, ToastController } from '@ionic/angular/standalone';
+import { IonInput, IonButton, IonContent, IonLabel, ToastController, IonSpinner } from '@ionic/angular/standalone';
 
 export interface FormSignIn {
   email: FormControl<string | null>;
@@ -16,7 +16,7 @@ export interface FormSignIn {
 @Component({
   selector: 'app-sign-in',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonContent, IonLabel, IonInput, IonButton ],
+  imports: [ReactiveFormsModule, NgIf, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonContent, IonLabel, IonInput, IonButton, IonSpinner],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss'
 })
@@ -43,7 +43,7 @@ export default class SignInComponent {
       this.emailError = '';
       this.generalError = '';
     });
-    
+
     // Escuchar cambios en el campo de contraseña para resetear errores
     this.form.get('password')?.valueChanges.subscribe(() => {
       this.passwordError = '';
@@ -57,7 +57,7 @@ export default class SignInComponent {
       duration: 2000,
       position: 'bottom',
     });
-  
+
     await toast.present();
   }
 
@@ -87,7 +87,7 @@ export default class SignInComponent {
     this.emailError = '';
     this.passwordError = '';
     this.generalError = '';
-    
+
     if (this.form.invalid) {
       // Marcar todos los campos como tocados para mostrar validaciones
       Object.keys(this.form.controls).forEach(key => {
@@ -101,21 +101,28 @@ export default class SignInComponent {
 
     try {
       this.isSubmitting = true;
-      
+
       // Intenta el inicio de sesión directamente
       await this._authServices.signIn({ email, password });
-      
+
       // Si llega aquí, el inicio de sesión fue exitoso
-      this.isSubmitting = false;
       this._router.navigateByUrl('/menu');
+
+      const sub = this._router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          this.isSubmitting = false;
+          sub.unsubscribe(); // Deja de escuchar después de navegar
+        }
+      });
+
       await this.showToast('Inicio de sesión correcto');
     } catch (error: any) {
       this.isSubmitting = false;
       console.error('Error de autenticación:', error);
-      
+
       // Obtener mensaje específico basado en el código de error
       const errorInfo = this._authServices.getAuthErrorMessage(error);
-      
+
       if (errorInfo.type === 'email') {
         this.emailError = errorInfo.message;
       } else if (errorInfo.type === 'password') {
@@ -123,7 +130,7 @@ export default class SignInComponent {
       } else {
         this.generalError = errorInfo.message;
       }
-      
+
       // await this.showToast(errorInfo.message);
     }
   }
@@ -133,7 +140,7 @@ export default class SignInComponent {
       this.isSubmitting = true;
       const result = await this._authServices.signInWithGoogle();
       this.isSubmitting = false;
-      
+
       if (result) {
         this._router.navigateByUrl('/menu');
         await this.showToast('Inicio de sesión con Google correcto');

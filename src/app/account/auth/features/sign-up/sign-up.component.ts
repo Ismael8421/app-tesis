@@ -3,10 +3,10 @@ import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angu
 import { hasEmailError, isRequired } from '../utils/validators';
 import { NgIf, NgClass } from '@angular/common';
 import { AuthService } from '../../data-access/auth.service';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { GoogleButtonComponent } from '../../../../UI/google-button/google-button.component';
 import { EyeButtonComponent } from '../../../../UI/eye-button/eye-button.component';
-import { IonButton, IonContent, IonInput, IonLabel, ToastController } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonInput, IonLabel, IonSpinner, ToastController } from '@ionic/angular/standalone';
 import { passwordStrengthValidator, getPasswordStrengthMessage, PasswordStrength } from '../utils/password-validator';
 
 interface FormSignUp {
@@ -18,7 +18,7 @@ interface FormSignUp {
 @Component({
   selector: 'app-sign-up',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgClass, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonContent, IonLabel, IonInput, IonButton],
+  imports: [ReactiveFormsModule, NgIf, NgClass, RouterLink, GoogleButtonComponent, EyeButtonComponent, IonContent, IonLabel, IonInput, IonButton, IonSpinner],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
 })
@@ -212,9 +212,17 @@ export default class SignUpComponent {
       }
       
       await this._authServices.signUp({ email, password });
-      this.isSubmitting = false;
-      await this.showToast('Registro exitoso');
+      
       this._router.navigateByUrl('/register');
+
+      const sub = this._router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          this.isSubmitting = false;
+          sub.unsubscribe(); // Deja de escuchar después de navegar
+        }
+      });
+
+      await this.showToast('Registro exitoso');
     } catch (error: any) {
       this.isSubmitting = false;
       console.error('Error al registrar usuario:', error);

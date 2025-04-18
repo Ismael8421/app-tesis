@@ -130,6 +130,9 @@
       <ion-button type="submit" expand="block" [disabled]="isSubmitting">
         {{ isSubmitting ? 'Creando...' : 'Crear' }}
       </ion-button>
+      <div *ngIf="isSubmitting" class="spinner-overlay">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+      </div>
 
       <p>
         Ya tienes una cuenta? 

@@ -555,6 +555,9 @@ export class SearchComponent {
           const otherUserYear = otherUserData?.anioLectivo;
           const userCarrera = userData['carrera'];
 
+          // Obtener la URL de la imagen de perfil
+          const profileImageUrl = userData['profileImageUrl'] || 'icons/logo_tesis.png';
+
           // FILTRO CRÍTICO: Verificar que sean del mismo año lectivo
           if (otherUserYear !== userAnioLectivo) {
             console.log(`Descartando - Año diferente: ${otherUserYear} vs ${userAnioLectivo}`);
@@ -574,8 +577,9 @@ export class SearchComponent {
               anioLectivo: otherUserYear || '',
               mencion: userFormData['mencion'] || '',
               paralelo: userFormData['paralelo'] || '',
-              isInGroup: isInGroup,               // ← Añadir esto
-              groupMembers: groupMembers,         // ← Añadir esto
+              isInGroup: isInGroup,
+              groupMembers: groupMembers,
+              profileImageUrl: profileImageUrl,
               ...userFormData,
               matchScore: matchDetails.totalScore,
               skillScore: matchDetails.skillScore,

@@ -18,7 +18,7 @@
             <!-- Sección superior: Avatar y nombre -->
             <div class="profile-header">
               <ion-avatar class="profile-img">
-                <ion-img src="icons/logo_tesis.png" alt="Profile"></ion-img>
+                <ion-img [src]="user.profileImageUrl || 'icons/logo_tesis.png'" alt="Profile"></ion-img>
               </ion-avatar>
 
               <div *ngIf="user.isInGroup" class="in-group-indicator">

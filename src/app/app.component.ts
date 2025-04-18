@@ -9,12 +9,16 @@ import { AuthService } from './account/auth/data-access/auth.service';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { NotificationService } from './menu/chats/data-access/notification.service';
 import { UserActivityService } from './menu/shared/data-access/user-activity.service';
-import { ModalController } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet, ModalController } from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
+import { NetworkService } from './services/network.service';
+import { OfflineScreenComponent } from './offline-screen/offline-screen.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, IonApp, OfflineScreenComponent, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -25,18 +29,21 @@ export class AppComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private userActivityService = inject(UserActivityService);
   private modalController = inject(ModalController);
+  isOffline = false;
+  private networkSubscription: Subscription | undefined;
 
   constructor(
     private themeService: ThemeService,
     private auth: Auth,
-    private authService: AuthService
+    private authService: AuthService,
+    private networkService: NetworkService
   ) {
     // Asegurarnos de que el tema se inicialice
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       this.themeService.setTheme(savedTheme as 'system' | 'dark' | 'light');
     }
-    
+
     // Añadir listener para cambios de estado de autenticación
     FirebaseAuthentication.addListener('authStateChange', (change) => {
       console.log('Auth state changed', change);
@@ -51,6 +58,16 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
+    // Verificar estado inicial
+    this.isOffline = !this.networkService.isConnected();
+
+    // Suscribirse a cambios en la conexión
+    this.networkSubscription = this.networkService.getNetworkStatus().subscribe(
+      isConnected => {
+        this.isOffline = !isConnected;
+      }
+    );
+
     // Verificar si hay un resultado de redirección al iniciar la app
     const result = await this.authService.getRedirectResult();
     if (result?.user) {
@@ -62,10 +79,10 @@ export class AppComponent implements OnInit {
       // El usuario ya estaba autenticado
       this.initServices();
     }
-    
+
     // Verificar resultados de redirección de autenticación
     await this.checkRedirectResult();
-  
+
     // Cuando la plataforma está lista, inicializar todo lo relacionado
     this.platform.ready().then(() => {
       // Esto asegura que las operaciones nativas se ejecuten una vez que la plataforma esté lista
@@ -79,17 +96,17 @@ export class AppComponent implements OnInit {
    */
   private initServices() {
     if (!this.auth.currentUser) return;
-    
+
     // Inicializar el estado del usuario (online/offline)
     this.userStatusService.refreshStatus();
-    
+
     // Registrar actividad del usuario (inicio de sesión) y verificar actividad
     this.userActivityService.registerActivity('login');
     this.userActivityService.checkInactivity();
-    
+
     // Inicializar el servicio de notificaciones
     this.initNotifications();
-  }  
+  }
 
   /**
    * Inicializa el sistema de notificaciones
@@ -98,10 +115,10 @@ export class AppComponent implements OnInit {
     try {
       // Solicitar/comprobar permisos de notificaciones
       const hasPermission = await this.notificationService.checkAndRequestPermissions();
-      
+
       if (hasPermission) {
         console.log('Permisos de notificaciones concedidos');
-        
+
         // Actualizar el token FCM después del login
         if (this.auth.currentUser) {
           await this.notificationService.updateTokenAfterLogin();
@@ -124,12 +141,18 @@ export class AppComponent implements OnInit {
       if (result && result.user) {
         // Usuario ha iniciado sesión correctamente mediante redirección
         this.router.navigateByUrl('/menu');
-        
+
         // Inicializar notificaciones después del login
         await this.notificationService.updateTokenAfterLogin();
       }
     } catch (error) {
       console.error('Error al manejar redirección de autenticación:', error);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.networkSubscription) {
+      this.networkSubscription.unsubscribe();
     }
   }
 }

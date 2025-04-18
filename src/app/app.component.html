@@ -1,1 +1,5 @@
-<router-outlet/>
+<app-offline-screen *ngIf="isOffline"></app-offline-screen>
+<ng-container *ngIf="!isOffline">
+    <!-- Contenido normal de la app aquí -->
+    <router-outlet></router-outlet>
+</ng-container>

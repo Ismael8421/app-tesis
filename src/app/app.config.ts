@@ -11,6 +11,7 @@ import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideHttpClient } from '@angular/common/http';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { UserActivityService } from './menu/shared/data-access/user-activity.service';
+import { NetworkService } from './services/network.service';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWICQxQQutJ-7t3hjIZP9QRuhtszoNkM8",
@@ -35,6 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideMessaging(() => getMessaging()), 
     provideStorage(() => getStorage()),
     provideHttpClient(),
-    UserActivityService
+    UserActivityService,
+    NetworkService
   ]
 };

@@ -7,10 +7,10 @@ plugins {
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.example.app"
+    namespace "com.tecnifind.app"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.example.app"
+        applicationId "com.tecnifind.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

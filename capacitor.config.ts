@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.example.app',
+  appId: 'com.tecnifind.app',
   appName: 'TecniFind',
   webDir: 'dist/app-tesis/browser',
   server: {

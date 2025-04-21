@@ -1,7 +1,7 @@
 plugins {
   // Add the dependency for the Google services Gradle plugin
     id 'com.android.application'
-    id 'com.google.gms.google-services'
+    // id 'com.google.gms.google-services'
 }
 
 apply plugin: 'com.android.application'

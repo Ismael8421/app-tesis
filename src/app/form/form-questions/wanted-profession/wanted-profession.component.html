@@ -6,32 +6,32 @@
 
   <ion-list formGroupName="wanted_profession">
     <ion-item button (click)="toggleCheckbox('O1')">
-      <ion-checkbox slot="start" formControlName="O1"></ion-checkbox>
+      <ion-checkbox slot="start" formControlName="O1" (click)="$event.stopPropagation()"></ion-checkbox>
       <ion-label>Circuitos eléctricos domésticos o industriales</ion-label>
     </ion-item>
 
     <ion-item button (click)="toggleCheckbox('O2')">
-      <ion-checkbox slot="start" formControlName="O2"></ion-checkbox>
+      <ion-checkbox slot="start" formControlName="O2" (click)="$event.stopPropagation()"></ion-checkbox>
       <ion-label>Construcción de piezas metálicas</ion-label>
     </ion-item>
 
     <ion-item button (click)="toggleCheckbox('O3')">
-      <ion-checkbox slot="start" formControlName="O3"></ion-checkbox>
+      <ion-checkbox slot="start" formControlName="O3" (click)="$event.stopPropagation()"></ion-checkbox>
       <ion-label>Mantenimiento y reparación automotriz</ion-label>
     </ion-item>
 
     <ion-item button (click)="toggleCheckbox('O4')">
-      <ion-checkbox slot="start" formControlName="O4"></ion-checkbox>
+      <ion-checkbox slot="start" formControlName="O4" (click)="$event.stopPropagation()"></ion-checkbox>
       <ion-label>Mecánica, electrónica y automatización</ion-label>
     </ion-item>
 
     <ion-item button (click)="toggleCheckbox('O5')">
-      <ion-checkbox slot="start" formControlName="O5"></ion-checkbox>
+      <ion-checkbox slot="start" formControlName="O5" (click)="$event.stopPropagation()"></ion-checkbox>
       <ion-label>Desarrollo de software web y/o móvil</ion-label>
     </ion-item>
 
     <ion-item button (click)="toggleCheckbox('O6')">
-      <ion-checkbox slot="start" formControlName="O6"></ion-checkbox>
+      <ion-checkbox slot="start" formControlName="O6" (click)="$event.stopPropagation()"></ion-checkbox>
       <ion-label>Conocimientos de la biología humana, animal y/o química</ion-label>
     </ion-item>
 

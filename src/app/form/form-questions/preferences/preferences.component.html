@@ -11,22 +11,34 @@
     
     <div formGroupName="schedule">
       <ion-item button (click)="toggleCheckbox('Q1O1')">
-        <ion-checkbox #checkbox1 slot="start" formControlName="Q1O1"></ion-checkbox>
+        <ion-checkbox #checkbox1 
+                     slot="start" 
+                     formControlName="Q1O1"
+                     (click)="$event.stopPropagation()"></ion-checkbox>
         <ion-label>Durante el almuerzo</ion-label>
       </ion-item>
-
+    
       <ion-item button (click)="toggleCheckbox('Q1O2')">
-        <ion-checkbox #checkbox2 slot="start" formControlName="Q1O2"></ion-checkbox>
+        <ion-checkbox #checkbox2 
+                     slot="start" 
+                     formControlName="Q1O2"
+                     (click)="$event.stopPropagation()"></ion-checkbox>
         <ion-label>Tardes después de clases</ion-label>
       </ion-item>
-
+    
       <ion-item button (click)="toggleCheckbox('Q1O3')">
-        <ion-checkbox #checkbox3 slot="start" formControlName="Q1O3"></ion-checkbox>
+        <ion-checkbox #checkbox3 
+                     slot="start" 
+                     formControlName="Q1O3"
+                     (click)="$event.stopPropagation()"></ion-checkbox>
         <ion-label>Fines de semana por la mañana</ion-label>
       </ion-item>
-
+    
       <ion-item button (click)="toggleCheckbox('Q1O4')">
-        <ion-checkbox #checkbox4 slot="start" formControlName="Q1O4"></ion-checkbox>
+        <ion-checkbox #checkbox4 
+                     slot="start" 
+                     formControlName="Q1O4"
+                     (click)="$event.stopPropagation()"></ion-checkbox>
         <ion-label>Fines de semana por la tarde</ion-label>
       </ion-item>
       

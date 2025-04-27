@@ -5,7 +5,6 @@ Funcionando el botón de rechazar, se guarda en la base de datos y local
 Funcionando el botón de like, se guarda en la base de datos y local
 Funcionando el menú de favoritos
 Programado notificaciones(se borra FCM)
-
 La función de fotos de perfil funciona todo bien (desde la v75.1)
 
 A partir de la v77 se empieza a trabajar las notificaciones desde cero.
@@ -52,3 +51,7 @@ Las recomendaciones priorizan la coincidencia de habilidades específicas de las
 
 El algoritmo usa dos puntuaciones separadas: una para habilidades específicas (skillScore) y otra para factores generales como compatibilidad de horarios o métodos de trabajo (otherScore), ordenando primero por skillScore y luego por totalScore.
 La base de datos usa campos en español, y cada carrera tiene conjuntos específicos de habilidades según el año lectivo (segundo o tercero) que se evalúan independientemente en la función evaluateSkillsMatch().
+
+
+
+

@@ -415,7 +415,7 @@
       </swiper-slide>
 
       <!-- Diapositiva de "Cargando más" que se mostrará cuando se están cargando más recomendaciones -->
-      <swiper-slide *ngIf="isLoadingMore">
+      <swiper-slide>
         <ion-card class="content-container ion-no-margin loading-more-card">
           <ion-card-content class="profile-section">
             <div class="loading-container">
@@ -427,7 +427,7 @@
       </swiper-slide>
 
       <!-- Tarjeta final - solo mostrar cuando se han cargado todas las posibles recomendaciones -->
-      <swiper-slide *ngIf="recommendedUsers.length > 0 && recommendedUsers.length >= allPotentialMatches.length">
+      <swiper-slide *ngIf="recommendedUsers.length > 0">
         <ion-card class="content-container ion-no-margin end-card">
           <ion-card-content class="profile-section">
             <div class="end-recommendations">

@@ -10,12 +10,21 @@
       <p>Cargando recomendaciones...</p>
     </div>
 
-    <swiper-container *ngIf="!loading || recommendedUsers.length > 0" (swiperslidechange)="onSlideChange($event)"
-      initial-slide="0" slides-per-view="1" centered-slides="true" grab-cursor="true" threshold="5">
+    <swiper-container
+      *ngIf="!loading || recommendedUsers.length > 0"
+      (swiperslidechange)="onSlideChange($event)"
+      initial-slide="0"
+      slides-per-view="auto"
+      centered-slides="true"
+      grab-cursor="true"
+      threshold="5"
+      space-between="20">
       <swiper-slide *ngFor="let user of recommendedUsers">
         <ion-card class="content-container ion-no-margin">
+          <div class="swipe-indicator" *ngIf="recommendedUsers.length > 1">
+            <ion-icon name="chevron-back" size="large"></ion-icon>
+          </div>
           <ion-card-content class="profile-section">
-            <!-- Sección superior: Avatar y nombre -->
             <div class="profile-header">
               <ion-avatar class="profile-img">
                 <ion-img [src]="user.profileImageUrl || 'icons/logo_tesis.png'" alt="Profile"></ion-img>
@@ -37,7 +46,6 @@
               </div>
             </div>
 
-            <!-- Sección central: Información académica -->
             <div class="info-section">
               <div class="academic-info">
                 <ion-text>
@@ -48,12 +56,8 @@
                 </ion-text>
               </div>
 
-              <!-- Habilidades del usuario -->
               <div class="skills-section">
-                <!-- Para cualquier carrera, mostramos solo las propiedades existentes -->
-                <!-- Para segundos -->
                 <div *ngIf="user.anioLectivo === 'Segundo'" class="skills-container">
-                  <!-- INFORMÁTICA - Segundo año -->
                   <p *ngIf="user.habilidad_ofrecida_seg?.informatica_seg_of?.programacion" class="skill-item">
                     <span class="skill-label">Programación:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.informatica_seg_of.programacion}}</span>
@@ -71,7 +75,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.informatica_seg_of.redes}}</span>
                   </p>
 
-                  <!-- IEME - Segundo año -->
                   <p *ngIf="user.habilidad_ofrecida_seg?.ieme_seg_of?.instalacionesSeg" class="skill-item">
                     <span class="skill-label">Instalaciones eléctricas:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.ieme_seg_of.instalacionesSeg}}</span>
@@ -89,7 +92,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.ieme_seg_of.automatizacionSeg}}</span>
                   </p>
 
-                  <!-- MCM - Segundo año -->
                   <p *ngIf="user.habilidad_ofrecida_seg?.mcm_seg_of?.soldaduraMcmSeg" class="skill-item">
                     <span class="skill-label">Soldadura:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.mcm_seg_of.soldaduraMcmSeg}}</span>
@@ -107,7 +109,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_seg?.mcm_seg_of?.dibujoMcmSeg}}</span>
                   </p>
 
-                  <!-- EMA - Segundo año -->
                   <p *ngIf="user.habilidad_ofrecida_seg?.ema_seg_of?.sistemasSeg" class="skill-item">
                     <span class="skill-label">Sistemas eléctricos:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.ema_seg_of.sistemasSeg}}</span>
@@ -121,7 +122,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.ema_seg_of.mantenimientoSeg}}</span>
                   </p>
 
-                  <!-- Mecatrónica - Segundo año -->
                   <p *ngIf="user.habilidad_ofrecida_seg?.mec_seg_of?.electronicaDigital" class="skill-item">
                     <span class="skill-label">Electrónica digital:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.mec_seg_of.electronicaDigital}}</span>
@@ -139,7 +139,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_seg?.mec_seg_of?.automatizacionMecSeg}}</span>
                   </p>
 
-                  <!-- Ciencias - Segundo año -->
                   <p *ngIf="user.habilidad_ofrecida_seg?.ciencias_seg_of?.laboratorio" class="skill-item">
                     <span class="skill-label">Laboratorio:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_seg.ciencias_seg_of.laboratorio}}</span>
@@ -150,14 +149,11 @@
                   </p>
                   <p *ngIf="user.habilidad_ofrecida_seg?.ciencias_seg_of?.redaccionCreativaSeg" class="skill-item">
                     <span class="skill-label">Redacción creativa:</span>
-                    <span
-                      class="skill-value">{{user.habilidad_ofrecida_seg.ciencias_seg_of.redaccionCreativaSeg}}</span>
+                    <span class="skill-value">{{user.habilidad_ofrecida_seg.ciencias_seg_of.redaccionCreativaSeg}}</span>
                   </p>
                 </div>
 
-                <!-- Para terceros -->
                 <div *ngIf="user.anioLectivo === 'Tercero'" class="skills-container">
-                  <!-- INFORMÁTICA - Tercer año -->
                   <p *ngIf="user.habilidad_ofrecida_ter?.informatica_ter_of?.programacion" class="skill-item">
                     <span class="skill-label">Programación:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.informatica_ter_of.programacion}}</span>
@@ -171,7 +167,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.informatica_ter_of.cad}}</span>
                   </p>
 
-                  <!-- Mención en Programación móvil -->
                   <ng-container *ngIf="user.mencion === 'Programacion movil'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.informatica_ter_of?.soporte" class="skill-item">
                       <span class="skill-label">Circuitos:</span>
@@ -183,7 +178,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- Mención en Aplicaciones web -->
                   <ng-container *ngIf="user.mencion === 'Aplicaciones web'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.informatica_ter_of?.web" class="skill-item">
                       <span class="skill-label">Desarrollo web:</span>
@@ -195,7 +189,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- IEME - Tercer año -->
                   <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.electrotecnia" class="skill-item">
                     <span class="skill-label">Electrotecnia:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.electrotecnia}}</span>
@@ -213,7 +206,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.ieme_ter_of.potencia}}</span>
                   </p>
 
-                  <!-- Mención en Sistemas Eléctricos de Potencia -->
                   <ng-container *ngIf="user.mencion === 'Sistemas electricos de Potencia'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.maquinas" class="skill-item">
                       <span class="skill-label">Máquinas eléctricas:</span>
@@ -225,7 +217,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- Mención en Electrónica Digital -->
                   <ng-container *ngIf="user.mencion === 'Electronica digital'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.ieme_ter_of?.electronicaAplicada" class="skill-item">
                       <span class="skill-label">Electrónica aplicada:</span>
@@ -237,7 +228,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- MCM - Tercer año -->
                   <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.metrologia" class="skill-item">
                     <span class="skill-label">Metrología:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.mcm_ter_of.metrologia}}</span>
@@ -255,7 +245,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.mcm_ter_of.fabricacion}}</span>
                   </p>
 
-                  <!-- Mención en Precisión -->
                   <ng-container *ngIf="user.mencion === 'Mecanica de precision y produccion de serie'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.molds" class="skill-item">
                       <span class="skill-label">Moldes y matrices:</span>
@@ -263,7 +252,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- Mención en Diseño -->
                   <ng-container *ngIf="user.mencion === 'Diseno y automatizacion de maquinas y mecanismos'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.mcm_ter_of?.machinesMcm" class="skill-item">
                       <span class="skill-label">Diseño de máquinas:</span>
@@ -271,7 +259,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- EMA - Tercer año -->
                   <p *ngIf="user.habilidad_ofrecida_ter?.ema_ter_of?.motores" class="skill-item">
                     <span class="skill-label">Motores:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.ema_ter_of.motores}}</span>
@@ -285,7 +272,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.ema_ter_of.sistemasElectricos}}</span>
                   </p>
 
-                  <!-- Mención en Mantenimiento -->
                   <ng-container *ngIf="user.mencion === 'Mantenimiento automotriz'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.ema_ter_of?.mantenimiento" class="skill-item">
                       <span class="skill-label">Mantenimiento:</span>
@@ -293,7 +279,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- Mención en Electrotecnia -->
                   <ng-container *ngIf="user.mencion === 'Electrotecnia automotriz'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.ema_ter_of?.automotriz" class="skill-item">
                       <span class="skill-label">Electrónica automotriz:</span>
@@ -301,7 +286,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- Mecatrónica - Tercer año -->
                   <p *ngIf="user.habilidad_ofrecida_ter?.mec_ter_of?.microcontroladores" class="skill-item">
                     <span class="skill-label">Microcontroladores:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.mec_ter_of.microcontroladores}}</span>
@@ -319,7 +303,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.mec_ter_of.manufactura}}</span>
                   </p>
 
-                  <!-- Ciencias - Tercer año -->
                   <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.redaccionCreativa" class="skill-item">
                     <span class="skill-label">Redacción creativa:</span>
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.redaccionCreativa}}</span>
@@ -329,7 +312,6 @@
                     <span class="skill-value">{{user.habilidad_ofrecida_ter.ciencias_ter_of.investigacion}}</span>
                   </p>
 
-                  <!-- Mención en Ciencias de la salud -->
                   <ng-container *ngIf="user.mencion === 'Ciencias de la salud'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.biologia" class="skill-item">
                       <span class="skill-label">Biología:</span>
@@ -341,7 +323,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- Mención en Ciencias de la política -->
                   <ng-container *ngIf="user.mencion === 'Ciencias de la politica'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.sociologia" class="skill-item">
                       <span class="skill-label">Sociología:</span>
@@ -353,7 +334,6 @@
                     </p>
                   </ng-container>
 
-                  <!-- Mención en Matemática y Física -->
                   <ng-container *ngIf="user.mencion === 'Matematica y Fisica avanzada'">
                     <p *ngIf="user.habilidad_ofrecida_ter?.ciencias_ter_of?.matematica" class="skill-item">
                       <span class="skill-label">Matemáticas:</span>
@@ -395,7 +375,6 @@
               </div>
             </div>
 
-            <!-- Sección inferior: Botones -->
             <div class="buttons-container">
               <ion-button fill="solid" shape="round" mode="ios" (click)="rejectProfile(user)">
                 <app-check-icon></app-check-icon>
@@ -409,13 +388,11 @@
                 <app-heart-icon></app-heart-icon>
               </ion-button>
             </div>
-
           </ion-card-content>
         </ion-card>
       </swiper-slide>
 
-      <!-- Diapositiva de "Cargando más" que se mostrará cuando se están cargando más recomendaciones -->
-      <swiper-slide>
+      <swiper-slide *ngIf="loadingMore">
         <ion-card class="content-container ion-no-margin loading-more-card">
           <ion-card-content class="profile-section">
             <div class="loading-container">
@@ -426,47 +403,39 @@
         </ion-card>
       </swiper-slide>
 
-      <!-- Tarjeta final - solo mostrar cuando se han cargado todas las posibles recomendaciones -->
-      <swiper-slide *ngIf="recommendedUsers.length > 0">
+      <swiper-slide *ngIf="recommendedUsers.length > 0 && currentBatchIndex >= allPotentialMatches.length && !loadingMore">
         <ion-card class="content-container ion-no-margin end-card">
           <ion-card-content class="profile-section">
-            <div class="end-recommendations">
-              <ion-icon name="checkmark-circle-outline" size="large"></ion-icon>
-              <h2>¡Has visto todas las recomendaciones!</h2>
-              <p>Ya has revisado todas las recomendaciones disponibles basadas en tus preferencias.</p>
-              <ion-button expand="block" (click)="handleRefresh($event)">
-                Actualizar recomendaciones
-              </ion-button>
+            <div class="end-container">
+              <ion-icon name="information-circle-outline" size="large"></ion-icon>
+              <h3>No hay más recomendaciones</h3>
+              <p>Has visto todos los perfiles disponibles. Intenta actualizar o ajusta tus preferencias.</p>
+              <ion-button fill="outline" (click)="handleRefresh()">Actualizar</ion-button>
             </div>
           </ion-card-content>
         </ion-card>
       </swiper-slide>
 
-      <!-- Mensaje cuando no hay recomendaciones desde el inicio -->
-      <div *ngIf="!loading && recommendedUsers.length === 0" class="no-recommendations">
-        <ion-icon name="search-outline" size="large"></ion-icon>
-        <h2>No hay recomendaciones disponibles</h2>
-        <p>En este momento no hay estudiantes que coincidan con tus criterios de búsqueda.</p>
-        <ion-button expand="block" (click)="navegateToForm()">
-          Modificar preferencias
-        </ion-button>
-      </div>
+      <swiper-slide *ngIf="!loading && recommendedUsers.length === 0 && currentBatchIndex === 0">
+        <ion-card class="content-container ion-no-margin end-card">
+          <ion-card-content class="profile-section">
+            <div class="end-container">
+              <ion-icon name="information-circle-outline" size="large"></ion-icon>
+              <h3>Sin recomendaciones</h3>
+              <p>No encontramos perfiles que coincidan con tus criterios. Intenta ajustar tus preferencias.</p>
+              <ion-button fill="outline" (click)="navegateToForm()">Editar preferencias</ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </swiper-slide>
     </swiper-container>
 
-    <!-- Mensaje cuando no hay recomendaciones después de cargar -->
-    <div *ngIf="!loading && recommendedUsers.length === 0" class="no-recommendations">
-      <ion-icon name="search-outline" size="large"></ion-icon>
-      <h2>No hay recomendaciones disponibles</h2>
-      <p>En este momento no hay estudiantes que coincidan con tus criterios de búsqueda.</p>
-      <ion-button expand="block" (click)="navegateToForm()">
-        Modificar preferencias
-      </ion-button>
-    </div>
-
-    <ion-alert [isOpen]="!isFormComplete"
-      message="Para personalizar tus recomendaciones, necesitamos conocerte mejor a través de un breve formulario"
-      [buttons]="alertButtons" (didDismiss)="isFormComplete = true">
-    </ion-alert>
+    <ion-alert
+      *ngIf="showAlert"
+      header="Formulario incompleto"
+      message="Por favor completa tu formulario para ver recomendaciones."
+      [isOpen]="showAlert"
+      [buttons]="alertButtons"
+    ></ion-alert>
   </div>
-
 </ion-content>

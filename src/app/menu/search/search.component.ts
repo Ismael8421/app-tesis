@@ -1,5 +1,5 @@
 import { NgIf, NgFor, CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, inject } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, ElementRef, inject } from '@angular/core';
 import { Auth, User } from '@angular/fire/auth';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -57,18 +57,18 @@ export class SearchComponent {
 
   recommendedUsers: any[] = [];
   loading = true;
+  loadingMore = false; // Track loading of additional batches
 
   userData: userCreate | null = null;
   formData: formCreate | null = null;
   isFormComplete: boolean = true;
   showAlert: boolean = false;
 
-  rejectedProfiles: string[] = []; // IDs de perfiles rechazados
-  likedProfiles: string[] = []; // IDs de perfiles con like
+  rejectedProfiles: string[] = [];
+  likedProfiles: string[] = [];
 
   userVisibility: VisibilityType = 'visible';
 
-  // Colecciones para las diferentes carreras
   private carreraCollections = [
     'Informatica',
     'IEME',
@@ -77,6 +77,10 @@ export class SearchComponent {
     'Mecatronica',
     'Ciencias'
   ];
+
+  private batchSize = 5; // Number of profiles to load per batch
+  allPotentialMatches: any[] = []; // Store all potential matches
+  currentBatchIndex = 0; // Track the current batch index
 
   alertButtons = [{
     text: 'Ir',
@@ -87,6 +91,7 @@ export class SearchComponent {
 
   constructor(
     private profileVisibilityService: ProfileVisibilityService,
+    private elementRef: ElementRef
   ) {
     this.profileVisibilityService.getProfileStatus()
       .subscribe((status: { visibility: VisibilityType }) => {
@@ -109,7 +114,6 @@ export class SearchComponent {
       'manana_fines': 'Mañanas en fin de semana',
       'tarde_fines': 'Tardes en fin de semana'
     };
-
     return horarioMap[horario] || horario;
   }
 
@@ -118,7 +122,6 @@ export class SearchComponent {
       try {
         const user = this.auth.currentUser;
         if (user) {
-          // Cargar datos de ambos servicios en paralelo junto con la verificación del formulario
           const [registerData, formData, formCompleted] = await Promise.all([
             this.registerService.getUserData(user.uid),
             this.formService.getFormData(user.uid),
@@ -130,7 +133,6 @@ export class SearchComponent {
           this.isFormComplete = formCompleted;
           this.showAlert = !formCompleted;
 
-          // Suscribirse a los perfiles rechazados
           this.rejectedProfilesService.getRejectedProfiles().subscribe(
             profiles => {
               this.rejectedProfiles = profiles;
@@ -138,7 +140,6 @@ export class SearchComponent {
             }
           );
 
-          // Suscribirse a los perfiles con like
           this.likedProfilesService.getLikedProfiles().subscribe(
             profiles => {
               this.likedProfiles = profiles;
@@ -146,7 +147,6 @@ export class SearchComponent {
             }
           );
 
-          // Cargar recomendaciones solo si el formulario está completo
           if (formCompleted && this.userData && this.formData) {
             await this.loadRecommendationsWithCache();
           }
@@ -161,7 +161,6 @@ export class SearchComponent {
     }, 1000);
   }
 
-  // Función para normalizar el nombre de la carrera como aparece en Firestore
   private normalizeCarreraName(carrera: string): string {
     const carreraMap: { [key: string]: string } = {
       'informatica': 'Informatica',
@@ -171,7 +170,6 @@ export class SearchComponent {
       'mecatronica': 'Mecatronica',
       'ciencias': 'Ciencias'
     };
-
     return carreraMap[carrera.toLowerCase()] || carrera;
   }
 
@@ -184,7 +182,6 @@ export class SearchComponent {
 
     try {
       const chatId = await this.chatService.startChat(currentUser.uid, otherUserId);
-      // Registrar inicio de chat como actividad importante
       this.userActivityService.registerActivity('start_chat');
       if (chatId) {
         this.router.navigate(['/menu/mensajes', chatId]);
@@ -203,7 +200,6 @@ export class SearchComponent {
 
     console.log('🔍 Iniciando loadRecommendationsWithCache...');
 
-    // Parámetros actuales de búsqueda para verificar si el caché es válido
     const queryParams = {
       carrerasBuscadas: this.formData.carrera_buscada || [],
       anioLectivo: this.userData.anioLectivo || ''
@@ -211,43 +207,33 @@ export class SearchComponent {
 
     console.log('🔍 Parámetros de búsqueda:', JSON.stringify(queryParams));
 
-    // Intentar cargar desde caché primero
     console.log('🔍 Intentando cargar desde caché...');
     const cachedLoaded = await this.recommendationCacheService.loadFromCache(queryParams);
 
     if (cachedLoaded) {
       console.log('✅ Recomendaciones cargadas desde caché con éxito');
       this.cachedLoaded = true;
-
-      // Ocultar el spinner de inmediato cuando tenemos caché
       this.loading = false;
 
-      // Suscribirse a las recomendaciones en caché
       this.recommendationCacheService.getCachedRecommendations().subscribe(
         recommendations => {
           console.log(`🔍 Recibidas ${recommendations.length} recomendaciones del caché`);
           if (recommendations && recommendations.length > 0) {
-            this.recommendedUsers = recommendations;
-            console.log('✅ Asignadas recomendaciones del caché a recommendedUsers');
-
-            // Filtrar para eliminar perfiles que ya han sido rechazados o con like
-            const beforeFilterLength = this.recommendedUsers.length;
-            this.recommendedUsers = this.recommendedUsers.filter(
+            this.allPotentialMatches = recommendations.filter(
               match => !this.rejectedProfiles.includes(match.uid) &&
                 !this.likedProfiles.includes(match.uid)
             );
-            console.log(`🔍 Filtrado: ${beforeFilterLength} → ${this.recommendedUsers.length} después de eliminar rechazados/likes`);
+            console.log(`🔍 Filtrado: ${recommendations.length} → ${this.allPotentialMatches.length} después de eliminar rechazados/likes`);
 
-            // Opcionalmente, cargar recomendaciones frescas en segundo plano
-            // solo si hay muy pocas recomendaciones disponibles
-            if (this.recommendedUsers.length < 5) {
+            this.loadNextBatch();
+
+            if (this.allPotentialMatches.length < this.batchSize) {
               console.log('ℹ️ Pocas recomendaciones en caché, cargando más en segundo plano...');
               setTimeout(() => {
                 this.loadRecommendations();
               }, 1000);
             }
           } else {
-            // Si el caché está vacío, cargar normalmente
             console.log('⚠️ Cache vacío, cargando recomendaciones normalmente');
             this.loading = true;
             this.loadRecommendations();
@@ -255,7 +241,6 @@ export class SearchComponent {
         }
       );
     } else {
-      // Si no hay caché válido, cargar normalmente
       console.log('⚠️ No hay caché válido, cargando recomendaciones desde cero...');
       this.loading = true;
       await this.loadRecommendations();
@@ -271,10 +256,9 @@ export class SearchComponent {
         return;
       }
 
-      const allPotentialMatches: any[] = [];
+      this.allPotentialMatches = [];
       const currentUserId = this.auth.currentUser?.uid;
 
-      // Solo proceder si tenemos el año lectivo del usuario actual
       if (!this.userData.anioLectivo) {
         console.error('Falta año lectivo del usuario actual');
         return;
@@ -283,34 +267,26 @@ export class SearchComponent {
       const userAnioLectivo = this.userData.anioLectivo;
       console.log('Año lectivo del usuario actual:', userAnioLectivo);
 
-      // Obtener carreras buscadas por el usuario
       const carrerasBuscadas = this.formData.carrera_buscada || [];
       console.log('Carreras buscadas:', carrerasBuscadas);
 
-      // Si no hay carreras buscadas, no mostrar recomendaciones
       if (carrerasBuscadas.length === 0) {
         console.log('El usuario no ha seleccionado carreras para buscar');
         return;
       }
 
-      // Convertir las carreras buscadas a sus nombres normalizados para la colección
       const collectionsToSearch = carrerasBuscadas.map(carrera => this.normalizeCarreraName(carrera));
       console.log('Colecciones a buscar:', collectionsToSearch);
 
-      // Buscar en cada colección correspondiente a las carreras buscadas
       for (const collectionName of collectionsToSearch) {
         console.log(`Buscando en colección: ${collectionName}`);
         const carreraCollection = collection(this.firestore, collectionName);
-
-        // Obtenemos todos los usuarios que no sean el usuario actual
         const q = query(carreraCollection, where('uid', '!=', currentUserId));
         const querySnapshot = await getDocs(q);
 
         console.log(`Encontrados ${querySnapshot.docs.length} documentos en ${collectionName}`);
 
-        // Para cada usuario en la colección
         for (const docSnap of querySnapshot.docs) {
-          // Obtener la información general del usuario
           const userGeneralDoc = await getDoc(doc(this.firestore, 'usuarios', docSnap.id));
           const userData = userGeneralDoc.data();
 
@@ -321,27 +297,20 @@ export class SearchComponent {
 
           const formCompleted = userData['formCompleted'] ?? false;
 
-          // Solo considerar usuarios que hayan completado el formulario
           if (formCompleted) {
             const userFormData = docSnap.data();
-
-            // Obtener el año lectivo y la carrera
             const otherUserData = await this.registerService.getUserData(docSnap.id);
             const otherUserYear = otherUserData?.anioLectivo;
             const userCarrera = userData['carrera'];
-
-            // Obtener la URL de la imagen de perfil
             const profileImageUrl = userData['profileImageUrl'] || 'icons/logo_tesis.png';
 
             console.log(`Usuario ${userFormData['nombreUsuario'] || 'sin nombre'}, Año: ${otherUserYear}, Carrera: ${userCarrera}`);
 
-            // FILTRO CRÍTICO: Verificar que sean del mismo año lectivo
             if (otherUserYear !== userAnioLectivo) {
               console.log(`Descartando - Año diferente: ${otherUserYear} vs ${userAnioLectivo}`);
               continue;
             }
 
-            // Verificar visibilidad del perfil
             const visibilityRef = doc(this.firestore, 'profileVisibility', docSnap.id);
             const visibilitySnap = await getDoc(visibilityRef);
 
@@ -350,20 +319,18 @@ export class SearchComponent {
               continue;
             }
 
-            // Verificar si el perfil ya ha sido rechazado o dado like
             if (this.rejectedProfiles.includes(docSnap.id) || this.likedProfiles.includes(docSnap.id)) {
               console.log(`Descartando - Perfil rechazado o con like: ${docSnap.id}`);
               continue;
             }
 
-            // Calcular puntuación de compatibilidad con énfasis en habilidades
             const matchDetails = this.calculateDetailedMatchScore(userFormData, userCarrera);
             console.log(`Match score para ${userFormData['nombreUsuario'] || 'sin nombre'}: 
               Total: ${matchDetails.totalScore}, 
               Habilidades: ${matchDetails.skillScore}, 
               Otros: ${matchDetails.otherScore}`);
 
-            allPotentialMatches.push({
+            this.allPotentialMatches.push({
               uid: docSnap.id,
               nombreUsuario: userFormData['nombreUsuario'] || 'Usuario',
               nombre: userFormData['nombre'] || '',
@@ -384,38 +351,25 @@ export class SearchComponent {
         }
       }
 
-      console.log(`Total de matches potenciales: ${allPotentialMatches.length}`);
+      console.log(`Total de matches potenciales: ${this.allPotentialMatches.length}`);
 
-      console.log("Matches potenciales (sin filtrar):", allPotentialMatches.map(u => ({
-        nombre: u.nombreUsuario,
-        anio: u.anioLectivo,
-        carrera: u.carrera,
-        totalScore: u.matchScore,
-        skillScore: u.skillScore
-      })));
+      this.allPotentialMatches.sort((a, b) => {
+        if (b.skillScore !== a.skillScore) {
+          return b.skillScore - a.skillScore;
+        }
+        return b.matchScore - a.matchScore;
+      });
 
-      // Ordenar primero por puntuación de habilidades (mayor a menor) y luego por puntuación total
-      this.recommendedUsers = allPotentialMatches
-        .sort((a, b) => {
-          // Primero ordenar por coincidencia de habilidades
-          if (b.skillScore !== a.skillScore) {
-            return b.skillScore - a.skillScore;
-          }
-          // En caso de empate, usar la puntuación total
-          return b.matchScore - a.matchScore;
-        })
-        .slice(0, 20);
-
-      console.log(`Recomendaciones finales: ${this.recommendedUsers.length}`);
-
-      // Actualizar caché con las recomendaciones
-      if (this.recommendedUsers.length > 0) {
+      if (this.allPotentialMatches.length > 0) {
         const queryParams = {
           carrerasBuscadas: this.formData.carrera_buscada || [],
           anioLectivo: this.userData.anioLectivo || ''
         };
-        await this.recommendationCacheService.cacheRecommendations(this.recommendedUsers, queryParams);
+        await this.recommendationCacheService.cacheRecommendations(this.allPotentialMatches, queryParams);
       }
+
+      this.currentBatchIndex = 0;
+      this.loadNextBatch();
 
     } catch (error) {
       console.error('Error al cargar recomendaciones:', error);
@@ -424,13 +378,38 @@ export class SearchComponent {
     }
   }
 
+  private loadNextBatch() {
+    if (this.currentBatchIndex >= this.allPotentialMatches.length) {
+      console.log('No hay más perfiles para cargar');
+      this.loadingMore = false;
+      return;
+    }
+
+    this.loadingMore = true;
+    const startIndex = this.currentBatchIndex;
+    const endIndex = Math.min(startIndex + this.batchSize, this.allPotentialMatches.length);
+    const newBatch = this.allPotentialMatches.slice(startIndex, endIndex);
+
+    this.recommendedUsers = [...this.recommendedUsers, ...newBatch];
+    this.currentBatchIndex = endIndex;
+
+    console.log(`Cargado lote de ${newBatch.length} perfiles, total cargados: ${this.recommendedUsers.length}`);
+
+    setTimeout(() => {
+      const swiperEl = document.querySelector('swiper-container');
+      if (swiperEl && swiperEl.swiper) {
+        swiperEl.swiper.update();
+      }
+      this.loadingMore = false;
+    }, 100);
+  }
+
   private calculateMatchScore(otherUserData: any, otherUserCarrera: string): number {
     if (!this.formData || !otherUserData) return 0;
 
     let matchScore = 0;
     console.log(`Calculando puntuación para usuario con carrera: ${otherUserCarrera}`);
 
-    // 1. Verificar si la carrera del otro usuario está entre las buscadas por el usuario actual
     const carreraAlias = {
       'Informatica': 'informatica',
       'IEME': 'ieme',
@@ -449,7 +428,6 @@ export class SearchComponent {
       console.log(`Carrera no está entre las buscadas: ${normalizedCarrera}`);
     }
 
-    // 2. Compatibilidad de horarios
     if (this.formData.horario && otherUserData.horario) {
       const commonSchedules = this.formData.horario.filter(
         horario => otherUserData.horario?.includes(horario)
@@ -460,7 +438,6 @@ export class SearchComponent {
       console.log('No se pudo evaluar compatibilidad de horarios');
     }
 
-    // 3. Compatibilidad de método de trabajo
     if (this.formData.metodo && otherUserData.metodo) {
       if (this.formData.metodo === otherUserData.metodo ||
         this.formData.metodo === 'ambos' ||
@@ -474,7 +451,6 @@ export class SearchComponent {
       console.log('No se pudo evaluar compatibilidad de método de trabajo');
     }
 
-    // 4. Compatibilidad de horas
     if (this.formData.horas && otherUserData.horas) {
       if (this.formData.horas === otherUserData.horas ||
         this.formData.horas === 'flexible' ||
@@ -488,7 +464,6 @@ export class SearchComponent {
       console.log('No se pudo evaluar compatibilidad de horas');
     }
 
-    // 5. Evaluar match de habilidades (lo más importante)
     const skillScore = this.evaluateSkillsMatch(otherUserData, otherUserCarrera);
     matchScore += skillScore;
 
@@ -761,7 +736,6 @@ export class SearchComponent {
         }
         break;
 
-
       case 'MCM':
         if (this.formData.habilidad_buscada_seg?.mcm_seg && otherUserData.habilidad_ofrecida_seg?.mcm_seg_of) {
           console.log('Evaluando habilidades de MCM (Segundo)');
@@ -943,13 +917,13 @@ export class SearchComponent {
     console.log('Comenzando operación de actualización');
 
     try {
-      // Reiniciar estados
       this.loading = true;
       this.recommendedUsers = [];
+      this.allPotentialMatches = [];
+      this.currentBatchIndex = 0;
 
       const user = this.auth.currentUser;
       if (user) {
-        // Recargar datos de ambos servicios
         const [registerData, formData, formCompleted] = await Promise.all([
           this.registerService.getUserData(user.uid),
           this.formService.getFormData(user.uid),
@@ -960,11 +934,9 @@ export class SearchComponent {
         this.formData = formData;
         this.isFormComplete = formCompleted;
 
-        // Cargar recomendaciones solo si el formulario está completo
         if (formCompleted && this.userData && this.formData) {
           await this.loadRecommendations();
 
-          // Después de cargar las recomendaciones, reiniciar el swiper a la primera diapositiva
           setTimeout(() => {
             const swiperEl = document.querySelector('swiper-container');
             if (swiperEl && swiperEl.swiper) {
@@ -986,6 +958,11 @@ export class SearchComponent {
   onSlideChange(event: any) {
     const swiperEl = event.target;
     const currentIndex = swiperEl.swiper.realIndex;
+
+    if (currentIndex >= this.recommendedUsers.length - 2 && !this.loadingMore) {
+      console.log('Usuario cerca del final, cargando más perfiles...');
+      this.loadNextBatch();
+    }
 
     if (currentIndex === this.recommendedUsers.length) {
       console.log('Usuario ha llegado al final de las recomendaciones');
@@ -1018,13 +995,14 @@ export class SearchComponent {
       await new Promise(resolve => setTimeout(resolve, 500));
 
       this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
+      this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
 
       if (this.cachedLoaded && this.recommendedUsers.length > 0) {
         const queryParams = {
           carrerasBuscadas: this.formData?.carrera_buscada || [],
           anioLectivo: this.userData?.anioLectivo || ''
         };
-        await this.recommendationCacheService.cacheRecommendations(this.recommendedUsers, queryParams);
+        await this.recommendationCacheService.cacheRecommendations(this.allPotentialMatches, queryParams);
       }
 
       if (this.recommendedUsers.length === 0) {
@@ -1093,13 +1071,14 @@ export class SearchComponent {
       await new Promise(resolve => setTimeout(resolve, 500));
 
       this.recommendedUsers = this.recommendedUsers.filter(u => u.uid !== user.uid);
+      this.allPotentialMatches = this.allPotentialMatches.filter(u => u.uid !== user.uid);
 
       if (this.cachedLoaded && this.recommendedUsers.length > 0) {
         const queryParams = {
           carrerasBuscadas: this.formData?.carrera_buscada || [],
           anioLectivo: this.userData?.anioLectivo || ''
         };
-        await this.recommendationCacheService.cacheRecommendations(this.recommendedUsers, queryParams);
+        await this.recommendationCacheService.cacheRecommendations(this.allPotentialMatches, queryParams);
       }
 
       if (this.recommendedUsers.length === 0) {
@@ -1123,5 +1102,16 @@ export class SearchComponent {
       console.error('Error al dar like al perfil:', error);
       this.presentToast('Error al añadir perfil a guardados', 'danger');
     }
+  }
+
+  ngAfterViewInit() {
+    // Espera un momento para asegurarte de que el DOM está listo
+    setTimeout(() => {
+      // Selecciona solo la primera tarjeta y añade la clase
+      const firstSlide = this.elementRef.nativeElement.querySelector('swiper-slide');
+      if (firstSlide) {
+        firstSlide.classList.add('initial-card');
+      }
+    }, 100);
   }
 }

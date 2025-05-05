@@ -253,3 +253,38 @@
   background-color: var(--ion-color-medium);
   border-radius: 3px;
 }
+
+:host {
+  /* Seleccionamos todos los spinners dentro de este componente */
+  ion-spinner {
+    visibility: visible !important;
+    position: static !important;
+    min-width: initial !important;
+    min-height: initial !important;
+  }
+  
+  /* Eliminamos el pseudo-elemento after que muestra el GIF */
+  ion-spinner::after {
+    content: none !important;
+    display: none !important;
+  }
+  
+  /* Estilos específicos para cada spinner en el componente */
+  .loading-indicator ion-spinner {
+    width: 40px;
+    height: 40px;
+    color: var(--ion-color-medium);
+  }
+  
+  .sending-indicator ion-spinner {
+    width: 14px;
+    height: 14px;
+    color: var(--ion-color-medium-shade);
+  }
+  
+  .send-spinner {
+    width: 24px;
+    height: 24px;
+    color: var(--ion-color-primary-contrast);
+  }
+}

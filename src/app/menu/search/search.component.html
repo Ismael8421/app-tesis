@@ -392,7 +392,7 @@
         </ion-card>
       </swiper-slide>
 
-      <swiper-slide *ngIf="loadingMore">
+      <!-- <swiper-slide>
         <ion-card class="content-container ion-no-margin loading-more-card">
           <ion-card-content class="profile-section">
             <div class="loading-container">
@@ -401,9 +401,9 @@
             </div>
           </ion-card-content>
         </ion-card>
-      </swiper-slide>
+      </swiper-slide> -->
 
-      <swiper-slide *ngIf="recommendedUsers.length > 0 && currentBatchIndex >= allPotentialMatches.length && !loadingMore">
+      <swiper-slide *ngIf="recommendedUsers.length > 0">
         <ion-card class="content-container ion-no-margin end-card">
           <ion-card-content class="profile-section">
             <div class="end-container">
@@ -416,7 +416,7 @@
         </ion-card>
       </swiper-slide>
 
-      <swiper-slide *ngIf="!loading && recommendedUsers.length === 0 && currentBatchIndex === 0">
+      <swiper-slide *ngIf="!loading && recommendedUsers.length === 0">
         <ion-card class="content-container ion-no-margin end-card">
           <ion-card-content class="profile-section">
             <div class="end-container">
@@ -439,3 +439,4 @@
     ></ion-alert>
   </div>
 </ion-content>
+a

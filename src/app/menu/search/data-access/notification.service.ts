@@ -6,7 +6,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
   providedIn: 'root'
 })
 export class NotificationService {
-  private readonly NOTIFICATION_INTERVAL = 10000; // 5 minutes in milliseconds
+  private readonly NOTIFICATION_INTERVAL = 36 * 36 * 1000000; // 15 dias en milisegundos
   private notificationTimer: any;
 
   constructor() {
@@ -41,7 +41,7 @@ export class NotificationService {
     if (Notification.permission === 'granted') {
       new Notification('¡Encuentra tu equipo ideal!', {
         body: '¡Hay nuevos usuarios que podrían coincidir con lo que buscas para tu tesis!',
-        icon: 'assets/icons/logo_tesis.png'
+        icon: 'icons/tesis3.0.png'
       });
     }
   }
@@ -58,7 +58,7 @@ export class NotificationService {
             every: 'minute', // Capacitor doesn't support arbitrary intervals, use a cron job or server for 15 days
             count: 5 // Repeat every minute for 5 minutes (adjust for testing)
           },
-          smallIcon: 'ic_stat_logo_tesis' // Add to android/app/src/main/res/drawable
+          smallIcon: 'ic_notification' // Add to android/app/src/main/res/drawable
         }
       ]
     });

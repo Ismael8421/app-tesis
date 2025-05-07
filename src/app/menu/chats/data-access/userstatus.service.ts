@@ -1,121 +1,94 @@
-import { Injectable, OnDestroy } from '@angular/core';
+// userstatus.service.ts
+import { Injectable } from '@angular/core';
+import { Database, ref, set, onDisconnect, onValue } from '@angular/fire/database';
 import { Auth } from '@angular/fire/auth';
-import { Database, ref, set, onDisconnect, serverTimestamp } from '@angular/fire/database';
-import { Router, NavigationEnd } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
-import { App } from '@capacitor/app';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { NetworkService } from './network.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserStatusService implements OnDestroy {
-  private currentChatId: string | null = null;
-  private routerSubscription: Subscription;
-  private appStateSubscription: any;
+export class UserStatusService {
+  private statusRef: any;
+  private _otherUserStatus = new BehaviorSubject<string>('offline');
+  otherUserStatus$ = this._otherUserStatus.asObservable();
 
   constructor(
-    private auth: Auth,
     private db: Database,
-    private router: Router
+    private auth: Auth,
+    private networkService: NetworkService
   ) {
-    // Monitorear cambios de ruta para detectar cuando el usuario entra/sale de un chat
-    this.routerSubscription = this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      this.handleRouteChange(event.url);
-    });
-
-    // Monitorear estado de la aplicación
-    this.setupAppStateListener();
-
-    // Inicializar el estado cuando se carga el servicio
-    this.updateOnlineStatus();
+    this.initStatus();
   }
 
-  ngOnDestroy() {
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
-    }
-    
-    if (this.appStateSubscription) {
-      this.appStateSubscription.remove();
-    }
-    
-    // Asegurarse de que el usuario aparezca como offline al cerrar
-    this.setUserOffline();
-  }
+  private initStatus() {
+    this.auth.onAuthStateChanged(user => {
+      if (user) {
+        // Use the userStatus path from your database structure
+        this.statusRef = ref(this.db, `userStatus/${user.uid}`);
+        
+        // Set online status when connected
+        this.networkService.isOnline$.subscribe(isOnline => {
+          if (isOnline) {
+            this.setOnline();
+          } else {
+            this.setOffline();
+          }
+        });
 
-  private async setupAppStateListener() {
-    // Detectar cuando la app pasa a segundo plano o vuelve al primer plano
-    this.appStateSubscription = await App.addListener('appStateChange', ({ isActive }) => {
-      if (isActive) {
-        // La app volvió al primer plano
-        this.updateOnlineStatus();
-      } else {
-        // La app pasó a segundo plano
-        this.setUserOffline();
+        // Set offline status when the user disconnects
+        onDisconnect(this.statusRef).set({
+          state: 'offline',
+          last_changed: Date.now()
+        }).catch(error => {
+          console.error('Error setting onDisconnect:', error);
+        });
+
+        // Set initial status
+        this.refreshStatus();
       }
     });
   }
 
-  private handleRouteChange(url: string) {
-    // Detectar si el usuario está en un chat
-    const chatMatch = url.match(/\/menu\/mensajes\/([^\/]+)/);
-    if (chatMatch && chatMatch[1]) {
-      this.currentChatId = chatMatch[1];
-    } else {
-      this.currentChatId = null;
-    }
-    
-    // Actualizar el estado en Firebase
-    this.updateOnlineStatus();
-  }
-
-  private async updateOnlineStatus() {
-    const user = this.auth.currentUser;
-    if (!user) return;
-
-    try {
-      const statusRef = ref(this.db, `userStatus/${user.uid}`);
-      const status = {
-        status: 'online',
-        lastSeen: serverTimestamp(),
-        currentChatId: this.currentChatId
-      };
-
-      // Establecer el estado como 'online'
-      await set(statusRef, status);
-
-      // Configurar automáticamente como 'offline' cuando se desconecte
-      await onDisconnect(statusRef).update({
-        status: 'offline',
-        lastSeen: serverTimestamp(),
-        currentChatId: null
-      });
-    } catch (error) {
-      console.error('Error updating online status:', error);
+  setOnline() {
+    if (this.statusRef) {
+      set(this.statusRef, {
+        state: 'online',
+        last_changed: Date.now()
+      }).catch(error => console.error('Error setting online status:', error));
     }
   }
 
-  private async setUserOffline() {
-    const user = this.auth.currentUser;
-    if (!user) return;
-
-    try {
-      const statusRef = ref(this.db, `userStatus/${user.uid}`);
-      await set(statusRef, {
-        status: 'offline',
-        lastSeen: serverTimestamp(),
-        currentChatId: null
-      });
-    } catch (error) {
-      console.error('Error setting user offline:', error);
+  setOffline() {
+    if (this.statusRef) {
+      set(this.statusRef, {
+        state: 'offline',
+        last_changed: Date.now()
+      }).catch(error => console.error('Error setting offline status:', error));
     }
   }
 
-  // Método público para actualizar manualmente el estado
-  public async refreshStatus() {
-    await this.updateOnlineStatus();
+  refreshStatus() {
+    this.networkService.checkConnectionNow().then(isOnline => {
+      if (isOnline) {
+        this.setOnline();
+      } else {
+        this.setOffline();
+      }
+    });
+  }
+
+  // Monitor another user's status
+  monitorUserStatus(userId: string): Observable<string> {
+    const userStatusRef = ref(this.db, `userStatus/${userId}`);
+    onValue(userStatusRef, (snapshot) => {
+      const data = snapshot.val();
+      const status = data?.state || 'offline';
+      this._otherUserStatus.next(status);
+    }, error => {
+      console.error('Error monitoring user status:', error);
+      this._otherUserStatus.next('offline');
+    });
+    return this.otherUserStatus$;
   }
 }

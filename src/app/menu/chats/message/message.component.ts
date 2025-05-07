@@ -62,6 +62,8 @@ export class MessageComponent implements OnInit, OnDestroy {
   isSending: boolean = false;
   isDarkMode: boolean = false;
 
+  otherUserStatus$: Observable<string>;
+
   constructor() {
     const chatId = this.route.snapshot.paramMap.get('id') || '';
 
@@ -75,11 +77,13 @@ export class MessageComponent implements OnInit, OnDestroy {
         if (!otherUserId) return { chat, otherUserName: 'Usuario' };
     
         try {
-          // Intentar obtener datos del usuario de la caché primero
+          // Initialize other user's status monitoring
+          this.otherUserStatus$ = this.userStatusService.monitorUserStatus(otherUserId);
+
+          // ... existing code for user name and profile image ...
+          
           const cachedNames = await this.storageService.getUserNames();
           const cachedName = cachedNames[otherUserId];
-          
-          // Obtener la imagen de perfil
           this.userProfileService.getProfileImageUrl(otherUserId).subscribe(imageUrl => {
             this.otherUserProfileImage = imageUrl;
           });
@@ -88,11 +92,9 @@ export class MessageComponent implements OnInit, OnDestroy {
             return { chat, otherUserName: cachedName };
           }
           
-          // Si no está en caché, obtener de Firebase
           const userData = await this.registerService.getUserData(otherUserId);
           const otherUserName = userData ? userData.nombreUsuario || 'Usuario' : 'Usuario';
           
-          // Guardar en caché
           if (otherUserName && otherUserName !== 'Usuario') {
             const namesUpdate = { [otherUserId]: otherUserName };
             await this.storageService.saveUserNames(namesUpdate);
@@ -112,32 +114,47 @@ export class MessageComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.updateDarkModeStatus();
       });
+
+      this.otherUserStatus$ = this.chatData$.pipe(
+        switchMap(chatData => {
+          if (this.otherUserId) {
+            return this.userStatusService.monitorUserStatus(this.otherUserId);
+          }
+          return of('offline');
+        })
+      );
   }
 
   ngOnInit() {
     // Inicializar el estado del tema
     this.updateDarkModeStatus();
-  
+
     // Suscribirse a cambios en la conectividad
     this.subscriptions.push(
       this.networkService.isOnline$.subscribe(isOnline => {
         this.isOnline = isOnline;
       })
     );
-  
+
+    this.subscriptions.push(
+      this.otherUserStatus$.subscribe(status => {
+        this.isOnline = status === 'online';
+      })
+    );
+
     if (!this.currentUser) {
       this.router.navigate(['/login']);
       return;
     }
-  
+
     const chatId = this.getChatId();
-  
+
     // Actualizar el estado del usuario para indicar que está activo en este chat
     this.userStatusService.refreshStatus();
-  
+
     // Cargar mensajes iniciales y suscribirse a actualizaciones
     this.loadMessages();
-  
+
     // Suscribirse a eventos de mensajes nuevos
     this.subscriptions.push(
       this.chatService.messageAddedEvent$
@@ -146,15 +163,15 @@ export class MessageComponent implements OnInit, OnDestroy {
           // Comprobar si el mensaje ya está en la lista
           const currentMessages = this.allMessages.value;
           const messageExists = currentMessages.some(m => m.id === event.message.id);
-  
+
           if (!messageExists) {
             // Añadir el nuevo mensaje a la lista
             const updatedMessages = [...currentMessages, event.message];
             this.allMessages.next(updatedMessages);
-  
+
             // Desplazar al final
             setTimeout(() => this.scrollToBottom(), 100);
-            
+
             // Marcar mensajes como leídos inmediatamente si estamos en el chat
             if (document.hasFocus() && this.isOnline) {
               this.markMessagesAsRead();
@@ -162,21 +179,21 @@ export class MessageComponent implements OnInit, OnDestroy {
           }
         })
     );
-  
+
     // Configurar un intervalo para marcar mensajes como leídos periódicamente
     this.markAsReadInterval = setInterval(() => {
       if (document.hasFocus() && this.isOnline) {
         this.markMessagesAsRead();
       }
     }, 2000);
-  
+
     // Marcar mensajes como leídos al entrar al chat - múltiples intentos
     // Primer intento inmediato
     this.markMessagesAsRead();
-    
+
     // Segundo intento después de 500ms
     setTimeout(() => this.markMessagesAsRead(), 500);
-    
+
     // Tercer intento después de la carga de mensajes (normalmente 1-2 segundos)
     setTimeout(() => this.markMessagesAsRead(), 2000);
   }
@@ -184,20 +201,20 @@ export class MessageComponent implements OnInit, OnDestroy {
   // Cargar mensajes iniciales
   private loadMessages() {
     const chatId = this.getChatId();
-  
+
     // Mostrar carga
     this.isLoading = true;
-  
+
     // Suscribirse a los mensajes
     this.subscriptions.push(
       this.chatService.getMessages(chatId).subscribe({
         next: (messages) => {
           this.isLoading = false;
           this.allMessages.next(messages);
-  
+
           // Desplazar al final después de cargar mensajes
           setTimeout(() => this.scrollToBottom(), 100);
-  
+
           // Marcar mensajes como leídos después de cargar
           if (this.isOnline && this.currentUser) {
             setTimeout(() => this.markMessagesAsRead(), 300);
@@ -242,15 +259,15 @@ export class MessageComponent implements OnInit, OnDestroy {
 
   private async markMessagesAsRead() {
     if (!this.currentUser || !this.isOnline) return;
-  
+
     const chatId = this.getChatId();
     try {
       console.log('Marcando mensajes como leídos al entrar/interactuar con el chat');
       await this.chatService.markMessagesAsRead(chatId, this.currentUser.uid);
-      
+
       // Forzar actualización de UI para reflejar cambios inmediatamente
       this.chatService.forceRefreshChats();
-      
+
       // Forzar refrescar mensajes también
       this.chatService.forceRefreshMessages();
     } catch (error) {

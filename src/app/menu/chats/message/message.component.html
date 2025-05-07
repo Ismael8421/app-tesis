@@ -14,7 +14,7 @@
     
         <ion-title class="title-container" *ngIf="chatData$ | async as chatData">
           <h1>{{ chatData.otherUserName }}</h1>
-          <!-- <h2>{{ isOnline ? 'En línea' : 'Sin conexión' }}</h2> -->
+          <h2>{{ isOnline ? 'En línea' : 'Desconectado' }}</h2>
         </ion-title>
     
         <ion-avatar slot="end" class="avatar">
@@ -25,10 +25,10 @@
     </ion-header>
 
     <!-- Indicador de estado de red -->
-    <div *ngIf="!isOnline" class="network-status offline">
+    <!-- <div *ngIf="!isOnline" class="network-status offline">
       <ion-icon name="cloud-offline"></ion-icon>
       Sin conexión - Mostrando mensajes almacenados
-    </div>
+    </div> -->
 
     <div class="messages">
       <div class="messages-content" #scrollContainer>
@@ -69,11 +69,11 @@
                  placeholder="Enviar mensaje" 
                  class="message-input"
                  (keyup.enter)="enviar_mensaje()"
-                 [disabled]="!isOnline || isSending"></ion-input>
+                 [disabled]="isSending"></ion-input>
 
       <ion-button (click)="enviar_mensaje()" 
                   class="message-submit"
-                  [disabled]="!mensaje.trim() || !isOnline || isSending">
+                  [disabled]="!mensaje.trim() || isSending">
         <ion-spinner *ngIf="isSending" name="dots" class="send-spinner"></ion-spinner>
         <span *ngIf="!isSending">Enviar</span>
       </ion-button>

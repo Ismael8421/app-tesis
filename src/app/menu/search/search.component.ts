@@ -19,6 +19,7 @@ import { LikedProfilesService } from './data-access/iked-profiles.service';
 import { ProfileVisibilityService, VisibilityType } from './data-access/profile-visibility.service';
 import { UserActivityService } from '../shared/data-access/user-activity.service';
 import { RecommendationCacheService } from './data-access/recommendation-cache.service';
+import { NotificationService } from './data-access/notification.service';
 
 register();
 
@@ -54,6 +55,7 @@ export class SearchComponent {
   private userActivityService = inject(UserActivityService);
   private recommendationCacheService = inject(RecommendationCacheService);
   private cachedLoaded = false;
+  private notificationService = inject(NotificationService);
 
   recommendedUsers: any[] = [];
   loading = true;
@@ -159,6 +161,12 @@ export class SearchComponent {
         this.loading = false;
       }
     }, 1000);
+
+    this.notificationService.startPeriodicNotifications();
+  }
+
+  ngOnDestroy() {
+    this.notificationService.stopPeriodicNotifications();
   }
 
   // Función para normalizar el nombre de la carrera como aparece en Firestore

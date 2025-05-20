@@ -282,12 +282,6 @@ export class MessageComponent implements OnInit, OnDestroy {
   async enviar_mensaje() {
     if (!this.mensaje.trim() || !this.currentUser) return;
 
-    // Si no hay conexión, mostrar mensaje
-    if (!this.isOnline) {
-      alert('No tienes conexión a Internet. No es posible enviar mensajes sin conexión.');
-      return;
-    }
-
     // Guardar el texto del mensaje
     const mensajeTexto = this.mensaje.trim();
 

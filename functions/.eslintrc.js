@@ -29,8 +29,5 @@ module.exports = {
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
     "indent": ["error", 2],
-    // Reglas adicionales para solucionar tus problemas de linting
-    "max-len": ["error", {"code": 120}], // Aumentar longitud máxima de línea a 120
-    "@typescript-eslint/no-explicit-any": "warn", // Convertir el error de 'any' en una advertencia
   },
 };
